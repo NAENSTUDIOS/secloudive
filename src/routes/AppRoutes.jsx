@@ -16,6 +16,7 @@ const InternshipSimulator = lazy(() => import('../pages/InternshipSimulator'))
 const InvestigationSimulator = lazy(() => import('../pages/InvestigationSimulator'))
 const RealLabs = lazy(() => import('../pages/RealLabs'))
 const JobPlaybookEngine = lazy(() => import('../pages/JobPlaybookEngine'))
+const CloudProjects = lazy(() => import('../pages/CloudProjects'))
 const CareerRoadmap = lazy(() => import('../components/CareerRoadmap'))
 const TimelineSummary = lazy(() => import('../components/AttackTimeline').then(m => ({ default: m.TimelineSummary })))
 
@@ -45,6 +46,8 @@ export default function AppRoutes() {
         <Route path="/labs/:id" element={<RealLabs />} />
         <Route path="/playbooks" element={<JobPlaybookEngine />} />
         <Route path="/playbooks/:id" element={<JobPlaybookEngine />} />
+        <Route path="/projects" element={<CloudProjects />} />
+        <Route path="/projects/:id" element={<CloudProjects />} />
         <Route path="/categories" element={<Categories />} />
         <Route path="/architecture-reviews" element={<ArchitectureRoute />} />
         <Route path="/internship-simulator" element={<SimulatorRoute />} />

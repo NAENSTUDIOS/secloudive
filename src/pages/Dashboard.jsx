@@ -7,7 +7,7 @@ import SecurityMaturityAssessment from '../components/SecurityMaturityAssessment
 import { useChallenges } from '../context/ChallengeContext'
 
 import JobProcessFramework from '../components/JobProcessFramework'
-import { Terminal, Code2 } from 'lucide-react'
+import { Terminal, Code2, FolderGit2 } from 'lucide-react'
 
 const studyAreas = [
   { key: 'iam', label: 'IAM Security', description: 'Policies, privilege boundaries, and trust relationships' },
@@ -257,6 +257,47 @@ export default function Dashboard() {
           </Link>
           <Link to="/playbooks" className="flagship-view-all-link">
             Explore 7-step playbooks & query logs &rarr;
+          </Link>
+        </div>
+      </section>
+
+      {/* 100% Free-Tier Capstone Projects Banner */}
+      <section className="flagship-simulator-banner" style={{ background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(15, 23, 42, 0.8) 100%)', borderColor: 'rgba(16, 185, 129, 0.25)' }}>
+        <div className="flagship-banner-copy">
+          <div className="eyebrow">
+            <span className="pulse-dot" style={{ backgroundColor: 'var(--green, #10b981)' }} /> 100% FREE TIER GUARANTEE /// 4 RESUME-READY CAPSTONE PROJECTS
+          </div>
+          <h2>Cloud Security Capstone Projects ($0 AWS Cost Guarantee)</h2>
+          <p>
+            Build and showcase high-impact enterprise security tools in your personal AWS account without paying a dime. Includes automated $0.01 AWS budget alarms, click-by-click tear-down runbooks, and ready-to-paste resume impact statements.
+          </p>
+          <div className="flagship-banner-stats">
+            <div className="flagship-stat">
+              <span>ESTIMATED AWS COST</span>
+              <strong style={{ color: 'var(--green, #4ade80)' }}>$0.00 (Free Tier)</strong>
+            </div>
+            <div className="flagship-stat">
+              <span>RESUME IMPACT</span>
+              <strong>STAR Interview Ready</strong>
+            </div>
+            <div className="flagship-stat">
+              <span>TEAR-DOWN SAFETY</span>
+              <strong>1-Click CLI Teardown</strong>
+            </div>
+          </div>
+        </div>
+        <div className="flagship-banner-action">
+          <Link
+            className="button button-primary btn-large"
+            to="/projects"
+            style={{ background: 'linear-gradient(135deg, #059669 0%, #047857 100%)' }}
+          >
+            <FolderGit2 size={18} />
+            <span>Launch Capstone Projects</span>
+            <ArrowRight size={17} />
+          </Link>
+          <Link to="/projects" className="flagship-view-all-link">
+            View 4 Free-Tier Projects & Safety Setup &rarr;
           </Link>
         </div>
       </section>
