@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import allChallenges from '../data/index.js'
 import threatScenarios from '../data/threatScenarios.js'
 import { investigations, investigationCategories } from '../data/investigations.js'
+import { realLabs, jobProcessStages, jobRoles } from '../data/jobLabs.js'
 
 const STORAGE_KEY = 'secloudive-progress-v1'
 const ChallengeContext = createContext(null)
@@ -15,7 +16,8 @@ function readProgress() {
       architectureScores: raw.architectureScores || {},
       simulatorScores: raw.simulatorScores || {},
       investigationScores: raw.investigationScores || {},
-      investigationAssessments: raw.investigationAssessments || {}
+      investigationAssessments: raw.investigationAssessments || {},
+      labSteps: raw.labSteps || {}
     }
   } catch {
     return {
@@ -24,7 +26,8 @@ function readProgress() {
       architectureScores: {},
       simulatorScores: {},
       investigationScores: {},
-      investigationAssessments: {}
+      investigationAssessments: {},
+      labSteps: {}
     }
   }
 }
@@ -113,6 +116,30 @@ export function ChallengeProvider({ children }) {
     return totalInvestigationScore
   }
 
+  const toggleLabStep = (labId, stepId) => {
+    setProgress(current => {
+      const existing = current.labSteps?.[labId] || []
+      const updated = existing.includes(stepId)
+        ? existing.filter(id => id !== stepId)
+        : [...existing, stepId]
+      return {
+        ...current,
+        labSteps: {
+          ...current.labSteps,
+          [labId]: updated
+        }
+      }
+    })
+  }
+
+  const resetLabProgress = labId => {
+    setProgress(current => {
+      const copy = { ...(current.labSteps || {}) }
+      delete copy[labId]
+      return { ...current, labSteps: copy }
+    })
+  }
+
   const resetProgress = () =>
     setProgress({
       answers: {},
@@ -120,13 +147,31 @@ export function ChallengeProvider({ children }) {
       architectureScores: {},
       simulatorScores: {},
       investigationScores: {},
-      investigationAssessments: {}
+      investigationAssessments: {},
+      labSteps: {}
     })
 
   const completedCount = Object.values(progress.completed).filter(Boolean).length
   const architectureReviewedCount = Object.keys(progress.architectureScores || {}).length
   const simulatorCompletedCount = Object.keys(progress.simulatorScores || {}).length
   const investigationCompletedCount = Object.keys(progress.investigationScores || {}).length
+
+  // Calculate completed labs (labs where all steps are marked complete)
+  const completedLabsCount = useMemo(() => {
+    let count = 0
+    realLabs.forEach(lab => {
+      const completedSteps = progress.labSteps?.[lab.id] || []
+      if (completedSteps.length === lab.steps.length) {
+        count += 1
+      }
+    })
+    return count
+  }, [progress.labSteps])
+
+  // Total completed lab steps across all labs
+  const completedLabStepsCount = useMemo(() => {
+    return Object.values(progress.labSteps || {}).reduce((sum, arr) => sum + (arr?.length || 0), 0)
+  }, [progress.labSteps])
 
   // Categorical investigation completion tracking
   const investigationCategoryCounts = useMemo(() => {
@@ -169,16 +214,23 @@ export function ChallengeProvider({ children }) {
       threatScenarios,
       investigations,
       investigationCategories,
+      realLabs,
+      jobProcessStages,
+      jobRoles,
       progress,
       submitAnswer,
       submitArchitectureReview,
       submitSimulatorInvestigation,
       submitInvestigation,
+      toggleLabStep,
+      resetLabProgress,
       resetProgress,
       completedCount,
       architectureReviewedCount,
       simulatorCompletedCount,
       investigationCompletedCount,
+      completedLabsCount,
+      completedLabStepsCount,
       investigationCategoryCounts,
       investigationAverageScore,
       internshipReadiness,
@@ -191,6 +243,8 @@ export function ChallengeProvider({ children }) {
       architectureReviewedCount,
       simulatorCompletedCount,
       investigationCompletedCount,
+      completedLabsCount,
+      completedLabStepsCount,
       investigationCategoryCounts,
       investigationAverageScore,
       internshipReadiness,

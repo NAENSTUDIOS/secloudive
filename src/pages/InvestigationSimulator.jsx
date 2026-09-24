@@ -27,7 +27,9 @@ import {
   Printer,
   Crosshair,
   Zap,
-  Radio
+  Radio,
+  Briefcase,
+  Circle
 } from 'lucide-react'
 import { useChallenges } from '../context/ChallengeContext'
 import EvidenceViewer from '../components/EvidenceViewer'
@@ -56,7 +58,8 @@ export default function InvestigationSimulator() {
   const [selectedFindingIds, setSelectedFindingIds] = useState([])
   const [assessedSeverity, setAssessedSeverity] = useState('')
   const [selectedContainmentId, setSelectedContainmentId] = useState('')
-  const [evidenceMode, setEvidenceMode] = useState('artifacts') // 'artifacts' | 'terminal'
+  const [evidenceMode, setEvidenceMode] = useState('artifacts') // 'artifacts' | 'terminal' | 'runbook'
+  const [completedRunbookSteps, setCompletedRunbookSteps] = useState([])
   const [showDossier, setShowDossier] = useState(false)
   const [submissionResult, setSubmissionResult] = useState(null)
 
@@ -397,13 +400,192 @@ Report digitally signed by SeCloudive SOC Incident Response Simulator
                 <Terminal size={13} />
                 <span>AWS CloudShell CLI (Live)</span>
               </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={evidenceMode === 'runbook'}
+                className={`evidence-mode-tab ${evidenceMode === 'runbook' ? 'active' : ''}`}
+                onClick={() => setEvidenceMode('runbook')}
+              >
+                <Briefcase size={13} />
+                <span>Job SOP Runbook (Step-by-Step)</span>
+              </button>
             </div>
           </div>
 
           {evidenceMode === 'artifacts' ? (
             <EvidenceViewer evidenceList={activeInvestigation.evidence} />
-          ) : (
+          ) : evidenceMode === 'terminal' ? (
             <InteractiveTerminal investigation={activeInvestigation} />
+          ) : (
+            <div className="incident-runbook-container animate-reveal">
+              <div className="runbook-lead-banner">
+                <div className="lead-role-meta">
+                  <Briefcase size={14} className="text-cyan" />
+                  <strong>Standard Operating Procedure (SOP) & Hands-on Job Guide</strong>
+                </div>
+                <p className="lead-role-desc">
+                  Follow the exact 5-phase triage process used by Tier-2/Tier-3 Cloud Security Engineers.
+                  Execute each command, verify the forensic telemetry, and check off each step as you proceed.
+                </p>
+              </div>
+
+              <div className="runbook-steps-timeline">
+                {/* Step 1: Pre-Flight Scoping */}
+                <div className={`runbook-step-card ${completedRunbookSteps.includes('step-1') ? 'is-complete' : ''}`}>
+                  <div className="rb-step-header">
+                    <div className="rb-step-num-pill">
+                      {completedRunbookSteps.includes('step-1') ? <CheckCircle2 size={13} className="text-emerald" /> : 'STEP 01'}
+                    </div>
+                    <h4>Pre-Flight Scoping & Caller Identity Verification</h4>
+                    <button
+                      type="button"
+                      className="rb-complete-toggle"
+                      onClick={() => setCompletedRunbookSteps(prev => prev.includes('step-1') ? prev.filter(s => s !== 'step-1') : [...prev, 'step-1'])}
+                    >
+                      {completedRunbookSteps.includes('step-1') ? <CheckCircle2 size={16} className="text-emerald" /> : <Circle size={16} />}
+                      <span>{completedRunbookSteps.includes('step-1') ? 'Completed' : 'Mark Done'}</span>
+                    </button>
+                  </div>
+                  <p className="rb-step-context">
+                    Always establish your caller identity and security session boundary before touching any production infrastructure.
+                  </p>
+                  <div className="rb-command-box">
+                    <code>aws sts get-caller-identity</code>
+                    <button
+                      type="button"
+                      className="rb-run-btn"
+                      onClick={() => setEvidenceMode('terminal')}
+                      title="Switch to CloudShell to run this query"
+                    >
+                      <Play size={10} />
+                      <span>Run in CloudShell</span>
+                    </button>
+                  </div>
+                  <div className="rb-console-hint">
+                    <strong>Console Alternative:</strong> AWS Management Console &gt; Top Navigation Bar &gt; Verify Account ID &amp; IAM Role: <code>SecOps-IncidentResponder</code>
+                  </div>
+                </div>
+
+                {/* Step 2: Extract Configuration & Policy Telemetry */}
+                <div className={`runbook-step-card ${completedRunbookSteps.includes('step-2') ? 'is-complete' : ''}`}>
+                  <div className="rb-step-header">
+                    <div className="rb-step-num-pill">
+                      {completedRunbookSteps.includes('step-2') ? <CheckCircle2 size={13} className="text-emerald" /> : 'STEP 02'}
+                    </div>
+                    <h4>Extract Live Configuration & Policy Artifacts</h4>
+                    <button
+                      type="button"
+                      className="rb-complete-toggle"
+                      onClick={() => setCompletedRunbookSteps(prev => prev.includes('step-2') ? prev.filter(s => s !== 'step-2') : [...prev, 'step-2'])}
+                    >
+                      {completedRunbookSteps.includes('step-2') ? <CheckCircle2 size={16} className="text-emerald" /> : <Circle size={16} />}
+                      <span>{completedRunbookSteps.includes('step-2') ? 'Completed' : 'Mark Done'}</span>
+                    </button>
+                  </div>
+                  <p className="rb-step-context">
+                    Pull the live JSON configuration to inspect whether wildcards (<code>*</code>), open CIDRs (<code>0.0.0.0/0</code>), or public flags are present.
+                  </p>
+                  <div className="rb-command-box">
+                    <code>{activeInvestigation.terminalCommands?.[0]?.cmd || `aws iam get-role-policy --role-name ${activeInvestigation.ticket.toLowerCase()}-role`}</code>
+                    <button
+                      type="button"
+                      className="rb-run-btn"
+                      onClick={() => setEvidenceMode('terminal')}
+                      title="Switch to CloudShell to run this query"
+                    >
+                      <Play size={10} />
+                      <span>Run in CloudShell</span>
+                    </button>
+                  </div>
+                  <div className="rb-console-hint">
+                    <strong>Inspect Artifacts:</strong> Switch to the <em>Evidence Artifacts</em> tab above to view the complete {activeInvestigation.evidence?.length || 2} configuration files extracted from this system.
+                  </div>
+                </div>
+
+                {/* Step 3: CloudTrail Forensic Log Hunting */}
+                <div className={`runbook-step-card ${completedRunbookSteps.includes('step-3') ? 'is-complete' : ''}`}>
+                  <div className="rb-step-header">
+                    <div className="rb-step-num-pill">
+                      {completedRunbookSteps.includes('step-3') ? <CheckCircle2 size={13} className="text-emerald" /> : 'STEP 03'}
+                    </div>
+                    <h4>Correlate CloudTrail API Activity & Source IPs</h4>
+                    <button
+                      type="button"
+                      className="rb-complete-toggle"
+                      onClick={() => setCompletedRunbookSteps(prev => prev.includes('step-3') ? prev.filter(s => s !== 'step-3') : [...prev, 'step-3'])}
+                    >
+                      {completedRunbookSteps.includes('step-3') ? <CheckCircle2 size={16} className="text-emerald" /> : <Circle size={16} />}
+                      <span>{completedRunbookSteps.includes('step-3') ? 'Completed' : 'Mark Done'}</span>
+                    </button>
+                  </div>
+                  <p className="rb-step-context">
+                    Query CloudTrail event history to identify which principal executed the suspicious action, their source IP address, and user agent.
+                  </p>
+                  <div className="rb-command-box">
+                    <code>{activeInvestigation.terminalCommands?.[1]?.cmd || 'aws cloudtrail lookup-events --max-results 5'}</code>
+                    <button
+                      type="button"
+                      className="rb-run-btn"
+                      onClick={() => setEvidenceMode('terminal')}
+                      title="Switch to CloudShell to run this query"
+                    >
+                      <Play size={10} />
+                      <span>Run in CloudShell</span>
+                    </button>
+                  </div>
+                  <div className="rb-interview-tip-hint">
+                    <strong>Senior Pro-Tip:</strong> Correlate the <code>sourceIPAddress</code> against your corporate VPN and AWS NAT Gateway egress IPs to distinguish attacker sessions from internal engineers.
+                  </div>
+                </div>
+
+                {/* Step 4: Minute-0 Tactical Containment Action */}
+                <div className={`runbook-step-card ${completedRunbookSteps.includes('step-4') ? 'is-complete' : ''}`}>
+                  <div className="rb-step-header">
+                    <div className="rb-step-num-pill">
+                      {completedRunbookSteps.includes('step-4') ? <CheckCircle2 size={13} className="text-emerald" /> : 'STEP 04'}
+                    </div>
+                    <h4>Execute Minute-0 Tactical Containment (Zero Evidence Loss)</h4>
+                    <button
+                      type="button"
+                      className="rb-complete-toggle"
+                      onClick={() => setCompletedRunbookSteps(prev => prev.includes('step-4') ? prev.filter(s => s !== 'step-4') : [...prev, 'step-4'])}
+                    >
+                      {completedRunbookSteps.includes('step-4') ? <CheckCircle2 size={16} className="text-emerald" /> : <Circle size={16} />}
+                      <span>{completedRunbookSteps.includes('step-4') ? 'Completed' : 'Mark Done'}</span>
+                    </button>
+                  </div>
+                  <p className="rb-step-context">
+                    Apply immediate isolation to stop attacker lateral movement. Scroll to the <strong>Tactical Containment Protocol</strong> section below to select and execute the optimal minute-0 procedure.
+                  </p>
+                  <div className="rb-pitfall-alert">
+                    <AlertTriangle size={13} className="text-rose" />
+                    <span><strong>Critical Pitfall:</strong> Do not delete the IAM user or EC2 instance! Deleting resources erases ephemeral audit logs and destroys forensic evidence needed for compliance reporting.</span>
+                  </div>
+                </div>
+
+                {/* Step 5: Complete Triage & Submit Post-Mortem */}
+                <div className={`runbook-step-card ${completedRunbookSteps.includes('step-5') ? 'is-complete' : ''}`}>
+                  <div className="rb-step-header">
+                    <div className="rb-step-num-pill">
+                      {completedRunbookSteps.includes('step-5') ? <CheckCircle2 size={13} className="text-emerald" /> : 'STEP 05'}
+                    </div>
+                    <h4>Confirm Findings, Assign Severity & Close Ticket</h4>
+                    <button
+                      type="button"
+                      className="rb-complete-toggle"
+                      onClick={() => setCompletedRunbookSteps(prev => prev.includes('step-5') ? prev.filter(s => s !== 'step-5') : [...prev, 'step-5'])}
+                    >
+                      {completedRunbookSteps.includes('step-5') ? <CheckCircle2 size={16} className="text-emerald" /> : <Circle size={16} />}
+                      <span>{completedRunbookSteps.includes('step-5') ? 'Completed' : 'Mark Done'}</span>
+                    </button>
+                  </div>
+                  <p className="rb-step-context">
+                    Select confirmed vulnerabilities in the checklist below, assign the incident severity rating, and submit the dossier to unlock the Tier-3 Root Cause Analysis (RCA) and export the Post-Mortem.
+                  </p>
+                </div>
+              </div>
+            </div>
           )}
         </section>
 

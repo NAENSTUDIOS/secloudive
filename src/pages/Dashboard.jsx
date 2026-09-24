@@ -6,6 +6,9 @@ import ChallengeCard from '../components/ChallengeCard'
 import SecurityMaturityAssessment from '../components/SecurityMaturityAssessment'
 import { useChallenges } from '../context/ChallengeContext'
 
+import JobProcessFramework from '../components/JobProcessFramework'
+import { Terminal, Code2 } from 'lucide-react'
+
 const studyAreas = [
   { key: 'iam', label: 'IAM Security', description: 'Policies, privilege boundaries, and trust relationships' },
   { key: 's3', label: 'S3 Data Security', description: 'Bucket protection, KMS encryption, and access policies' },
@@ -28,6 +31,9 @@ export default function Dashboard() {
     investigationCompletedCount,
     investigationAverageScore,
     internshipReadiness,
+    realLabs,
+    completedLabsCount,
+    completedLabStepsCount,
   } = useChallenges()
 
   const next = challenges.find(challenge => !progress.completed[challenge.id]) || challenges[0]
@@ -168,6 +174,51 @@ export default function Dashboard() {
           </Link>
         </div>
       </section>
+
+      {/* Real Hands-On Labs & 6-Stage SOP Framework Banner */}
+      <section className="flagship-simulator-banner" style={{ background: 'linear-gradient(135deg, rgba(14, 165, 233, 0.08) 0%, rgba(15, 23, 42, 0.8) 100%)', borderColor: 'rgba(14, 165, 233, 0.25)' }}>
+        <div className="flagship-banner-copy">
+          <div className="eyebrow">
+            <span className="pulse-dot" style={{ backgroundColor: 'var(--cyan)' }} /> REAL ENTERPRISE WORKFLOWS /// 8 HANDS-ON RUNBOOK LABS
+          </div>
+          <h2>Real Cloud Security Job Labs & SOP Guides</h2>
+          <p>
+            Experience how Cloud Security Engineers execute tickets in Fortune 500 environments.
+            Follow click-by-click AWS console navigation, run live AWS CLI commands in the interactive CloudShell sandbox, and master the 6-stage industry standard operating procedure.
+          </p>
+          <div className="flagship-banner-stats">
+            <div className="flagship-stat">
+              <span>LABS MASTERED</span>
+              <strong>{completedLabsCount} / {realLabs?.length || 8}</strong>
+            </div>
+            <div className="flagship-stat">
+              <span>SOP STEPS COMPLETED</span>
+              <strong className="text-cyan">{completedLabStepsCount} Steps</strong>
+            </div>
+            <div className="flagship-stat">
+              <span>DUAL-MODE GUIDANCE</span>
+              <strong>AWS CLI + Console GUI</strong>
+            </div>
+          </div>
+        </div>
+        <div className="flagship-banner-action">
+          <Link
+            className="button button-primary btn-large"
+            to="/labs"
+            style={{ background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)' }}
+          >
+            <Terminal size={18} />
+            <span>Open Real Labs & Runbooks</span>
+            <ArrowRight size={17} />
+          </Link>
+          <Link to="/labs" className="flagship-view-all-link">
+            Explore 8 production runbooks & SOPs &rarr;
+          </Link>
+        </div>
+      </section>
+
+      {/* 6-Stage Cloud Security Job SOP Lifecycle */}
+      <JobProcessFramework />
 
       {/* Active Workspaces */}
       <div className="dashboard-grid">

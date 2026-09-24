@@ -11,6 +11,7 @@ export default function Navbar() {
       <Link to="/#why" onClick={closeMenu}>Why SeCloudive</Link>
       <Link to="/#domains" onClick={closeMenu}>Domains</Link>
       <NavLink to="/investigations" onClick={closeMenu} className="nav-highlight">Investigations</NavLink>
+      <NavLink to="/labs" onClick={closeMenu} className="nav-labs-link">Real Labs & SOPs</NavLink>
       <NavLink to="/categories" onClick={closeMenu}>Challenges</NavLink>
       <NavLink to="/internship-simulator" onClick={closeMenu}>SOC On-Call</NavLink>
       <NavLink to="/dashboard" onClick={closeMenu}>Dashboard</NavLink>
