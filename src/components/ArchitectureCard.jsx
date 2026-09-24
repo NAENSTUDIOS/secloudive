@@ -1,0 +1,2 @@
+import { ArrowUpRight, Boxes } from 'lucide-react'
+export default function ArchitectureCard({ title, description, status = 'Review ready' }) { return <div className="architecture-card"><div className="architecture-graphic"><Boxes size={22} /><span /><span /><span /></div><div><div className="challenge-type">{status}</div><h3>{title}</h3><p>{description}</p></div><ArrowUpRight className="architecture-arrow" size={17} /></div> }

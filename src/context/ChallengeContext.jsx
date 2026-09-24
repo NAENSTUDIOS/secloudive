@@ -1,0 +1,194 @@
+import { createContext, useContext, useEffect, useMemo, useState } from 'react'
+import allChallenges from '../data/index.js'
+import threatScenarios from '../data/threatScenarios.js'
+import { investigations, investigationCategories } from '../data/investigations.js'
+
+const STORAGE_KEY = 'secloudive-progress-v1'
+const ChallengeContext = createContext(null)
+
+function readProgress() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}
+    return {
+      answers: raw.answers || {},
+      completed: raw.completed || {},
+      architectureScores: raw.architectureScores || {},
+      simulatorScores: raw.simulatorScores || {},
+      investigationScores: raw.investigationScores || {},
+      investigationAssessments: raw.investigationAssessments || {}
+    }
+  } catch {
+    return {
+      answers: {},
+      completed: {},
+      architectureScores: {},
+      simulatorScores: {},
+      investigationScores: {},
+      investigationAssessments: {}
+    }
+  }
+}
+
+export function ChallengeProvider({ children }) {
+  const [progress, setProgress] = useState(readProgress)
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(progress))
+  }, [progress])
+
+  const submitAnswer = (challenge, answer) =>
+    setProgress(current => ({
+      ...current,
+      answers: { ...current.answers, [challenge.id]: answer },
+      completed: { ...current.completed, [challenge.id]: answer === challenge.correctAnswer }
+    }))
+
+  const submitArchitectureReview = (challenge, findingIds) =>
+    setProgress(current => ({
+      ...current,
+      architectureScores: {
+        ...current.architectureScores,
+        [challenge.id]: Math.round((findingIds.length / challenge.findings.length) * 100)
+      },
+      completed: { ...current.completed, [challenge.id]: true }
+    }))
+
+  const submitSimulatorInvestigation = (scenario, findingIds) =>
+    setProgress(current => ({
+      ...current,
+      simulatorScores: {
+        ...current.simulatorScores,
+        [scenario.id]: Math.round((findingIds.length / Math.max(1, scenario.evidence.length)) * 100)
+      }
+    }))
+
+  const submitInvestigation = (investigation, selectedFindingIds, assessedSeverity) => {
+    const correctFindings = investigation.findings.filter(f => f.isCorrect).map(f => f.id)
+    const incorrectFindings = investigation.findings.filter(f => !f.isCorrect).map(f => f.id)
+
+    // Calculate precision and recall on findings
+    const truePositives = selectedFindingIds.filter(id => correctFindings.includes(id)).length
+    const falsePositives = selectedFindingIds.filter(id => incorrectFindings.includes(id)).length
+    
+    // Severity assessment matches
+    const severityMatch = assessedSeverity && assessedSeverity.toLowerCase() === investigation.riskLevel.toLowerCase()
+
+    // 80% weight on findings (accuracy), 20% on correct severity triage
+    const findingsScore = Math.max(0, (truePositives - (falsePositives * 0.5)) / Math.max(1, correctFindings.length)) * 80
+    const severityScore = severityMatch ? 20 : 0
+    const totalInvestigationScore = Math.min(100, Math.round(findingsScore + severityScore))
+
+    setProgress(current => ({
+      ...current,
+      completed: { ...current.completed, [investigation.id]: true },
+      investigationScores: {
+        ...current.investigationScores,
+        [investigation.id]: totalInvestigationScore
+      },
+      investigationAssessments: {
+        ...current.investigationAssessments,
+        [investigation.id]: {
+          selectedFindingIds,
+          assessedSeverity,
+          submittedAt: new Date().toISOString(),
+          score: totalInvestigationScore
+        }
+      }
+    }))
+
+    return totalInvestigationScore
+  }
+
+  const resetProgress = () =>
+    setProgress({
+      answers: {},
+      completed: {},
+      architectureScores: {},
+      simulatorScores: {},
+      investigationScores: {},
+      investigationAssessments: {}
+    })
+
+  const completedCount = Object.values(progress.completed).filter(Boolean).length
+  const architectureReviewedCount = Object.keys(progress.architectureScores || {}).length
+  const simulatorCompletedCount = Object.keys(progress.simulatorScores || {}).length
+  const investigationCompletedCount = Object.keys(progress.investigationScores || {}).length
+
+  // Categorical investigation completion tracking
+  const investigationCategoryCounts = useMemo(() => {
+    const counts = {}
+    investigations.forEach(inv => {
+      const cat = inv.categoryKey
+      if (!counts[cat]) counts[cat] = { total: 0, completed: 0 }
+      counts[cat].total += 1
+      if (progress.investigationScores?.[inv.id] !== undefined) {
+        counts[cat].completed += 1
+      }
+    })
+    return counts
+  }, [progress.investigationScores])
+
+  const investigationAverageScore = useMemo(() => {
+    const scores = Object.values(progress.investigationScores || {})
+    if (!scores.length) return 0
+    return Math.round(scores.reduce((sum, s) => sum + s, 0) / scores.length)
+  }, [progress.investigationScores])
+
+  const internshipReadiness = Math.round(
+    Object.values(progress.simulatorScores || {}).reduce((sum, score) => sum + score, 0) /
+      Math.max(1, threatScenarios.length)
+  )
+
+  const totalScore = allChallenges.reduce((sum, challenge) => {
+    if (challenge.id.startsWith('architecture-') && progress.architectureScores?.[challenge.id] !== undefined) {
+      return sum + Math.round((challenge.points * progress.architectureScores[challenge.id]) / 100)
+    }
+    return sum + (progress.completed[challenge.id] ? challenge.points : 0)
+  }, 0)
+
+  const maxScore = allChallenges.reduce((sum, challenge) => sum + challenge.points, 0)
+  const scorePercent = Math.round((totalScore / Math.max(1, maxScore)) * 100)
+
+  const value = useMemo(
+    () => ({
+      challenges: allChallenges,
+      threatScenarios,
+      investigations,
+      investigationCategories,
+      progress,
+      submitAnswer,
+      submitArchitectureReview,
+      submitSimulatorInvestigation,
+      submitInvestigation,
+      resetProgress,
+      completedCount,
+      architectureReviewedCount,
+      simulatorCompletedCount,
+      investigationCompletedCount,
+      investigationCategoryCounts,
+      investigationAverageScore,
+      internshipReadiness,
+      totalScore,
+      scorePercent
+    }),
+    [
+      progress,
+      completedCount,
+      architectureReviewedCount,
+      simulatorCompletedCount,
+      investigationCompletedCount,
+      investigationCategoryCounts,
+      investigationAverageScore,
+      internshipReadiness,
+      totalScore,
+      scorePercent
+    ]
+  )
+
+  return <ChallengeContext.Provider value={value}>{children}</ChallengeContext.Provider>
+}
+
+export function useChallenges() {
+  return useContext(ChallengeContext)
+}
+
