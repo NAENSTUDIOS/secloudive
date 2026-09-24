@@ -1009,6 +1009,906 @@ x-amzn-waf-action: block
         pitfallWarning: 'Never run automated penetration testing tools or aggressive vulnerability scanners against AWS production endpoints without prior AWS simulated event scoping.'
       }
     ]
+  },
+  {
+    id: 'lab-eks-pod-compromise',
+    labNumber: 'LAB-09',
+    title: 'Amazon EKS Pod Compromise, K8s ServiceAccount Token Theft & IRSA Remediation',
+    jobRole: 'DevSecOps Specialist',
+    roleKey: 'devsecops',
+    organization: 'Enterprise SaaS & Cloud-Native FinTech (EKS Production)',
+    difficulty: 'Advanced',
+    timeEstimate: '35 mins',
+    mitreAttack: ['T1610 - Deploy Container', 'T1078.004 - Cloud Accounts', 'T1552.001 - Credentials in Files'],
+    ticketId: 'SEC-8921',
+    sla: '45 mins (P1 Critical)',
+    incidentContext: 'GuardDuty EKS Runtime Monitoring detected suspicious container execution: a compromised Pod in the default namespace accessed the Kubernetes API with a stolen ServiceAccount token and attempted to assume the underlying EC2 Node instance profile.',
+    architectureContext: 'EKS Cluster v1.30 with managed node groups. Pods share the EC2 worker node IAM role which has excessive permissions (AmazonS3FullAccess, DynamoDBFullAccess).',
+    investigationSteps: [
+      {
+        stepId: 's1',
+        phase: 'Stage 1: Alert Triage & Scope Verification',
+        title: 'Triage GuardDuty EKS Runtime Finding & Isolate Compromised Pod',
+        jobContext: 'Inspect the GuardDuty detection payload to identify the cluster name, namespace, pod name, and container image.',
+        consolePath: 'AWS Console > GuardDuty > Findings > Filter by "PrivilegeEscalation:Kubernetes/PrivilegedContainer"',
+        cliCommand: 'aws guardduty list-findings --detector-id d-987654321 --finding-criteria \'{"Criterion": {"type": {"Eq": ["PrivilegeEscalation:Kubernetes/PrivilegedContainer"]}}}\'',
+        expectedOutput: JSON.stringify({
+          FindingIds: ['gd-eks-pod-compromise-9921']
+        }, null, 2),
+        interviewTip: 'Explain the difference between EKS Audit Log Monitoring and EKS Runtime Monitoring: Audit logs track control plane API calls, while Runtime Monitoring detects processes and syscalls inside containers.',
+        pitfallWarning: 'Do not simply delete the pod! If it is managed by a Deployment, Kubernetes will immediately reschedule a new replica with the same vulnerable configuration.'
+      },
+      {
+        stepId: 's2',
+        phase: 'Stage 2: Reconnaissance & Token Inspection',
+        title: 'Inspect Worker Node IAM Role & Verify Excessive Node Permissions',
+        jobContext: 'Check the IAM role attached to the EKS worker nodes to quantify the blast radius if container escape occurs.',
+        consolePath: 'AWS Console > EKS > Clusters > prod-cluster > Compute > Node Groups > Node IAM Role',
+        cliCommand: 'aws iam list-attached-role-policies --role-name EKS-Worker-Node-Managed-Role',
+        expectedOutput: JSON.stringify({
+          AttachedPolicies: [
+            { PolicyName: 'AmazonEKSWorkerNodePolicy', PolicyArn: 'arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy' },
+            { PolicyName: 'AmazonEKS_CNI_Policy', PolicyArn: 'arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy' },
+            { PolicyName: 'AmazonEC2ContainerRegistryReadOnly', PolicyArn: 'arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly' },
+            { PolicyName: 'AmazonS3FullAccess', PolicyArn: 'arn:aws:iam::aws:policy/AmazonS3FullAccess' }
+          ]
+        }, null, 2),
+        interviewTip: 'Highlight the danger of attaching `AmazonS3FullAccess` to worker nodes: ANY pod running on that EC2 instance can query the AWS metadata service and inherit full S3 access across the account.',
+        pitfallWarning: 'Never attach business-data IAM policies (S3, DynamoDB) to EKS worker node roles. Node roles should strictly contain compute-plane infrastructure policies.'
+      },
+      {
+        stepId: 's3',
+        phase: 'Stage 3: Network Quarantine',
+        title: 'Apply Kubernetes NetworkPolicy to Block Pod Egress and IMDS Access',
+        jobContext: 'Apply a restrictive Kubernetes NetworkPolicy to sever the compromised pod\'s network connectivity to external C2 servers and the metadata endpoint 169.254.169.254.',
+        consolePath: 'AWS Console > CloudShell > kubectl apply -f isolate-pod.yaml',
+        cliCommand: 'aws eks get-token --cluster-name prod-cluster > /tmp/token && kubectl --token=$(cat /tmp/token) annotate pod payment-service-789bf-2k1 quarantine=true --overwrite',
+        expectedOutput: JSON.stringify({
+          Status: 'Pod payment-service-789bf-2k1 annotated quarantine=true. Calico/VPC-CNI NetworkPolicy active: all ingress/egress dropped except forensic capture.'
+        }, null, 2),
+        interviewTip: 'Demonstrate deep knowledge of cloud-native forensics: NetworkPolicy isolation allows live memory analysis without allowing the attacker to exfiltrate data.',
+        pitfallWarning: 'Verify that the VPC CNI network policy support or Calico is enabled on the cluster; standard EKS without policy support ignores NetworkPolicy manifests.'
+      },
+      {
+        stepId: 's4',
+        phase: 'Stage 4: Least-Privilege Architecture',
+        title: 'Configure IAM Roles for Service Accounts (IRSA) with OIDC',
+        jobContext: 'Migrate the workload to use an IAM Role for Service Accounts (IRSA) with a dedicated role scoped strictly to the payment bucket.',
+        consolePath: 'AWS Console > IAM > Roles > Create Role > Web identity > Select EKS OIDC Provider > payment-service-account',
+        cliCommand: 'aws iam create-role --role-name EKS-PaymentService-IRSA-Role --assume-role-policy-document \'{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"Federated":"arn:aws:iam::123456789012:oidc-provider/oidc.eks.us-east-1.amazonaws.com/id/EXAMPLE123"},"Action":"sts:AssumeRoleWithWebIdentity","Condition":{"StringEquals":{"oidc.eks.us-east-1.amazonaws.com/id/EXAMPLE123:sub":"system:serviceaccount:payments:payment-sa"}}}]}\'',
+        expectedOutput: JSON.stringify({
+          Role: {
+            RoleName: 'EKS-PaymentService-IRSA-Role',
+            Arn: 'arn:aws:iam::123456789012:role/EKS-PaymentService-IRSA-Role'
+          }
+        }, null, 2),
+        interviewTip: 'Explain how IRSA works: AWS STS exchanges the projected Kubernetes service account token for temporary AWS credentials via OIDC federation, eliminating shared node credentials.',
+        pitfallWarning: 'Ensure the OIDC condition uses `StringEquals` on both the OIDC issuer URL and the exact `system:serviceaccount:<namespace>:<serviceaccount>` name to prevent cross-namespace token reuse.'
+      },
+      {
+        stepId: 's5',
+        phase: 'Stage 5: Remediation & Hardening',
+        title: 'Remove Excessive S3 Policy from Worker Node & Enforce Hop Limit',
+        jobContext: 'Detach `AmazonS3FullAccess` from the node role and set the EC2 IMDS hop limit to 1 so pods cannot reach the metadata service.',
+        consolePath: 'AWS Console > IAM > Roles > EKS-Worker-Node-Managed-Role > Detach AmazonS3FullAccess',
+        cliCommand: 'aws iam detach-role-policy --role-name EKS-Worker-Node-Managed-Role --policy-arn arn:aws:iam::aws:policy/AmazonS3FullAccess && aws ec2 modify-instance-metadata-options --instance-id i-0123456789node --http-put-response-hop-limit 1 --http-tokens required',
+        expectedOutput: JSON.stringify({
+          InstanceMetadataOptions: {
+            InstanceId: 'i-0123456789node',
+            HttpTokens: 'required',
+            HttpPutResponseHopLimit: 1,
+            HttpEndpoint: 'enabled'
+          }
+        }, null, 2),
+        interviewTip: 'The hop limit of 1 is the golden rule for container security on EC2: because container traffic must traverse a virtual bridge (veth), a hop limit of 1 prevents packets from reaching the metadata IP.',
+        pitfallWarning: 'If using AWS VPC CNI with HostNetworking pods, test network plugins carefully before modifying metadata hop limits.'
+      },
+      {
+        stepId: 's6',
+        phase: 'Stage 6: Verification & Proof',
+        title: 'Verify Pod Cannot Access Node Metadata & Successfully Uses IRSA',
+        jobContext: 'Run test verification queries inside the payment pod to confirm IMDS requests are dropped and AWS CLI calls only succeed via IRSA.',
+        consolePath: 'AWS Console > CloudShell > Test STS caller identity inside pod',
+        cliCommand: 'aws sts get-caller-identity',
+        expectedOutput: JSON.stringify({
+          UserId: 'AROAEXAMPLEIRSA:botocore-session-1234',
+          Account: '123456789012',
+          Arn: 'arn:aws:sts::123456789012:assumed-role/EKS-PaymentService-IRSA-Role/botocore-session-1234'
+        }, null, 2),
+        interviewTip: 'Point out the Arn in the output: `assumed-role/EKS-PaymentService-IRSA-Role`. This verifies that the workload is authenticated via IRSA with zero node-level trust exposure.',
+        pitfallWarning: 'Document the incident post-mortem and establish an automated EKS PodSecurityPolicy/Kyverno rule requiring all pods to have readOnlyRootFilesystem.'
+      }
+    ]
+  },
+  {
+    id: 'lab-github-secrets-leak',
+    labNumber: 'LAB-10',
+    title: 'Leaked Production AWS Access Keys on GitHub & Automated Blast-Radius Quarantine',
+    jobRole: 'SecOps / Incident Responder',
+    roleKey: 'secops-analyst',
+    organization: 'FinTech Payment Processor (PCI-DSS Level 1)',
+    difficulty: 'Intermediate',
+    timeEstimate: '25 mins',
+    mitreAttack: ['T1552.001 - Credentials in Files', 'T1078.004 - Cloud Accounts', 'T1530 - Data from Cloud Storage'],
+    ticketId: 'SEC-9102',
+    sla: '15 mins (P0 Critical)',
+    incidentContext: 'An intern developer accidentally committed a `.env` file containing an active AWS Access Key ID (`AKIAIOSFODNN7EXAMPLE`) to a public GitHub repository. Within 4 minutes, automated bots in Russia and China attempted to spin up GPU EC2 instances and query S3 customer data.',
+    architectureContext: 'IAM User `developer-alex` possessed legacy long-term access keys with broad permissions in the production AWS account.',
+    investigationSteps: [
+      {
+        stepId: 's1',
+        phase: 'Stage 1: Minute-0 Intake & Deactivation',
+        title: 'Immediately Deactivate Compromised AWS Access Key',
+        jobContext: 'Kill the compromised access key immediately so no further API requests can be authenticated with these credentials.',
+        consolePath: 'AWS Console > IAM > Users > developer-alex > Security credentials > Access keys > Actions > Deactivate',
+        cliCommand: 'aws iam update-access-key --user-name developer-alex --access-key-id AKIAIOSFODNN7EXAMPLE --status Inactive',
+        expectedOutput: JSON.stringify({
+          ResponseMetadata: { HTTPStatusCode: 200 },
+          Status: 'Access key AKIAIOSFODNN7EXAMPLE changed to Inactive.'
+        }, null, 2),
+        interviewTip: 'Always mark the key `Inactive` rather than deleting it immediately. Keeping the inactive key object preserves the key ID in CloudTrail logs for historical correlation.',
+        pitfallWarning: 'Do not spend 20 minutes finding out who leaked it before deactivating the key. Every second the key is active, automated bots spawn crypto-mining instances.'
+      },
+      {
+        stepId: 's2',
+        phase: 'Stage 2: Emergency Blast-Radius Quarantine',
+        title: 'Attach Explicit Deny Boundary Policy to IAM User',
+        jobContext: 'Apply an inline policy with an explicit Deny on all actions (`*`) to ensure any temporary sessions or active credentials associated with this user are immediately neutralized.',
+        consolePath: 'AWS Console > IAM > Users > developer-alex > Add permissions > Create inline policy > JSON: DenyAll',
+        cliCommand: 'aws iam put-user-policy --user-name developer-alex --policy-name EmergencyQuarantineDenyAll --policy-document \'{"Version":"2012-10-17","Statement":[{"Effect":"Deny","Action":"*","Resource":"*"}]}\'',
+        expectedOutput: JSON.stringify({
+          ResponseMetadata: { HTTPStatusCode: 200 },
+          Status: 'Inline policy EmergencyQuarantineDenyAll attached. All actions denied by explicit deny.'
+        }, null, 2),
+        interviewTip: 'In AWS IAM policy evaluation logic, an explicit DENY always trumps any ALLOW. This guarantees that even if the user has AdministratorAccess, all actions are blocked instantly.',
+        pitfallWarning: 'Remember that active STS sessions generated via `sts:GetSessionToken` before deactivation might remain valid until expiration unless an explicit deny or RevokeOlderSessions policy is applied.'
+      },
+      {
+        stepId: 's3',
+        phase: 'Stage 3: Forensic CloudTrail Investigation',
+        title: 'Audit CloudTrail for All API Calls Executed by the Leaked Key',
+        jobContext: 'Query CloudTrail to identify every single API call invoked by `AKIAIOSFODNN7EXAMPLE` in the last 24 hours and list attacker source IP addresses.',
+        consolePath: 'AWS Console > CloudTrail > Event history > Lookup: Access Key ID = AKIAIOSFODNN7EXAMPLE',
+        cliCommand: 'aws cloudtrail lookup-events --lookup-attributes AttributeKey=AccessKeyId,AttributeValue=AKIAIOSFODNN7EXAMPLE --max-results 10',
+        expectedOutput: JSON.stringify({
+          Events: [
+            { EventName: 'RunInstances', EventTime: '2026-09-24T18:12:00Z', SourceIPAddress: '198.51.100.44', ErrorCode: 'UnauthorizedOperation' },
+            { EventName: 'ListBuckets', EventTime: '2026-09-24T18:12:05Z', SourceIPAddress: '198.51.100.44' },
+            { EventName: 'GetObject', EventTime: '2026-09-24T18:12:30Z', SourceIPAddress: '203.0.113.89', Resources: [{ ResourceName: 'customer-contracts-prod' }] }
+          ]
+        }, null, 2),
+        interviewTip: 'Demonstrate incident response rigor: Note both failed calls (`UnauthorizedOperation`) and successful calls (`GetObject`). If `GetObject` succeeded, initiate data breach disclosure procedures.',
+        pitfallWarning: 'Remember that CloudTrail event delivery has a 5-15 minute latency. If the incident just occurred, continue monitoring the trail for newly arriving events.'
+      },
+      {
+        stepId: 's4',
+        phase: 'Stage 4: Unauthorized Infrastructure Cleanup',
+        title: 'Terminate Attacker Compute Instances & Revoke Shared Snapshots',
+        jobContext: 'Inspect all EC2 regions for rogue instances spawned by the attacker (commonly `p3.16xlarge` or `g5.12xlarge` for mining).',
+        consolePath: 'AWS Console > EC2 > Instances > Check all global regions > Terminate rogue instances',
+        cliCommand: 'aws ec2 describe-instances --filters "Name=tag:Owner,Values=developer-alex" --query "Reservations[*].Instances[*].[InstanceId,State.Name,InstanceType]"',
+        expectedOutput: JSON.stringify([
+          ['i-0992381283miner01', 'running', 'g5.4xlarge']
+        ], null, 2),
+        interviewTip: 'Attackers frequently launch resources in obscure regions (e.g. `ap-southeast-3`, `me-south-1`) where organizations have less monitoring. Check all enabled regions.',
+        pitfallWarning: 'Do not terminate the instance until you take an EBS volume snapshot for forensic analysis and memory dump if needed for legal proceedings.'
+      },
+      {
+        stepId: 's5',
+        phase: 'Stage 5: Permanent Architectural Hardening',
+        title: 'Migrate Developer to AWS IAM Identity Center (SSO) with MFA',
+        jobContext: 'Permanently eliminate long-term access keys. Transition the developer to short-lived credentials via AWS IAM Identity Center with mandatory hardware WebAuthn MFA.',
+        consolePath: 'AWS Console > IAM > Users > developer-alex > Delete access key > Enforce AWS IAM Identity Center',
+        cliCommand: 'aws iam delete-access-key --user-name developer-alex --access-key-id AKIAIOSFODNN7EXAMPLE',
+        expectedOutput: JSON.stringify({
+          ResponseMetadata: { HTTPStatusCode: 200 },
+          Status: 'Long-term access key permanently deleted. User migrated to short-lived SSO credentials with max session duration 1 hour.'
+        }, null, 2),
+        interviewTip: 'State the modern cloud security standard: "In our organization, IAM users with long-term access keys are strictly prohibited by Service Control Policy (SCP). All human access requires IAM Identity Center SSO."',
+        pitfallWarning: 'Ensure pre-commit hooks (such as `trufflehog` or `git-secrets`) are added to developer CI/CD pipelines to block commits containing high-entropy strings.'
+      },
+      {
+        stepId: 's6',
+        phase: 'Stage 6: Verification & Proof',
+        title: 'Verify Zero Active Access Keys for User & Check AWS Health',
+        jobContext: 'Verify that the user has 0 active access keys and that AWS Compromised Credentials alerts are cleared.',
+        consolePath: 'AWS Console > IAM > Users > developer-alex > Security credentials > Access keys count: 0',
+        cliCommand: 'aws iam list-access-keys --user-name developer-alex',
+        expectedOutput: JSON.stringify({
+          AccessKeyMetadata: []
+        }, null, 2),
+        interviewTip: 'Show an empty `AccessKeyMetadata: []` list. This provides definitive proof to security compliance auditors that no valid static credentials exist for this principal.',
+        pitfallWarning: 'Export and archive the CloudTrail audit log to an immutable S3 bucket with Object Lock for compliance records.'
+      }
+    ]
+  },
+  {
+    id: 'lab-scp-organizations-bypass',
+    labNumber: 'LAB-11',
+    title: 'AWS Organizations Service Control Policy (SCP) Bypass & Member Account Quarantine',
+    jobRole: 'Cloud Security Architect',
+    roleKey: 'cloud-architect',
+    organization: 'Global Enterprise Multi-Account Landing Zone (150+ AWS Accounts)',
+    difficulty: 'Advanced',
+    timeEstimate: '30 mins',
+    mitreAttack: ['T1562.001 - Disable or Modify Cloud Tools', 'T1078.004 - Cloud Accounts'],
+    ticketId: 'SEC-9244',
+    sla: '30 mins (P1 High)',
+    incidentContext: 'An administrator in a sandbox AWS account attempted to bypass corporate security boundaries by spinning up unapproved EC2 instance sizes in `af-south-1` and attempting to disable AWS Security Hub.',
+    architectureContext: 'AWS Organizations multi-account structure with Core, Workloads, and Sandbox Organizational Units (OUs).',
+    investigationSteps: [
+      {
+        stepId: 's1',
+        phase: 'Stage 1: Alert Triage & Scope Verification',
+        title: 'Query AWS Config Compliance for Regional Restriction Violations',
+        jobContext: 'Inspect AWS Config rule evaluation to pinpoint which member account violated the corporate Region Restriction policy.',
+        consolePath: 'AWS Console > AWS Config > Compliance > Rules > required-regions-only',
+        cliCommand: 'aws configservice get-compliance-details-by-config-rule --config-rule-name required-regions-only --compliance-types NON_COMPLIANT',
+        expectedOutput: JSON.stringify({
+          EvaluationResults: [
+            {
+              EvaluationResultIdentifier: {
+                EvaluationResultQualifier: {
+                  ConfigRuleName: 'required-regions-only',
+                  ResourceType: 'AWS::EC2::Instance',
+                  ResourceId: 'i-0af7892341cape'
+                }
+              },
+              ComplianceType: 'NON_COMPLIANT',
+              ResultRecordedTime: '2026-09-24T19:00:00Z'
+            }
+          ]
+        }, null, 2),
+        interviewTip: 'Explain AWS Config vs SCPs: SCPs are preventive controls (they block API calls before execution), while AWS Config is a detective control (it alerts on non-compliant configurations).',
+        pitfallWarning: 'Never assume SCPs cover every action. Master account root is immune to SCPs, and service-linked roles can sometimes execute authorized internal operations.'
+      },
+      {
+        stepId: 's2',
+        phase: 'Stage 2: Reconnaissance & SCP Analysis',
+        title: 'Inspect Active SCPs on the Sandbox Organizational Unit',
+        jobContext: 'Examine the SCPs attached to the target OU to determine why the regional restriction failed to block the action.',
+        consolePath: 'AWS Console > AWS Organizations > Organize accounts > Sandbox OU > Policies tab',
+        cliCommand: 'aws organizations list-policies-for-target --target-id ou-prod-sandbox12 --filter SERVICE_CONTROL_POLICY',
+        expectedOutput: JSON.stringify({
+          Policies: [
+            { Id: 'p-FullAWSAccess', Name: 'FullAWSAccess', Type: 'SERVICE_CONTROL_POLICY' }
+          ]
+        }, null, 2),
+        interviewTip: 'Identify the flaw immediately: The Sandbox OU had only `FullAWSAccess` attached! Without an explicit Region Restriction SCP, any region is permitted.',
+        pitfallWarning: 'When designing SCPs, remember that SCPs do not grant permissions; they set maximum boundaries. Both an SCP ALLOW and an IAM ALLOW are required.'
+      },
+      {
+        stepId: 's3',
+        phase: 'Stage 3: Account Quarantine',
+        title: 'Move Compromised Account to Quarantine OU',
+        jobContext: 'Move the offending member account out of the Sandbox OU into the `Quarantine-Isolated` OU where strict lockdown SCPs are enforced.',
+        consolePath: 'AWS Console > AWS Organizations > Move account > Destination: Quarantine-OU',
+        cliCommand: 'aws organizations move-account --account-id 112233445566 --source-parent-id ou-prod-sandbox12 --destination-parent-id ou-quarantine-isolated',
+        expectedOutput: JSON.stringify({
+          ResponseMetadata: { HTTPStatusCode: 200 },
+          Status: 'Account 112233445566 moved to Quarantine OU successfully.'
+        }, null, 2),
+        interviewTip: 'Explain why moving an account into a Quarantine OU is safer than deleting it: It immediately applies lockdown policies without breaking centralized billing or deleting forensic data.',
+        pitfallWarning: 'Verify that the Quarantine OU does NOT inherit permissive SCPs from the organization root.'
+      },
+      {
+        stepId: 's4',
+        phase: 'Stage 4: Quarantine Lockdown Policy',
+        title: 'Attach DenyAllExceptSecurityOperations SCP to Quarantined Account',
+        jobContext: 'Apply a restrictive SCP that denies all non-security operations while preserving access for the central SecurityAudit role.',
+        consolePath: 'AWS Console > AWS Organizations > Policies > Service control policies > Attach SCP-Quarantine-Lockdown',
+        cliCommand: 'aws organizations attach-policy --policy-id p-QuarantineStrictLockdown --target-id 112233445566',
+        expectedOutput: JSON.stringify({
+          ResponseMetadata: { HTTPStatusCode: 200 },
+          Status: 'Policy p-QuarantineStrictLockdown attached to target account.'
+        }, null, 2),
+        interviewTip: 'Ensure the Quarantine SCP has a `Condition` with `StringNotLike: { "aws:PrincipalArn": ["arn:aws:iam::*:role/AWSControlTowerExecution", "arn:aws:iam::*:role/SecOps-IncidentResponder"] }` so security teams can still remediate.',
+        pitfallWarning: 'Do not lock out the root or management role needed to manage the account remotely.'
+      },
+      {
+        stepId: 's5',
+        phase: 'Stage 5: Permanent Global SCP',
+        title: 'Deploy Production-Grade Region Restriction SCP across Workloads',
+        jobContext: 'Author a global SCP denying all actions outside `us-east-1` and `us-west-2`, exempting global services like CloudFront, IAM, Route53, and STS.',
+        consolePath: 'AWS Console > AWS Organizations > Policies > Create Policy > Name: EnforceApprovedRegionsOnly',
+        cliCommand: 'aws organizations create-policy --name EnforceApprovedRegionsOnly --type SERVICE_CONTROL_POLICY --content \'{"Version":"2012-10-17","Statement":[{"Sid":"DenyUnapprovedRegions","Effect":"Deny","NotAction":["cloudfront:*","iam:*","route53:*","support:*","sts:*"],"Resource":"*","Condition":{"StringNotEquals":{"aws:RequestedRegion":["us-east-1","us-west-2"]}}}]}\'',
+        expectedOutput: JSON.stringify({
+          Policy: {
+            PolicySummary: {
+              Id: 'p-RegionRestrictionMaster',
+              Name: 'EnforceApprovedRegionsOnly',
+              Type: 'SERVICE_CONTROL_POLICY'
+            }
+          }
+        }, null, 2),
+        interviewTip: 'Why is `NotAction` with global services required? If you deny all actions outside approved regions, global services like CloudFront or Route53 (which operate in `us-east-1` globally) will break!',
+        pitfallWarning: 'Always exclude `support:*` and `sts:*` so engineers can open AWS support cases and authenticate.'
+      },
+      {
+        stepId: 's6',
+        phase: 'Stage 6: Verification & Proof',
+        title: 'Attempt Launch in Restricted Region & Confirm AccessDeniedException',
+        jobContext: 'Execute a test EC2 launch command targeting `af-south-1` from the member account to verify the SCP denies the call.',
+        consolePath: 'AWS Console > CloudShell > Run EC2 launch in af-south-1',
+        cliCommand: 'aws ec2 run-instances --image-id ami-012345af --instance-type t3.micro --region af-south-1',
+        expectedOutput: `An error occurred (AccessDeniedException) when calling the RunInstances operation: User is not authorized to perform: ec2:RunInstances on resource with an explicit deny in a service control policy.`,
+        interviewTip: 'Note the exact error text: `with an explicit deny in a service control policy`. This proves beyond doubt that the SCP is functioning at the organization boundary.',
+        pitfallWarning: 'Verify that AWS CloudTrail log files in the management account capture the `AccessDeniedException` event with the SCP policy identifier.'
+      }
+    ]
+  },
+  {
+    id: 'lab-apigw-lambda-sqli',
+    labNumber: 'LAB-12',
+    title: 'API Gateway Parameter Tampering to Aurora Serverless SQLi & IAM DB Authentication',
+    jobRole: 'Cloud Security Engineer',
+    roleKey: 'cloud-sec-eng',
+    organization: 'FinTech Consumer Mobile App Backend',
+    difficulty: 'Advanced',
+    timeEstimate: '35 mins',
+    mitreAttack: ['T1190 - Exploit Public-Facing Application', 'T1005 - Data from Local System'],
+    ticketId: 'SEC-9311',
+    sla: '30 mins (P1 Critical)',
+    incidentContext: 'An API Gateway endpoint `/v1/accounts/search` was exploited via raw SQL string concatenation in a Python Lambda function, dumping hashed customer passwords from Aurora PostgreSQL.',
+    architectureContext: 'Amazon API Gateway HTTP API -> AWS Lambda (Python 3.12) -> Amazon Aurora PostgreSQL Serverless v2.',
+    investigationSteps: [
+      {
+        stepId: 's1',
+        phase: 'Stage 1: Alert Triage & Scope Verification',
+        title: 'Inspect API Gateway Access Logs & Identify Malicious Queries',
+        jobContext: 'Analyze CloudWatch Logs for API Gateway to identify the attacker\'s request payload and source IP.',
+        consolePath: 'AWS Console > CloudWatch > Log groups > /aws/apigateway/prod-api > Search: 500 error or syntax error',
+        cliCommand: 'aws logs filter-log-events --log-group-name /aws/apigateway/prod-api --filter-pattern "UNION SELECT" --max-items 5',
+        expectedOutput: JSON.stringify({
+          events: [
+            {
+              timestamp: 1727209200000,
+              message: 'GET /v1/accounts/search?username=admin%27%20UNION%20SELECT%20password_hash,email%20FROM%20users-- HTTP 500'
+            }
+          ]
+        }, null, 2),
+        interviewTip: 'Explain how API Gateway access logs capture the raw query string parameters, user-agent, and response latency. This is essential for reconstructing the attacker\'s discovery timeline.',
+        pitfallWarning: 'Ensure API Gateway access logging is enabled with JSON formatting. Without it, you only get basic execution metrics without payload visibility.'
+      },
+      {
+        stepId: 's2',
+        phase: 'Stage 2: Lambda Source Code Inspection',
+        title: 'Review Lambda Source Code for Vulnerable SQL String Concatenation',
+        jobContext: 'Inspect the Lambda function code to identify the exact line vulnerable to SQL injection.',
+        consolePath: 'AWS Console > Lambda > Functions > AccountSearchFunction > Code source > lambda_function.py',
+        cliCommand: 'aws lambda get-function --function-name AccountSearchFunction --query "Code.Location"',
+        expectedOutput: JSON.stringify({
+          VulnerableSnippet: "query = f\"SELECT * FROM accounts WHERE name = '{username}'\"  # INSECURE CONCATENATION"
+        }, null, 2),
+        interviewTip: 'Point out the vulnerability: The developer used an f-string without parameterized binding. In production Python, always use parameterized queries with `psycopg2` or an ORM like SQLAlchemy.',
+        pitfallWarning: 'Never attempt to "sanitize" SQL strings with custom regexes; parameterized queries are the ONLY cryptographically sound defense against SQL injection.'
+      },
+      {
+        stepId: 's3',
+        phase: 'Stage 3: Emergency Perimeter Containment',
+        title: 'Deploy API Gateway Request Validator with Strict Regex Schema',
+        jobContext: 'Block malicious characters at the API Gateway perimeter using built-in request validation before requests even reach the Lambda function.',
+        consolePath: 'AWS Console > API Gateway > Models > Create Model > RequestValidator: Validate body, query string parameters, and headers',
+        cliCommand: 'aws apigateway update-request-validator --rest-api-id api-12345 --request-validator-id val-001 --patch-operations op=replace,path=/validateRequestParameters,value=true',
+        expectedOutput: JSON.stringify({
+          ResponseMetadata: { HTTPStatusCode: 200 },
+          validateRequestParameters: true,
+          Status: 'Request validator active: query strings violating alphanumeric schema are rejected with HTTP 400.'
+        }, null, 2),
+        interviewTip: 'Highlight defense-in-depth: Even if backend code has a flaw, API Gateway request validation prevents malformed characters from triggering execution, reducing Lambda invocation costs.',
+        pitfallWarning: 'Test request validation schemas thoroughly in staging to avoid rejecting legitimate user search queries containing accents or spaces.'
+      },
+      {
+        stepId: 's4',
+        phase: 'Stage 4: Database Identity Hardening',
+        title: 'Transition Aurora Database to AWS IAM Database Authentication',
+        jobContext: 'Eliminate hardcoded database passwords stored in environment variables. Enable IAM Database Authentication on Aurora PostgreSQL.',
+        consolePath: 'AWS Console > RDS > Databases > aurora-prod-cluster > Modify > Database authentication: Password and IAM database authentication',
+        cliCommand: 'aws rds modify-db-cluster --db-cluster-identifier aurora-prod-cluster --enable-iam-database-authentication --apply-immediately',
+        expectedOutput: JSON.stringify({
+          DBCluster: {
+            DBClusterIdentifier: 'aurora-prod-cluster',
+            IAMDatabaseAuthenticationEnabled: true
+          }
+        }, null, 2),
+        interviewTip: 'Explain IAM Database Authentication: Instead of storing database passwords, Lambda requests an ephemeral 15-minute authentication token from AWS STS via `rds:connect`.',
+        pitfallWarning: 'Remember to run `GRANT rds_iam TO <db_user>;` inside PostgreSQL after enabling IAM auth at the cluster level.'
+      },
+      {
+        stepId: 's5',
+        phase: 'Stage 5: Secure Code Deployment',
+        title: 'Deploy Patched Lambda Function with Parameterized SQL Queries',
+        jobContext: 'Update the Lambda function code to use parameterized queries (`cursor.execute(query, (username,))`) and deploy the patched package.',
+        consolePath: 'AWS Console > Lambda > Functions > AccountSearchFunction > Update code > Deploy',
+        cliCommand: 'aws lambda update-function-code --function-name AccountSearchFunction --zip-file fileb://patched-search.zip',
+        expectedOutput: JSON.stringify({
+          FunctionName: 'AccountSearchFunction',
+          LastUpdateStatus: 'Successful',
+          CodeSha256: '9k8s7d6f5a4b3c2e1f0e9d8c7b6a5f4e3d2c1b0a='
+        }, null, 2),
+        interviewTip: 'Explain parameterized queries: The database treats the user input strictly as literal data, never as executable SQL command syntax, completely eliminating SQL injection.',
+        pitfallWarning: 'Ensure automated CI/CD static application security testing (SAST) tools like Semgrep or Bandit are integrated into the pipeline to catch raw SQL queries.'
+      },
+      {
+        stepId: 's6',
+        phase: 'Stage 6: Verification & Proof',
+        title: 'Execute SQLi Exploit Probe & Confirm Rejection with HTTP 400',
+        jobContext: 'Send the original attack probe through the API Gateway endpoint and verify that the perimeter validator blocks the request with HTTP 400 Bad Request.',
+        consolePath: 'AWS Console > CloudShell > curl API Gateway endpoint with SQLi probe',
+        cliCommand: 'curl -i -s "https://api-12345.execute-api.us-east-1.amazonaws.com/v1/accounts/search?username=admin%27%20OR%201=1--"',
+        expectedOutput: `HTTP/2 400 Bad Request
+date: Thu, 24 Sep 2026 21:05:00 GMT
+content-type: application/json
+content-length: 42
+x-amzn-errortype: InvalidQueryParameterException
+
+{"message": "Invalid query parameter value"}`,
+        interviewTip: 'Notice the response: `400 Bad Request` with `InvalidQueryParameterException`. The attack was dropped entirely at the AWS perimeter, and zero Lambda executions were billed.',
+        pitfallWarning: 'Check Aurora query logs to verify zero database calls were recorded during this test.'
+      }
+    ]
+  },
+  {
+    id: 'lab-tgw-route-poisoning',
+    labNumber: 'LAB-13',
+    title: 'AWS Transit Gateway Route Table Hijacking & VPC Flow Log Forensic Reconstruction',
+    jobRole: 'Cloud Security Engineer',
+    roleKey: 'cloud-sec-eng',
+    organization: 'Global Multi-VPC Cloud Enterprise Network',
+    difficulty: 'Advanced',
+    timeEstimate: '35 mins',
+    mitreAttack: ['T1557 - Adversary-in-the-Middle', 'T1046 - Network Service Discovery'],
+    ticketId: 'SEC-9420',
+    sla: '30 mins (P1 Critical)',
+    incidentContext: 'An unauthorized IAM principal modified a production Transit Gateway (TGW) route table, routing all traffic destined for the Payment Processing VPC through an unapproved rogue inspection VPC.',
+    architectureContext: 'AWS Transit Gateway interconnecting 4 VPCs (Ingress, Egress, Shared Services, Payment Tier).',
+    investigationSteps: [
+      {
+        stepId: 's1',
+        phase: 'Stage 1: Alert Triage & Scope Verification',
+        title: 'Detect Anomalous Transit Gateway Route Table Associations',
+        jobContext: 'Inspect the live Transit Gateway route tables to identify which route was altered and where traffic is currently flowing.',
+        consolePath: 'AWS Console > VPC > Transit Gateways > Transit Gateway Route Tables > Routes tab',
+        cliCommand: 'aws ec2 search-transit-gateway-routes --transit-gateway-route-table-id tgw-rtb-01234prod --filters "Name=route-search.exact-match,Values=10.50.0.0/16"',
+        expectedOutput: JSON.stringify({
+          Routes: [
+            {
+              DestinationCidrBlock: '10.50.0.0/16',
+              TransitGatewayAttachmentId: 'tgw-attach-0rogue987',
+              Type: 'static',
+              State: 'active'
+            }
+          ]
+        }, null, 2),
+        interviewTip: 'Explain Transit Gateway Route Tables: Each attached VPC can be associated with a specific route table. A malicious route can divert sensitive database or payment subnets to an attacker-controlled sniffing instance.',
+        pitfallWarning: 'Do not delete the Transit Gateway attachment immediately; record the attachment ID and target VPC ID for the incident report and evidence chain.'
+      },
+      {
+        stepId: 's2',
+        phase: 'Stage 2: CloudTrail Forensic Attribution',
+        title: 'Query CloudTrail for CreateTransitGatewayRoute API Call',
+        jobContext: 'Search CloudTrail event logs to identify the user ARN, source IP, and timestamp when the malicious route was inserted.',
+        consolePath: 'AWS Console > CloudTrail > Event history > Event name: CreateTransitGatewayRoute',
+        cliCommand: 'aws cloudtrail lookup-events --lookup-attributes AttributeKey=EventName,AttributeValue=CreateTransitGatewayRoute --max-results 5',
+        expectedOutput: JSON.stringify({
+          Events: [
+            {
+              EventName: 'CreateTransitGatewayRoute',
+              EventTime: '2026-09-24T19:45:00Z',
+              Username: 'contractor-dev-temp',
+              SourceIPAddress: '198.51.100.77',
+              UserIdentity: { Arn: 'arn:aws:iam::123456789012:user/contractor-dev-temp' }
+            }
+          ]
+        }, null, 2),
+        interviewTip: 'Identify the principal: `contractor-dev-temp`. Review whether this contractor account should have had `ec2:CreateTransitGatewayRoute` permissions.',
+        pitfallWarning: 'Always correlate the `SourceIPAddress` with VPN session logs to determine whether the contractor\'s credentials were stolen or abused directly.'
+      },
+      {
+        stepId: 's3',
+        phase: 'Stage 3: Immediate Route Remediation',
+        title: 'Delete Poisoned Route & Re-establish Legitimate Payment VPC Path',
+        jobContext: 'Delete the rogue static route and restore the correct route pointing directly to the Payment VPC attachment.',
+        consolePath: 'AWS Console > VPC > Transit Gateway Route Tables > Select tgw-rtb-01234prod > Delete Route > Add Route 10.50.0.0/16 -> tgw-attach-legit-payment',
+        cliCommand: 'aws ec2 delete-transit-gateway-route --transit-gateway-route-table-id tgw-rtb-01234prod --destination-cidr-block 10.50.0.0/16 && aws ec2 create-transit-gateway-route --destination-cidr-block 10.50.0.0/16 --transit-gateway-route-table-id tgw-rtb-01234prod --transit-gateway-attachment-id tgw-attach-0legitpayment',
+        expectedOutput: JSON.stringify({
+          Route: {
+            DestinationCidrBlock: '10.50.0.0/16',
+            TransitGatewayAttachmentId: 'tgw-attach-0legitpayment',
+            Type: 'static',
+            State: 'active'
+          }
+        }, null, 2),
+        interviewTip: 'Show precision: Notice that we immediately restored the correct route in the same step. This ensures legitimate payment processing transactions resume with minimal disruption.',
+        pitfallWarning: 'Be aware of route propagation delays (typically 1-3 seconds). Verify that BGP / static routing tables reflect the update.'
+      },
+      {
+        stepId: 's4',
+        phase: 'Stage 4: VPC Flow Log Exfiltration Analysis',
+        title: 'Query VPC Flow Logs to Quantify Data Transferred to Rogue Attachment',
+        jobContext: 'Execute a CloudWatch Logs Insights query over VPC Flow Logs to calculate the total bytes transferred to the rogue VPC during the compromise window.',
+        consolePath: 'AWS Console > CloudWatch > Logs Insights > Select VPC Flow Logs > Run query',
+        cliCommand: 'aws logs start-query --log-group-name /aws/vpc/flowlogs/prod --start-time 1727205000 --end-time 1727210000 --query-string "fields @timestamp, srcAddr, dstAddr, bytes | filter dstAddr like /10.99./ | stats sum(bytes) by srcAddr"',
+        expectedOutput: JSON.stringify({
+          results: [
+            [{ field: 'srcAddr', value: '10.10.4.15' }, { field: 'sum(bytes)', value: '4502000' }]
+          ],
+          status: 'Complete'
+        }, null, 2),
+        interviewTip: 'VPC Flow Log metrics (`sum(bytes)`) are critical for breach disclosure: 4.5 MB was transferred. Knowing the exact byte count allows legal and forensic teams to assess if full database dumps occurred.',
+        pitfallWarning: 'VPC Flow Logs do not capture packet payload data (application-layer bytes), only IP headers, ports, packets, and byte counts.'
+      },
+      {
+        stepId: 's5',
+        phase: 'Stage 5: Network IAM Permissions Boundary',
+        title: 'Enforce IAM Permissions Boundary on Transit Gateway Operations',
+        jobContext: 'Create an IAM Permissions Boundary that prevents non-Core-Network engineers from creating or modifying Transit Gateway routes.',
+        consolePath: 'AWS Console > IAM > Policies > Create Policy > Restrict TGW Route Modifications',
+        cliCommand: 'aws iam put-user-policy --user-name contractor-dev-temp --policy-name DenyTGWModifications --policy-document \'{"Version":"2012-10-17","Statement":[{"Effect":"Deny","Action":["ec2:*TransitGateway*"],"Resource":"*"}]}\'',
+        expectedOutput: JSON.stringify({
+          ResponseMetadata: { HTTPStatusCode: 200 },
+          Status: 'Explicit Deny attached. User cannot execute any Transit Gateway API calls.'
+        }, null, 2),
+        interviewTip: 'In enterprise cloud environments, networking resources (Transit Gateways, DirectConnect) must be managed strictly by an isolated Network Engineering role through Terraform CI/CD.',
+        pitfallWarning: 'Audit existing IAM policies for wildcard actions like `ec2:*` which inadvertently grant full Transit Gateway control.'
+      },
+      {
+        stepId: 's6',
+        phase: 'Stage 6: Verification & Proof',
+        title: 'Verify Legitimate Payment Traffic Routing & Zero Traffic to Rogue VPC',
+        jobContext: 'Re-run Transit Gateway route table search to verify 100% of traffic destined for `10.50.0.0/16` routes to the certified payment attachment.',
+        consolePath: 'AWS Console > VPC > Transit Gateways > Search routes for 10.50.0.0/16',
+        cliCommand: 'aws ec2 search-transit-gateway-routes --transit-gateway-route-table-id tgw-rtb-01234prod --filters "Name=route-search.exact-match,Values=10.50.0.0/16"',
+        expectedOutput: JSON.stringify({
+          Routes: [
+            {
+              DestinationCidrBlock: '10.50.0.0/16',
+              TransitGatewayAttachmentId: 'tgw-attach-0legitpayment',
+              Type: 'static',
+              State: 'active'
+            }
+          ]
+        }, null, 2),
+        interviewTip: 'Conclude with audit evidence: The verified route targets `tgw-attach-0legitpayment`, and the contractor user is restricted from future network changes.',
+        pitfallWarning: 'Document the incident post-mortem and present findings at the weekly security engineering retrospective.'
+      }
+    ]
+  },
+  {
+    id: 'lab-kms-ransomware-deletion',
+    labNumber: 'LAB-14',
+    title: 'KMS Customer Master Key Malicious Deletion Triage & S3 Ransomware Recovery',
+    jobRole: 'SecOps / Incident Responder',
+    roleKey: 'secops-analyst',
+    organization: 'Healthcare HealthTech SaaS (HIPAA Certified)',
+    difficulty: 'Advanced',
+    timeEstimate: '30 mins',
+    mitreAttack: ['T1486 - Data Encrypted for Impact', 'T1485 - Data Destruction'],
+    ticketId: 'SEC-9550',
+    sla: '15 mins (P0 Critical)',
+    incidentContext: 'A rogue contractor scheduled the primary AWS KMS Customer Master Key (CMK) encrypting all patient health records for deletion with a 7-day waiting period, threatening to render 50 TB of clinical records permanently unrecoverable.',
+    architectureContext: 'AWS KMS Customer Managed Key (CMK) with S3 Bucket Keys encrypting medical patient records (PHI).',
+    investigationSteps: [
+      {
+        stepId: 's1',
+        phase: 'Stage 1: Alert Triage & Scope Verification',
+        title: 'Inspect KMS Key Status & Confirm Pending Deletion State',
+        jobContext: 'Query AWS KMS to check the key state and determine the exact date and time the key is scheduled to be permanently destroyed.',
+        consolePath: 'AWS Console > KMS > Customer managed keys > Filter by status: Pending deletion',
+        cliCommand: 'aws kms describe-key --key-id arn:aws:kms:us-east-1:123456789012:key/12345678-1234-1234-1234-123456789012',
+        expectedOutput: JSON.stringify({
+          KeyMetadata: {
+            KeyId: '12345678-1234-1234-1234-123456789012',
+            KeyState: 'PendingDeletion',
+            DeletionDate: '2026-10-01T20:00:00Z',
+            Description: 'Primary PHI Database Encryption Key'
+          }
+        }, null, 2),
+        interviewTip: 'Explain AWS KMS Deletion Semantics: KMS enforces a mandatory minimum waiting period between 7 and 30 days before a key is permanently destroyed. A key can NEVER be deleted instantly.',
+        pitfallWarning: 'While a key is in `PendingDeletion` state, all cryptographic operations (`Encrypt`, `Decrypt`, `GenerateDataKey`) fail immediately, causing application downtime!'
+      },
+      {
+        stepId: 's2',
+        phase: 'Stage 2: Minute-0 Key Recovery',
+        title: 'Cancel KMS Key Deletion Immediately to Restore Decryption',
+        jobContext: 'Execute `cancel-key-deletion` to immediately transition the KMS key back to `Enabled` state, restoring application decryption operations.',
+        consolePath: 'AWS Console > KMS > Customer managed keys > Select key > Key actions > Cancel key deletion',
+        cliCommand: 'aws kms cancel-key-deletion --key-id arn:aws:kms:us-east-1:123456789012:key/12345678-1234-1234-1234-123456789012',
+        expectedOutput: JSON.stringify({
+          KeyId: 'arn:aws:kms:us-east-1:123456789012:key/12345678-1234-1234-1234-123456789012',
+          KeyState: 'Enabled'
+        }, null, 2),
+        interviewTip: 'Calling `cancel-key-deletion` instantaneously changes KeyState to `Enabled`. Application decryption calls begin succeeding within milliseconds without key re-generation.',
+        pitfallWarning: 'Do not delay: If the deletion date passes, the cryptographic material is wiped from AWS HSMs forever and ciphertext encrypted with it can NEVER be decrypted by anyone.'
+      },
+      {
+        stepId: 's3',
+        phase: 'Stage 3: Forensic CloudTrail Attribution',
+        title: 'Identify Who Called ScheduleKeyDeletion via CloudTrail',
+        jobContext: 'Query CloudTrail to identify the IAM identity, source IP, and user-agent that scheduled the key deletion.',
+        consolePath: 'AWS Console > CloudTrail > Event history > Event name: ScheduleKeyDeletion',
+        cliCommand: 'aws cloudtrail lookup-events --lookup-attributes AttributeKey=EventName,AttributeValue=ScheduleKeyDeletion --max-results 1',
+        expectedOutput: JSON.stringify({
+          Events: [
+            {
+              EventName: 'ScheduleKeyDeletion',
+              EventTime: '2026-09-24T18:00:00Z',
+              Username: 'contractor-dev-temp',
+              SourceIPAddress: '198.51.100.77',
+              UserIdentity: { Arn: 'arn:aws:iam::123456789012:user/contractor-dev-temp' }
+            }
+          ]
+        }, null, 2),
+        interviewTip: 'Notice the correlation: The same compromised user `contractor-dev-temp` from the network attack also attempted KMS key destruction, confirming a persistent adversary.',
+        pitfallWarning: 'Immediately revoke all active credentials for `contractor-dev-temp` across all accounts.'
+      },
+      {
+        stepId: 's4',
+        phase: 'Stage 4: KMS Key Policy Hardening',
+        title: 'Lock Down KMS Key Policy to Deny ScheduleKeyDeletion for All Non-Root Principals',
+        jobContext: 'Update the KMS Key Policy to explicitly deny `kms:ScheduleKeyDeletion` and `kms:DeleteImportedKeyMaterial` for all IAM users and roles.',
+        consolePath: 'AWS Console > KMS > Customer managed keys > Select key > Key policy > Edit key policy',
+        cliCommand: 'aws kms put-key-policy --key-id arn:aws:kms:us-east-1:123456789012:key/12345678-1234-1234-1234-123456789012 --policy-name default --policy \'{"Version":"2012-10-17","Statement":[{"Sid":"DenyKeyDeletionForNonRoot","Effect":"Deny","Principal":"*","Action":["kms:ScheduleKeyDeletion","kms:Delete*"],"Resource":"*","Condition":{"StringNotEquals":{"aws:PrincipalArn":["arn:aws:iam::123456789012:root"]}}}]}\'',
+        expectedOutput: JSON.stringify({
+          ResponseMetadata: { HTTPStatusCode: 200 },
+          Status: 'KMS Key Policy updated. Deletion operations strictly restricted to AWS Account Root.'
+        }, null, 2),
+        interviewTip: 'Restricting key deletion to the AWS Account Root is an industry gold standard: In enterprise environments, root credentials require multi-person physical hardware tokens.',
+        pitfallWarning: 'Be extremely careful editing KMS key policies: If you remove all administrative access statements, you can lock yourself out of administering the key.'
+      },
+      {
+        stepId: 's5',
+        phase: 'Stage 5: S3 Ransomware Versioning Defense',
+        title: 'Enforce S3 Object Lock & MFA Delete on Patient Records Bucket',
+        jobContext: 'Protect the encrypted patient records S3 bucket against malicious overwriting or encryption tampering by enabling S3 Object Lock in Compliance Mode.',
+        consolePath: 'AWS Console > S3 > patient-records-prod > Properties > Object Lock: Enable Compliance Mode',
+        cliCommand: 'aws s3api put-object-lock-configuration --bucket patient-records-prod --object-lock-configuration \'{"ObjectLockEnabled":"Enabled","Rule":{"DefaultRetention":{"Mode":"COMPLIANCE","Days":365}}}\'',
+        expectedOutput: JSON.stringify({
+          ResponseMetadata: { HTTPStatusCode: 200 },
+          Status: 'S3 Object Lock enabled in COMPLIANCE mode for 365 days. Objects cannot be deleted or overwritten by ANY user, including AWS account root.'
+        }, null, 2),
+        interviewTip: 'Explain Compliance Mode vs Governance Mode in S3 Object Lock: In Governance mode, users with special IAM permissions can bypass retention. In COMPLIANCE mode, NO ONE (not even root or AWS support) can delete the object until the retention period expires.',
+        pitfallWarning: 'Object Lock must be enabled when creating the bucket, or requires contacting AWS Support to turn on for existing buckets.'
+      },
+      {
+        stepId: 's6',
+        phase: 'Stage 6: Verification & Proof',
+        title: 'Verify Key State is Enabled & Decryption Requests Function',
+        jobContext: 'Perform a test encryption and decryption round-trip using AWS KMS to prove that cryptographic operations are 100% restored.',
+        consolePath: 'AWS Console > CloudShell > Run kms encrypt/decrypt round trip',
+        cliCommand: 'aws kms encrypt --key-id arn:aws:kms:us-east-1:123456789012:key/12345678-1234-1234-1234-123456789012 --plaintext "healthcheck" --output text --query CiphertextBlob | aws kms decrypt --ciphertext-blob fileb://<(cat) --output text --query Plaintext',
+        expectedOutput: `healthcheck`,
+        interviewTip: 'The round-trip verification returns `healthcheck`. This demonstrates that both encryption and decryption pipelines are operational and customer records are protected.',
+        pitfallWarning: 'Archive all CloudTrail evidence in an immutable bucket for compliance reporting to healthcare regulators.'
+      }
+    ]
+  },
+  {
+    id: 'lab-cicd-oidc-hijack',
+    labNumber: 'LAB-15',
+    title: 'GitHub Actions OIDC Trust Policy Hijacking & Terraform State Tamper Defense',
+    jobRole: 'DevSecOps Specialist',
+    roleKey: 'devsecops',
+    organization: 'Enterprise FinTech Infrastructure (Terraform Core)',
+    difficulty: 'Advanced',
+    timeEstimate: '35 mins',
+    mitreAttack: ['T1195.002 - Compromise Software Supply Chain', 'T1078.004 - Cloud Accounts'],
+    ticketId: 'SEC-9672',
+    sla: '30 mins (P1 Critical)',
+    incidentContext: 'An overly permissive GitHub Actions OIDC IAM Trust Policy allowed any public fork of an open-source tool repository to assume a production deployment role and download sensitive Terraform state files containing database master passwords.',
+    architectureContext: 'GitHub Actions CI/CD pipeline using OpenID Connect (OIDC) to assume IAM Role `TerraformDeployerRole`.',
+    investigationSteps: [
+      {
+        stepId: 's1',
+        phase: 'Stage 1: Alert Triage & Scope Verification',
+        title: 'Inspect Suspicious sts:AssumeRoleWithWebIdentity CloudTrail Events',
+        jobContext: 'Search CloudTrail for `AssumeRoleWithWebIdentity` calls to identify which GitHub repository workflows assumed the production role.',
+        consolePath: 'AWS Console > CloudTrail > Event history > Event name: AssumeRoleWithWebIdentity',
+        cliCommand: 'aws cloudtrail lookup-events --lookup-attributes AttributeKey=EventName,AttributeValue=AssumeRoleWithWebIdentity --max-results 5',
+        expectedOutput: JSON.stringify({
+          Events: [
+            {
+              EventName: 'AssumeRoleWithWebIdentity',
+              EventTime: '2026-09-24T20:10:00Z',
+              SourceIPAddress: '140.82.112.4',
+              UserIdentity: {
+                PrincipalId: 'token.actions.githubusercontent.com:repo:attacker-account/core-infra:ref:refs/heads/hack',
+                Arn: 'arn:aws:sts::123456789012:assumed-role/TerraformDeployerRole/GitHubActions'
+              }
+            }
+          ]
+        }, null, 2),
+        interviewTip: 'Look at the PrincipalId: `repo:attacker-account/core-infra`. The role was assumed from an external fork owned by `attacker-account`, NOT the corporate GitHub organization `my-org`!',
+        pitfallWarning: 'When setting up GitHub Actions OIDC, if you forget to validate the repository owner, ANY GitHub user in the world who creates an action targeting your role ARN can assume it!'
+      },
+      {
+        stepId: 's2',
+        phase: 'Stage 2: Trust Policy Vulnerability Analysis',
+        title: 'Review IAM Role Trust Relationship for Wildcard Condition Flaw',
+        jobContext: 'Inspect the trust policy of `TerraformDeployerRole` to spot the wildcard string match.',
+        consolePath: 'AWS Console > IAM > Roles > TerraformDeployerRole > Trust relationships tab',
+        cliCommand: 'aws iam get-role --role-name TerraformDeployerRole --query "Role.AssumeRolePolicyDocument"',
+        expectedOutput: JSON.stringify({
+          Statement: [
+            {
+              Effect: 'Allow',
+              Principal: { Federated: 'arn:aws:iam::123456789012:oidc-provider/token.actions.githubusercontent.com' },
+              Action: 'sts:AssumeRoleWithWebIdentity',
+              Condition: {
+                StringLike: { 'token.actions.githubusercontent.com:sub': 'repo:*:*' }
+              }
+            }
+          ]
+        }, null, 2),
+        interviewTip: 'Identify the smoking gun: `repo:*:*`! This wildcard told AWS STS to trust ANY GitHub repository, branch, or pull request on all of GitHub.',
+        pitfallWarning: 'Never use `repo:*:*` in OIDC trust conditions. Always pin the exact organization and repository name.'
+      },
+      {
+        stepId: 's3',
+        phase: 'Stage 3: Minute-0 Trust Policy Containment',
+        title: 'Lock Down OIDC Condition to Strict Organization & Main Branch',
+        jobContext: 'Rewrite the trust policy immediately to restrict assumptions strictly to `repo:my-org/core-infra:ref:refs/heads/main`.',
+        consolePath: 'AWS Console > IAM > Roles > TerraformDeployerRole > Edit trust policy',
+        cliCommand: 'aws iam update-assume-role-policy --role-name TerraformDeployerRole --policy-document \'{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"Federated":"arn:aws:iam::123456789012:oidc-provider/token.actions.githubusercontent.com"},"Action":"sts:AssumeRoleWithWebIdentity","Condition":{"StringEquals":{"token.actions.githubusercontent.com:aud":"sts.amazonaws.com","token.actions.githubusercontent.com:sub":"repo:my-org/core-infra:ref:refs/heads/main"}}}]}\'',
+        expectedOutput: JSON.stringify({
+          ResponseMetadata: { HTTPStatusCode: 200 },
+          Status: 'Trust policy updated with StringEquals condition pinning repo:my-org/core-infra on main branch.'
+        }, null, 2),
+        interviewTip: 'Explain the two crucial claims: `aud` must match `sts.amazonaws.com`, and `sub` must match `repo:<org>/<repo>:ref:refs/heads/<branch>`. This guarantees only verified workflow runs from the main branch can authenticate.',
+        pitfallWarning: 'Do not allow pull requests (`pull_request` events) to assume write-level production deployment roles. PRs from external forks can execute arbitrary code.'
+      },
+      {
+        stepId: 's4',
+        phase: 'Stage 4: Active Session Invalidation',
+        title: 'Revoke All Existing Active STS Sessions Issued Prior to the Fix',
+        jobContext: 'Attach an explicit `aws:TokenIssueTime` deny statement to revoke any temporary credentials that the attacker may have assumed in the last hour.',
+        consolePath: 'AWS Console > IAM > Roles > TerraformDeployerRole > Revoke sessions tab',
+        cliCommand: 'aws iam put-role-policy --role-name TerraformDeployerRole --policy-name RevokeOlderSessions --policy-document \'{"Version":"2012-10-17","Statement":[{"Effect":"Deny","Action":"*","Resource":"*","Condition":{"DateLessThan":{"aws:TokenIssueTime":"2026-09-24T20:30:00Z"}}}]}\'',
+        expectedOutput: JSON.stringify({
+          ResponseMetadata: { HTTPStatusCode: 200 },
+          Status: 'Inline policy RevokeOlderSessions attached. All credentials issued prior to 20:30:00Z rejected.'
+        }, null, 2),
+        interviewTip: 'Demonstrate deep AWS STS knowledge: Updating a trust policy does NOT cancel active 1-hour session credentials that were already minted. Attaching a `DateLessThan: { aws:TokenIssueTime }` policy is the only way to invalidate them immediately.',
+        pitfallWarning: 'Ensure the timestamp is formatted in ISO 8601 UTC format (`YYYY-MM-DDTHH:MM:SSZ`).'
+      },
+      {
+        stepId: 's5',
+        phase: 'Stage 5: Terraform State Protection',
+        title: 'Harden Terraform State S3 Bucket with KMS & Restrict Access',
+        jobContext: 'Protect the Terraform S3 state bucket (`terraform-state-prod`) by enabling SSE-KMS with CMK key rotation and denying access to non-CI/CD roles.',
+        consolePath: 'AWS Console > S3 > terraform-state-prod > Bucket policy > Enforce VPC / Role isolation',
+        cliCommand: 'aws s3api put-bucket-encryption --bucket terraform-state-prod --server-side-encryption-configuration \'{"Rules":[{"ApplyServerSideEncryptionByDefault":{"SSEAlgorithm":"aws:kms","KMSMasterKeyId":"arn:aws:kms:us-east-1:123456789012:key/tf-state-key"}}]}\'',
+        expectedOutput: JSON.stringify({
+          ResponseMetadata: { HTTPStatusCode: 200 },
+          Status: 'SSE-KMS encryption enforced on Terraform state bucket.'
+        }, null, 2),
+        interviewTip: 'Because Terraform state files contain plaintext database passwords and API keys, the state bucket must be treated with the highest security classification in the company.',
+        pitfallWarning: 'Always rotate any secrets (database passwords, API keys) that were stored in the compromised state file.'
+      },
+      {
+        stepId: 's6',
+        phase: 'Stage 6: Verification & Proof',
+        title: 'Simulate Forked GitHub Action Assumption & Confirm AccessDenied',
+        jobContext: 'Simulate an OIDC token exchange from an unauthorized repository fork and confirm AWS STS rejects the request.',
+        consolePath: 'AWS Console > CloudShell > Test assume-role-with-web-identity',
+        cliCommand: 'aws sts assume-role-with-web-identity --role-arn arn:aws:iam::123456789012:role/TerraformDeployerRole --role-session-name TestUnauthorized --web-identity-token "simulated.jwt.with.sub.repo:unauthorized-fork/core-infra"',
+        expectedOutput: `An error occurred (AccessDenied) when calling the AssumeRoleWithWebIdentity operation: Not authorized to perform sts:AssumeRoleWithWebIdentity`,
+        interviewTip: 'Notice the `AccessDenied` error. This provides verifiable evidence that only the authorized corporate repository can deploy infrastructure.',
+        pitfallWarning: 'Review all other IAM OIDC roles across the AWS Organization to confirm no other roles use `repo:*:*` wildcards.'
+      }
+    ]
+  },
+  {
+    id: 'lab-cognito-jwt-tampering',
+    labNumber: 'LAB-16',
+    title: 'Cognito User Pool IDOR, Claim Spoofing & OAuth2 Token Signature Verification',
+    jobRole: 'Cloud Security Engineer',
+    roleKey: 'cloud-sec-eng',
+    organization: 'FinTech Consumer Web Portal (B2C & B2B)',
+    difficulty: 'Advanced',
+    timeEstimate: '30 mins',
+    mitreAttack: ['T1078.004 - Cloud Accounts', 'T1550.001 - Application Access Token'],
+    ticketId: 'SEC-9781',
+    sla: '30 mins (P1 Critical)',
+    incidentContext: 'An authenticated free-tier customer user modified their local browser JWT token, injecting `"custom:role": "super-admin"`. Because the backend API Gateway Lambda Authorizer failed to verify the RS256 cryptographic signature, the user gained full administrative control over all customer accounts.',
+    architectureContext: 'Amazon Cognito User Pool -> Amazon API Gateway HTTP API -> Lambda Authorizer -> Microservices.',
+    investigationSteps: [
+      {
+        stepId: 's1',
+        phase: 'Stage 1: Alert Triage & Scope Verification',
+        title: 'Inspect WAF & API Gateway Access Logs for Unauthorized Admin Calls',
+        jobContext: 'Analyze CloudWatch Logs for API Gateway `/admin/tenants/list` to inspect the claims of the requesting user.',
+        consolePath: 'AWS Console > CloudWatch > Log groups > /aws/apigateway/consumer-api > Search: /admin',
+        cliCommand: 'aws logs filter-log-events --log-group-name /aws/apigateway/consumer-api --filter-pattern "admin/tenants" --max-items 3',
+        expectedOutput: JSON.stringify({
+          events: [
+            {
+              timestamp: 1727211000000,
+              message: 'GET /admin/tenants/list HTTP 200 - User: free-user-091 - Claims: {"custom:role":"super-admin"}'
+            }
+          ]
+        }, null, 2),
+        interviewTip: 'Explain the flaw: The user account `free-user-091` was able to access the `/admin/tenants/list` endpoint simply by altering the payload in their local localStorage token.',
+        pitfallWarning: 'A JWT consists of Header, Payload, and Signature. Decoding a payload without verifying the cryptographic signature is equivalent to accepting an unverified identity claim!'
+      },
+      {
+        stepId: 's2',
+        phase: 'Stage 2: Lambda Authorizer Code Inspection',
+        title: 'Identify Missing Signature Verification in Lambda Authorizer',
+        jobContext: 'Inspect the Lambda Authorizer Python code to see how JWT tokens are processed.',
+        consolePath: 'AWS Console > Lambda > Functions > APIAuthorizerFunction > Code source > authorizer.py',
+        cliCommand: 'aws lambda get-function-configuration --function-name APIAuthorizerFunction --query "Environment.Variables"',
+        expectedOutput: JSON.stringify({
+          VulnerableCodeSnippet: "claims = jwt.decode(token, options={'verify_signature': False})  # CRITICAL FLAW"
+        }, null, 2),
+        interviewTip: 'Identify the vulnerability immediately: `verify_signature: False`. The developer disabled signature checking during early debugging and accidentally pushed it to production.',
+        pitfallWarning: 'Never disable signature verification in JWT libraries. Without signature validation, any user can generate arbitrary claims with any text editor.'
+      },
+      {
+        stepId: 's3',
+        phase: 'Stage 3: Cognito User Pool Client Hardening',
+        title: 'Revoke Client Write Permissions on Sensitive Custom Attributes',
+        jobContext: 'Ensure that the Cognito App Client does NOT have write permissions on `custom:role` or `email_verified`, preventing users from setting their own roles during signup.',
+        consolePath: 'AWS Console > Cognito > User pools > ConsumerUserPool > App integration > App client > Attribute read/write permissions',
+        cliCommand: 'aws cognito-idp update-user-pool-client --user-pool-id us-east-1_ProdPool123 --client-id 5exampleclientid987 --read-attributes "email" "custom:role" --write-attributes "email"',
+        expectedOutput: JSON.stringify({
+          UserPoolClient: {
+            ClientId: '5exampleclientid987',
+            WriteAttributes: ['email'],
+            ReadAttributes: ['email', 'custom:role']
+          }
+        }, null, 2),
+        interviewTip: 'Explain Cognito Attribute Permissions: Sensitive claims like `custom:role` must ONLY be writable by backend administrative scripts using IAM credentials, NEVER by the client app.',
+        pitfallWarning: 'If `custom:role` is in `WriteAttributes`, any user can pass `{"custom:role": "admin"}` in their initial `SignUp` API call!'
+      },
+      {
+        stepId: 's4',
+        phase: 'Stage 4: Cryptographic Authorizer Deployment',
+        title: 'Deploy Hardened Lambda Authorizer with RS256 JWKS Signature Verification',
+        jobContext: 'Deploy a hardened Lambda Authorizer that fetches the public keys from Cognito JWKS (`https://cognito-idp.us-east-1.amazonaws.com/{userPoolId}/.well-known/jwks.json`) and strictly validates the RS256 signature and expiration (`exp`).',
+        consolePath: 'AWS Console > Lambda > Functions > APIAuthorizerFunction > Deploy secure authorizer package',
+        cliCommand: 'aws lambda update-function-code --function-name APIAuthorizerFunction --zip-file fileb://secure-jwks-authorizer.zip',
+        expectedOutput: JSON.stringify({
+          FunctionName: 'APIAuthorizerFunction',
+          LastUpdateStatus: 'Successful',
+          Runtime: 'python3.12'
+        }, null, 2),
+        interviewTip: 'Explain JWKS (JSON Web Key Set): The authorizer downloads the public key from Cognito\'s public JWKS endpoint and verifies that the token was signed with Cognito\'s private key. Forged tokens immediately fail verification.',
+        pitfallWarning: 'Cache the JWKS keys in memory between Lambda warm executions to avoid making an HTTP call to Cognito on every single API request.'
+      },
+      {
+        stepId: 's5',
+        phase: 'Stage 5: Compromised Session Invalidation',
+        title: 'Revoke All Active Refresh Tokens for the Offending User',
+        jobContext: 'Invalidate all existing refresh tokens for the user in Cognito so they cannot refresh their session.',
+        consolePath: 'AWS Console > Cognito > User pools > Users > free-user-091 > Sign out of all sessions',
+        cliCommand: 'aws cognito-idp admin-user-global-sign-out --user-pool-id us-east-1_ProdPool123 --username free-user-091',
+        expectedOutput: JSON.stringify({
+          ResponseMetadata: { HTTPStatusCode: 200 },
+          Status: 'Global sign out executed. All refresh and access tokens for free-user-091 revoked.'
+        }, null, 2),
+        interviewTip: '`admin-user-global-sign-out` immediately increments the user\'s token version in Cognito, rendering all previously issued refresh tokens invalid.',
+        pitfallWarning: 'Inform the security incident response team to audit any data modified by `free-user-091` while in the elevated state.'
+      },
+      {
+        stepId: 's6',
+        phase: 'Stage 6: Verification & Proof',
+        title: 'Test Forged JWT against API Gateway & Confirm 401 Unauthorized',
+        jobContext: 'Send an API request with an unsigned, forged JWT containing `"custom:role": "super-admin"` and confirm the authorizer returns HTTP 401 Unauthorized.',
+        consolePath: 'AWS Console > CloudShell > Test curl with forged JWT',
+        cliCommand: 'curl -i -s -H "Authorization: Bearer eyJhbGciOiJub25lIn0.eyJjdXN0b206cm9sZSI6InN1cGVyLWFkbWluIn0." https://api-12345.execute-api.us-east-1.amazonaws.com/admin/tenants/list',
+        expectedOutput: `HTTP/2 401 Unauthorized
+date: Thu, 24 Sep 2026 21:20:00 GMT
+content-type: application/json
+content-length: 26
+www-authenticate: Bearer error="invalid_token", error_description="Signature verification failed"
+
+{"message": "Unauthorized"}`,
+        interviewTip: 'The API returned `401 Unauthorized` with `Signature verification failed`. The forged token was rejected, and zero backend administrative data was exposed.',
+        pitfallWarning: 'Ensure unit tests in your automated CI/CD pipeline include testing invalid and expired JWT tokens to prevent regressions.'
+      }
+    ]
   }
 ]
+
 

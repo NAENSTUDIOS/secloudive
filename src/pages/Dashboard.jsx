@@ -179,7 +179,7 @@ export default function Dashboard() {
       <section className="flagship-simulator-banner" style={{ background: 'linear-gradient(135deg, rgba(14, 165, 233, 0.08) 0%, rgba(15, 23, 42, 0.8) 100%)', borderColor: 'rgba(14, 165, 233, 0.25)' }}>
         <div className="flagship-banner-copy">
           <div className="eyebrow">
-            <span className="pulse-dot" style={{ backgroundColor: 'var(--cyan)' }} /> REAL ENTERPRISE WORKFLOWS /// 8 HANDS-ON RUNBOOK LABS
+            <span className="pulse-dot" style={{ backgroundColor: 'var(--cyan)' }} /> REAL ENTERPRISE WORKFLOWS /// 16 HANDS-ON RUNBOOK LABS
           </div>
           <h2>Real Cloud Security Job Labs & SOP Guides</h2>
           <p>
@@ -189,7 +189,7 @@ export default function Dashboard() {
           <div className="flagship-banner-stats">
             <div className="flagship-stat">
               <span>LABS MASTERED</span>
-              <strong>{completedLabsCount} / {realLabs?.length || 8}</strong>
+              <strong>{completedLabsCount} / {realLabs?.length || 16}</strong>
             </div>
             <div className="flagship-stat">
               <span>SOP STEPS COMPLETED</span>
@@ -212,13 +212,54 @@ export default function Dashboard() {
             <ArrowRight size={17} />
           </Link>
           <Link to="/labs" className="flagship-view-all-link">
-            Explore 8 production runbooks & SOPs &rarr;
+            Explore 16 production runbooks & SOPs &rarr;
           </Link>
         </div>
       </section>
 
       {/* 6-Stage Cloud Security Job SOP Lifecycle */}
       <JobProcessFramework />
+
+      {/* From Scratch to Solved: Job Playbook Engine Banner */}
+      <section className="flagship-simulator-banner" style={{ background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.08) 0%, rgba(15, 23, 42, 0.8) 100%)', borderColor: 'rgba(168, 85, 247, 0.25)' }}>
+        <div className="flagship-banner-copy">
+          <div className="eyebrow">
+            <span className="pulse-dot" style={{ backgroundColor: 'var(--purple)' }} /> END-TO-END SECOPS PLAYBOOKS /// FROM SCRATCH TO SOLVED
+          </div>
+          <h2>Cloud Security Job Playbook Engine & Forensic Studio</h2>
+          <p>
+            Experience the complete enterprise problem-solving lifecycle: Inbound GuardDuty JSON alerts &rarr; 5-minute bridge scoping &rarr; smoking gun extraction &rarr; minute-0 containment &rarr; Terraform IaC fixes &rarr; CISO post-mortem briefings.
+          </p>
+          <div className="flagship-banner-stats">
+            <div className="flagship-stat">
+              <span>WORKFLOW STAGES</span>
+              <strong>7-Step Full SOP</strong>
+            </div>
+            <div className="flagship-stat">
+              <span>FORENSIC QUERY STUDIO</span>
+              <strong style={{ color: 'var(--purple, #c084fc)' }}>Athena & CloudWatch</strong>
+            </div>
+            <div className="flagship-stat">
+              <span>EXECUTIVE REPORTING</span>
+              <strong>CISO Post-Mortems (.md)</strong>
+            </div>
+          </div>
+        </div>
+        <div className="flagship-banner-action">
+          <Link
+            className="button button-primary btn-large"
+            to="/playbooks"
+            style={{ background: 'linear-gradient(135deg, #9333ea 0%, #7e22ce 100%)' }}
+          >
+            <Layers size={18} />
+            <span>Launch Playbook Engine</span>
+            <ArrowRight size={17} />
+          </Link>
+          <Link to="/playbooks" className="flagship-view-all-link">
+            Explore 7-step playbooks & query logs &rarr;
+          </Link>
+        </div>
+      </section>
 
       {/* Active Workspaces */}
       <div className="dashboard-grid">
