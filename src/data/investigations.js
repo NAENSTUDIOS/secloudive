@@ -1,3 +1,5 @@
+import { investigationDetails } from './investigationDetails.js'
+
 export const investigationCategories = [
   { key: 'all', label: 'All Investigations' },
   { key: 'iam', label: 'IAM Security', color: 'cyan' },
@@ -7,7 +9,7 @@ export const investigationCategories = [
   { key: 'architecture', label: 'Architecture Security', color: 'blue' },
 ]
 
-export const investigations = [
+const rawInvestigations = [
   // ==========================================
   // 1. IAM SECURITY (5 Investigations)
   // ==========================================
@@ -1683,4 +1685,10 @@ Error: failed to sanitize print_env output. Build logs published publicly.`,
   }
 ]
 
+export const investigations = rawInvestigations.map(inv => ({
+  ...inv,
+  ...(investigationDetails[inv.id] || {})
+}))
+
 export default investigations
+

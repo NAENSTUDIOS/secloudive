@@ -1462,6 +1462,476 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid 
   border-color: var(--primary-soft);
 }
 
+/* ============================================================
+   REAL-WORLD GROUNDING & MITRE ATT&CK TAGS
+   ============================================================ */
+.mitre-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font: 700 10px 'DM Mono', monospace;
+  padding: 3px 9px;
+  border-radius: 4px;
+  background: rgba(14, 165, 233, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  color: #38bdf8;
+  letter-spacing: 0.3px;
+}
+
+.incident-realworld-callout {
+  margin-top: 18px;
+  padding: 14px 18px;
+  border-radius: 8px;
+  border: 1px solid rgba(251, 191, 36, 0.28);
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.08) 0%, rgba(15, 23, 42, 0.5) 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.rw-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font: 700 9px 'DM Mono', monospace;
+  color: #fbbf24;
+  letter-spacing: 1px;
+}
+.rw-text {
+  margin: 0;
+  color: #e2e8f0;
+  font-size: 12px;
+  line-height: 1.6;
+}
+.rw-text strong {
+  color: #fef08a;
+}
+
+/* Card Badges in Hub View */
+.inv-mitre-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font: 700 9px 'DM Mono', monospace;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: rgba(56, 189, 248, 0.1);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  color: #38bdf8;
+}
+.inv-realworld-tag {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 10px;
+  font: 500 11px system-ui, -apple-system, sans-serif;
+  color: #fde68a;
+  background: rgba(245, 158, 11, 0.08);
+  padding: 4px 8px;
+  border-radius: 4px;
+  border-left: 2px solid #f59e0b;
+}
+.terminal-count {
+  color: #38bdf8 !important;
+}
+
+/* Evidence Locker Header Tabs */
+.evidence-locker-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 20px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.evidence-mode-tabs {
+  display: flex;
+  background: rgba(11, 23, 40, 0.85);
+  padding: 4px;
+  border-radius: 8px;
+  border: 1px solid #1e334d;
+  gap: 4px;
+}
+.evidence-mode-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 14px;
+  border-radius: 6px;
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.evidence-mode-tab:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.04);
+}
+.evidence-mode-tab.active {
+  background: #142844;
+  color: #38bdf8;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* ============================================================
+   INTERACTIVE AWS CLOUDSHELL TERMINAL
+   ============================================================ */
+.interactive-terminal-container {
+  border: 1px solid #203a5b;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #050b14;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55);
+  font-family: 'DM Mono', monospace;
+}
+.terminal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 16px;
+  background: #0a1322;
+  border-bottom: 1px solid #182a40;
+}
+.terminal-dots {
+  display: flex;
+  gap: 6px;
+}
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+.dot-red { background: #ef4444; }
+.dot-yellow { background: #f59e0b; }
+.dot-green { background: #10b981; }
+
+.terminal-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #94a3b8;
+  letter-spacing: 0.3px;
+}
+.terminal-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.term-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: transparent;
+  border: 1px solid #1e334d;
+  color: #94a3b8;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.term-icon-btn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text);
+  border-color: #38bdf8;
+}
+
+/* Command Chips Toolbar */
+.terminal-chips-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background: #070e1b;
+  border-bottom: 1px solid #142236;
+  overflow-x: auto;
+}
+.chips-label {
+  font-size: 9px;
+  font-weight: 700;
+  color: #64748b;
+  letter-spacing: 1px;
+  flex: 0 0 auto;
+}
+.chips-scroll {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+.term-command-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 5px;
+  background: #0f1c30;
+  border: 1px solid #233b5c;
+  color: #cbd5e1;
+  font-size: 11px;
+  font-family: 'DM Mono', monospace;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+.term-command-chip:hover {
+  background: #172d4c;
+  border-color: #38bdf8;
+  color: #38bdf8;
+  transform: translateY(-1px);
+}
+.chip-play {
+  color: #38bdf8;
+}
+.chip-help {
+  border-color: #334155;
+  color: #94a3b8;
+}
+
+/* Terminal Screen */
+.terminal-screen {
+  min-height: 280px;
+  max-height: 440px;
+  overflow-y: auto;
+  padding: 18px 20px;
+  background: #040910;
+  color: #e2e8f0;
+  cursor: text;
+  font-size: 12px;
+  line-height: 1.6;
+}
+.term-line {
+  margin-bottom: 12px;
+}
+.term-line-system {
+  color: #64748b;
+  font-size: 11px;
+  white-space: pre-wrap;
+  border-left: 2px solid #1e3a5f;
+  padding-left: 10px;
+}
+.term-line-input {
+  color: #38bdf8;
+  font-weight: 600;
+}
+.term-line-output {
+  color: #a5f3fc;
+}
+.term-output-text {
+  margin: 0;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: #bae6fd;
+}
+
+/* Terminal Input Bar */
+.terminal-input-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: #08111d;
+  border-top: 1px solid #192a40;
+}
+.term-prompt-prefix {
+  color: #34d399;
+  font-weight: 700;
+  font-size: 12px;
+  flex: 0 0 auto;
+}
+.term-input-field {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #f8fafc;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+}
+.term-input-field::placeholder {
+  color: #475569;
+}
+.term-run-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: #0284c7;
+  color: #ffffff;
+  border: none;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.term-run-btn:hover:not(:disabled) {
+  background: #0369a1;
+}
+.term-run-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ============================================================
+   TACTICAL CONTAINMENT PROTOCOL CARDS
+   ============================================================ */
+.containment-protocol-box {
+  margin: 28px 0;
+  padding: 22px 24px;
+  border-radius: 8px;
+  border: 1px solid rgba(249, 115, 22, 0.35);
+  background: rgba(249, 115, 22, 0.04);
+}
+.containment-scenario-text {
+  color: #cbd5e1;
+  font-size: 13px;
+  line-height: 1.65;
+  margin: 8px 0 16px;
+}
+.containment-options-grid {
+  display: grid;
+  gap: 12px;
+}
+.containment-option-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 14px 18px;
+  border-radius: 6px;
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid #1e334d;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.containment-option-card:hover {
+  border-color: #38516e;
+  background: rgba(30, 41, 59, 0.7);
+}
+.containment-option-card.is-chosen {
+  border-color: #f97316;
+  background: rgba(249, 115, 22, 0.08);
+}
+.containment-radio-indicator {
+  margin-top: 3px;
+}
+.radio-dot {
+  display: block;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid #475569;
+  transition: all 0.2s;
+}
+.radio-dot.checked {
+  border-color: #f97316;
+  background: #f97316;
+  box-shadow: 0 0 8px rgba(249, 115, 22, 0.6);
+}
+.containment-copy {
+  flex: 1;
+}
+.containment-title {
+  display: block;
+  color: #f1f5f9;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.containment-rationale {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed rgba(255, 255, 255, 0.1);
+}
+.rationale-tag {
+  display: inline-block;
+  font: 700 10px 'DM Mono', monospace;
+  padding: 2px 7px;
+  border-radius: 3px;
+  margin-bottom: 6px;
+}
+.rationale-tag.correct {
+  background: rgba(52, 211, 153, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(52, 211, 153, 0.3);
+}
+.rationale-tag.flawed {
+  background: rgba(251, 113, 133, 0.15);
+  color: #fb7185;
+  border: 1px solid rgba(251, 113, 133, 0.3);
+}
+.rationale-text {
+  margin: 0;
+  color: #cbd5e1;
+  font-size: 11px;
+  line-height: 1.6;
+}
+.containment-correct {
+  border-color: rgba(52, 211, 153, 0.5) !important;
+  background: rgba(52, 211, 153, 0.08) !important;
+}
+.containment-incorrect {
+  border-color: rgba(251, 113, 133, 0.5) !important;
+  background: rgba(251, 113, 133, 0.08) !important;
+}
+
+/* Dossier Cards for MITRE & Real-World Case */
+.card-mitre {
+  border-color: rgba(56, 189, 248, 0.3);
+}
+.mitre-dossier-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.mitre-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+.mitre-label {
+  color: #94a3b8;
+  font-weight: 500;
+}
+.mitre-value {
+  color: #f1f5f9;
+  font-family: 'DM Mono', monospace;
+}
+.mitre-expl {
+  margin-top: 6px !important;
+  font-size: 11px !important;
+  color: #94a3b8 !important;
+  line-height: 1.6 !important;
+}
+
+.card-realworld {
+  border-color: rgba(251, 191, 36, 0.3);
+}
+.realworld-dossier-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.rw-case-title {
+  color: #fde047;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.rw-case-expl {
+  margin: 0 !important;
+  font-size: 11px !important;
+  color: #cbd5e1 !important;
+  line-height: 1.6 !important;
+}
+
 @media print {
   .topbar,
   .footer,

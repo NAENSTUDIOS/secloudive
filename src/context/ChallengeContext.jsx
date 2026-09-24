@@ -62,7 +62,7 @@ export function ChallengeProvider({ children }) {
       }
     }))
 
-  const submitInvestigation = (investigation, selectedFindingIds, assessedSeverity) => {
+  const submitInvestigation = (investigation, selectedFindingIds, assessedSeverity, selectedContainmentId) => {
     const correctFindings = investigation.findings.filter(f => f.isCorrect).map(f => f.id)
     const incorrectFindings = investigation.findings.filter(f => !f.isCorrect).map(f => f.id)
 
@@ -73,10 +73,23 @@ export function ChallengeProvider({ children }) {
     // Severity assessment matches
     const severityMatch = assessedSeverity && assessedSeverity.toLowerCase() === investigation.riskLevel.toLowerCase()
 
-    // 80% weight on findings (accuracy), 20% on correct severity triage
-    const findingsScore = Math.max(0, (truePositives - (falsePositives * 0.5)) / Math.max(1, correctFindings.length)) * 80
-    const severityScore = severityMatch ? 20 : 0
-    const totalInvestigationScore = Math.min(100, Math.round(findingsScore + severityScore))
+    // Tactical containment decision scoring
+    let containmentScore = 0
+    let findingsWeight = 80
+    let severityWeight = 20
+
+    if (investigation.containmentProtocol) {
+      findingsWeight = 70
+      severityWeight = 15
+      const correctOption = investigation.containmentProtocol.options.find(o => o.isCorrect)
+      if (correctOption && selectedContainmentId === correctOption.id) {
+        containmentScore = 15
+      }
+    }
+
+    const findingsScore = Math.max(0, (truePositives - (falsePositives * 0.5)) / Math.max(1, correctFindings.length)) * findingsWeight
+    const severityScore = severityMatch ? severityWeight : 0
+    const totalInvestigationScore = Math.min(100, Math.round(findingsScore + severityScore + containmentScore))
 
     setProgress(current => ({
       ...current,
@@ -90,6 +103,7 @@ export function ChallengeProvider({ children }) {
         [investigation.id]: {
           selectedFindingIds,
           assessedSeverity,
+          selectedContainmentId,
           submittedAt: new Date().toISOString(),
           score: totalInvestigationScore
         }

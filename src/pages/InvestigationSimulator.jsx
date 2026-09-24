@@ -24,11 +24,15 @@ import {
   TrendingUp,
   Cpu,
   Download,
-  Printer
+  Printer,
+  Crosshair,
+  Zap,
+  Radio
 } from 'lucide-react'
 import { useChallenges } from '../context/ChallengeContext'
 import EvidenceViewer from '../components/EvidenceViewer'
 import InvestigationCard from '../components/InvestigationCard'
+import InteractiveTerminal from '../components/InteractiveTerminal'
 
 export default function InvestigationSimulator() {
   const { id } = useParams()
@@ -51,6 +55,8 @@ export default function InvestigationSimulator() {
   // State for Active Workspace View
   const [selectedFindingIds, setSelectedFindingIds] = useState([])
   const [assessedSeverity, setAssessedSeverity] = useState('')
+  const [selectedContainmentId, setSelectedContainmentId] = useState('')
+  const [evidenceMode, setEvidenceMode] = useState('artifacts') // 'artifacts' | 'terminal'
   const [showDossier, setShowDossier] = useState(false)
   const [submissionResult, setSubmissionResult] = useState(null)
 
@@ -68,6 +74,7 @@ export default function InvestigationSimulator() {
       if (priorAssessment) {
         setSelectedFindingIds(priorAssessment.selectedFindingIds || [])
         setAssessedSeverity(priorAssessment.assessedSeverity || '')
+        setSelectedContainmentId(priorAssessment.selectedContainmentId || '')
         setShowDossier(true)
         setSubmissionResult({ score: priorAssessment.score })
       } else if (isCompleted) {
@@ -76,6 +83,7 @@ export default function InvestigationSimulator() {
       } else {
         setSelectedFindingIds([])
         setAssessedSeverity('')
+        setSelectedContainmentId('')
         setShowDossier(false)
         setSubmissionResult(null)
       }
@@ -94,6 +102,8 @@ export default function InvestigationSimulator() {
         inv.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         inv.ticket.toLowerCase().includes(searchQuery.toLowerCase()) ||
         inv.incidentSummary.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (inv.realWorldCase && inv.realWorldCase.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (inv.mitre && (inv.mitre.techniqueId.toLowerCase().includes(searchQuery.toLowerCase()) || inv.mitre.techniqueName.toLowerCase().includes(searchQuery.toLowerCase()))) ||
         inv.affectedServices.some(s => s.toLowerCase().includes(searchQuery.toLowerCase()))
 
       return matchesCategory && matchesRisk && matchesSearch
@@ -111,12 +121,14 @@ export default function InvestigationSimulator() {
   // Submit investigation
   const handleSubmit = e => {
     e.preventDefault()
-    if (!activeInvestigation || !selectedFindingIds.length) return
+    if (!activeInvestigation || !selectedFindingIds.length || !assessedSeverity) return
+    if (activeInvestigation.containmentProtocol && !selectedContainmentId) return
 
     const finalScore = submitInvestigation(
       activeInvestigation,
       selectedFindingIds,
-      assessedSeverity
+      assessedSeverity,
+      selectedContainmentId
     )
     setSubmissionResult({ score: finalScore })
     setShowDossier(true)
@@ -127,6 +139,7 @@ export default function InvestigationSimulator() {
     setShowDossier(false)
     setSelectedFindingIds([])
     setAssessedSeverity('')
+    setSelectedContainmentId('')
     setSubmissionResult(null)
   }
 
@@ -142,12 +155,15 @@ export default function InvestigationSimulator() {
   const handleExportPostMortem = () => {
     if (!activeInvestigation) return
     const scoreVal = submissionResult?.score ?? progress.investigationScores?.[activeInvestigation.id] ?? 100
+    const chosenContainment = activeInvestigation.containmentProtocol?.options.find(o => o.id === selectedContainmentId)
     const markdown = `# AWS SECURITY INCIDENT POST-MORTEM REPORT
 ================================================================================
 Ticket ID:        ${activeInvestigation.ticket}
 Incident:         ${activeInvestigation.title}
 Classification:   ${activeInvestigation.riskLevel.toUpperCase()} RISK
 Domain:           ${activeInvestigation.category}
+Real Incident:    ${activeInvestigation.realWorldCase || 'Enterprise Cloud Misconfiguration'}
+MITRE ATT&CK:     ${activeInvestigation.mitre ? `${activeInvestigation.mitre.techniqueId} - ${activeInvestigation.mitre.techniqueName} (${activeInvestigation.mitre.tactic})` : 'N/A'}
 Generated:        ${new Date().toUTCString()}
 Analyst Status:   CLOSED / RESOLVED (Triage Accuracy: ${scoreVal}%)
 Platform:         SeCloudive SOC Operations Center
@@ -157,14 +173,20 @@ Platform:         SeCloudive SOC Operations Center
 --------------------------------------------------------------------------------
 ${activeInvestigation.incidentSummary}
 
-2. BUSINESS CONTEXT & BLAST RADIUS
+2. REAL-WORLD BREACH GROUNDING & ARCHITECTURAL BLAST RADIUS
 --------------------------------------------------------------------------------
-${activeInvestigation.businessContext}
+${activeInvestigation.realWorldCase ? `Historical Case: ${activeInvestigation.realWorldCase}\n` : ''}${activeInvestigation.businessContext}
 
 Affected AWS Services:
 ${activeInvestigation.affectedServices.map(s => `* ${s}`).join('\n')}
 
-3. FORENSIC EVIDENCE ARTIFACTS
+3. TACTICAL CONTAINMENT PROTOCOL (MINUTE-0 DECISION)
+--------------------------------------------------------------------------------
+${activeInvestigation.containmentProtocol ? `Scenario: ${activeInvestigation.containmentProtocol.scenario}
+Selected Action: ${chosenContainment ? `${chosenContainment.label} (${chosenContainment.isCorrect ? 'ACCEPTED' : 'FLAWED'})` : 'Default Automated Quarantining'}
+Rationale: ${chosenContainment ? chosenContainment.rationale : 'Standard containment procedures applied.'}` : 'Standard IAM and network isolation applied.'}
+
+4. FORENSIC EVIDENCE ARTIFACTS
 --------------------------------------------------------------------------------
 ${activeInvestigation.evidence
   .map(
@@ -177,27 +199,27 @@ ${e.content}
   )
   .join('\n\n')}
 
-4. ROOT CAUSE ANALYSIS (RCA)
+5. ROOT CAUSE ANALYSIS (RCA)
 --------------------------------------------------------------------------------
 ${activeInvestigation.rootCauseAnalysis}
 
-5. TECHNICAL SECURITY IMPACT
+6. TECHNICAL SECURITY IMPACT
 --------------------------------------------------------------------------------
 ${activeInvestigation.securityImpact}
 
-6. BUSINESS & COMPLIANCE IMPACT
+7. BUSINESS & COMPLIANCE IMPACT
 --------------------------------------------------------------------------------
 ${activeInvestigation.businessImpact}
 
-7. STEP-BY-STEP INCIDENT REMEDIATION & CONTAINMENT PLAN
+8. STEP-BY-STEP INCIDENT REMEDIATION & CONTAINMENT PLAN
 --------------------------------------------------------------------------------
 ${activeInvestigation.remediationPlan.map((step, idx) => `${idx + 1}. ${step}`).join('\n')}
 
-8. AWS WELL-ARCHITECTED SECURITY BEST PRACTICES
+9. AWS WELL-ARCHITECTED SECURITY BEST PRACTICES
 --------------------------------------------------------------------------------
 ${activeInvestigation.awsBestPractices.map(bp => `* ${bp}`).join('\n')}
 
-9. SECURITY MINDSET & LESSONS LEARNED
+10. SECURITY MINDSET & LESSONS LEARNED
 --------------------------------------------------------------------------------
 ${activeInvestigation.lessonsLearned}
 
@@ -275,9 +297,27 @@ Report digitally signed by SeCloudive SOC Incident Response Simulator
                 {activeInvestigation.riskLevel} Risk
               </span>
               <span className="ticket-id-pill">{activeInvestigation.ticket}</span>
+              {activeInvestigation.mitre && (
+                <span className="mitre-pill" title={`${activeInvestigation.mitre.techniqueName} (${activeInvestigation.mitre.tactic})`}>
+                  <Crosshair size={12} />
+                  MITRE {activeInvestigation.mitre.techniqueId}: {activeInvestigation.mitre.techniqueName}
+                </span>
+              )}
             </div>
             <h1 className="incident-hero-title">{activeInvestigation.title}</h1>
             <p className="incident-hero-summary">{activeInvestigation.incidentSummary}</p>
+
+            {activeInvestigation.realWorldCase && (
+              <div className="incident-realworld-callout">
+                <div className="rw-badge">
+                  <Zap size={13} className="text-amber" />
+                  <span>REAL-WORLD INCIDENT MODEL</span>
+                </div>
+                <p className="rw-text">
+                  Directly grounded in the historical <strong>{activeInvestigation.realWorldCase}</strong>. Learn the exact technical misconfigurations and forensic signals that led to real-world cloud compromise.
+                </p>
+              </div>
+            )}
           </div>
 
           <div className="business-context-card">
@@ -320,21 +360,51 @@ Report digitally signed by SeCloudive SOC Incident Response Simulator
           </ul>
         </section>
 
-        {/* Forensic Evidence Locker */}
+        {/* Forensic Evidence Locker & Interactive AWS CloudShell */}
         <section className="evidence-locker-section">
-          <div className="section-subhead">
-            <div className="subhead-icon">
-              <Terminal size={16} />
+          <div className="evidence-locker-top">
+            <div className="section-subhead">
+              <div className="subhead-icon">
+                <Terminal size={16} />
+              </div>
+              <div>
+                <h3>Forensic Evidence Locker</h3>
+                <p>
+                  Inspect configuration snapshots, IAM policies, and CloudTrail telemetry, or execute
+                  live AWS CLI queries inside the SOC CloudShell sandbox.
+                </p>
+              </div>
             </div>
-            <div>
-              <h3>Forensic Evidence Locker</h3>
-              <p>
-                Inspect configuration snapshots, IAM policies, network maps, and CloudTrail
-                telemetry extracted from the affected environment.
-              </p>
+
+            <div className="evidence-mode-tabs" role="tablist">
+              <button
+                type="button"
+                role="tab"
+                aria-selected={evidenceMode === 'artifacts'}
+                className={`evidence-mode-tab ${evidenceMode === 'artifacts' ? 'active' : ''}`}
+                onClick={() => setEvidenceMode('artifacts')}
+              >
+                <FileText size={13} />
+                <span>Evidence Artifacts ({activeInvestigation.evidence?.length || 0})</span>
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={evidenceMode === 'terminal'}
+                className={`evidence-mode-tab ${evidenceMode === 'terminal' ? 'active' : ''}`}
+                onClick={() => setEvidenceMode('terminal')}
+              >
+                <Terminal size={13} />
+                <span>AWS CloudShell CLI (Live)</span>
+              </button>
             </div>
           </div>
-          <EvidenceViewer evidenceList={activeInvestigation.evidence} />
+
+          {evidenceMode === 'artifacts' ? (
+            <EvidenceViewer evidenceList={activeInvestigation.evidence} />
+          ) : (
+            <InteractiveTerminal investigation={activeInvestigation} />
+          )}
         </section>
 
         {/* Interactive Investigation Form */}
@@ -409,6 +479,62 @@ Report digitally signed by SeCloudive SOC Incident Response Simulator
               </div>
             </div>
 
+            {/* Tactical Containment Protocol */}
+            {activeInvestigation.containmentProtocol && (
+              <div className="containment-protocol-box">
+                <span className="checklist-legend">
+                  TACTICAL CONTAINMENT PROTOCOL (Minute-0 Operational Decision)
+                </span>
+                <p className="containment-scenario-text">
+                  {activeInvestigation.containmentProtocol.scenario}
+                </p>
+                <div className="containment-options-grid">
+                  {activeInvestigation.containmentProtocol.options.map(option => {
+                    const isChosen = selectedContainmentId === option.id
+                    let feedbackClass = ''
+                    if (showDossier) {
+                      if (option.isCorrect) feedbackClass = 'containment-correct'
+                      else if (isChosen && !option.isCorrect) feedbackClass = 'containment-incorrect'
+                    }
+
+                    return (
+                      <div
+                        key={option.id}
+                        className={`containment-option-card ${isChosen ? 'is-chosen' : ''} ${feedbackClass}`}
+                        onClick={() => !showDossier && setSelectedContainmentId(option.id)}
+                        role="radio"
+                        aria-checked={isChosen}
+                        tabIndex={0}
+                        onKeyDown={e => {
+                          if (e.key === ' ' || e.key === 'Enter') {
+                            e.preventDefault()
+                            if (!showDossier) setSelectedContainmentId(option.id)
+                          }
+                        }}
+                      >
+                        <div className="containment-radio-indicator">
+                          <span className={`radio-dot ${isChosen ? 'checked' : ''}`} />
+                        </div>
+                        <div className="containment-copy">
+                          <strong className="containment-title">{option.label}</strong>
+                          {showDossier && (
+                            <div className="containment-rationale">
+                              {option.isCorrect ? (
+                                <span className="rationale-tag correct">✓ Optimal SecOps Procedure</span>
+                              ) : (
+                                <span className="rationale-tag flawed">⚠ Operational Antipattern</span>
+                              )}
+                              <p className="rationale-text">{option.rationale}</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+
             {/* Severity Assessment */}
             <div className="severity-triage-box">
               <span className="checklist-legend">BLAST RADIUS & SEVERITY TRIAGE</span>
@@ -449,7 +575,11 @@ Report digitally signed by SeCloudive SOC Incident Response Simulator
               <div className="triage-actions-bar">
                 <button
                   type="submit"
-                  disabled={!selectedFindingIds.length || !assessedSeverity}
+                  disabled={
+                    !selectedFindingIds.length ||
+                    !assessedSeverity ||
+                    (activeInvestigation.containmentProtocol && !selectedContainmentId)
+                  }
                   className="button button-primary submit-investigation-btn"
                 >
                   <ShieldCheck size={16} />
@@ -459,7 +589,9 @@ Report digitally signed by SeCloudive SOC Incident Response Simulator
                   {!selectedFindingIds.length
                     ? 'Select at least one confirmed finding'
                     : !assessedSeverity
-                    ? 'Assign a severity rating to complete triage'
+                    ? 'Assign a severity rating'
+                    : activeInvestigation.containmentProtocol && !selectedContainmentId
+                    ? 'Select a Minute-0 Containment action'
                     : 'Ready to submit assessment'}
                 </span>
               </div>
@@ -545,6 +677,45 @@ Report digitally signed by SeCloudive SOC Incident Response Simulator
             </div>
 
             <div className="dossier-grid">
+              {/* MITRE ATT&CK Mapping Card */}
+              {activeInvestigation.mitre && (
+                <div className="dossier-card card-mitre">
+                  <div className="dossier-card-head">
+                    <Crosshair size={16} className="text-cyan" />
+                    <h4>MITRE ATT&CK® for Cloud Matrix</h4>
+                  </div>
+                  <div className="mitre-dossier-content">
+                    <div className="mitre-meta-row">
+                      <span className="mitre-label">Tactic:</span>
+                      <strong className="mitre-value text-cyan">{activeInvestigation.mitre.tactic}</strong>
+                    </div>
+                    <div className="mitre-meta-row">
+                      <span className="mitre-label">Technique:</span>
+                      <strong className="mitre-value">{activeInvestigation.mitre.techniqueId} - {activeInvestigation.mitre.techniqueName}</strong>
+                    </div>
+                    <p className="mitre-expl">
+                      Adversaries leverage this technique to bypass conventional security boundaries in AWS environments. Mitigation requires strict principle of least privilege and real-time detection telemetry.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Real World Breach Grounding Card */}
+              {activeInvestigation.realWorldCase && (
+                <div className="dossier-card card-realworld">
+                  <div className="dossier-card-head">
+                    <Zap size={16} className="text-amber" />
+                    <h4>Real-World Breach Analysis</h4>
+                  </div>
+                  <div className="realworld-dossier-content">
+                    <strong className="rw-case-title">{activeInvestigation.realWorldCase}</strong>
+                    <p className="rw-case-expl">
+                      This incident mirrors actual multi-million dollar data breaches where adversaries exploited this precise combination of AWS IAM, networking, or S3 misconfigurations.
+                    </p>
+                  </div>
+                </div>
+              )}
+
               {/* Root Cause Analysis */}
               <div className="dossier-card card-rca">
                 <div className="dossier-card-head">

@@ -1,8 +1,8 @@
-import { ArrowRight, CheckCircle2, AlertTriangle, ShieldAlert, FileText, Layers } from 'lucide-react'
+import { ArrowRight, CheckCircle2, AlertTriangle, ShieldAlert, FileText, Layers, Crosshair, Zap, Terminal } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 export default function InvestigationCard({ investigation, score, isCompleted }) {
-  const { id, ticket, category, categoryKey, title, incidentSummary, riskLevel, affectedServices, evidence } = investigation
+  const { id, ticket, category, categoryKey, title, incidentSummary, riskLevel, affectedServices, evidence, mitre, realWorldCase, terminalCommands } = investigation
 
   const riskClass =
     riskLevel.toLowerCase() === 'critical'
@@ -19,6 +19,12 @@ export default function InvestigationCard({ investigation, score, isCompleted })
         <div className="inv-card-badges">
           <span className="inv-ticket-tag">{ticket}</span>
           <span className={`inv-cat-pill cat-${categoryKey || 'iam'}`}>{category}</span>
+          {mitre && (
+            <span className="inv-mitre-tag" title={`${mitre.techniqueName} (${mitre.tactic})`}>
+              <Crosshair size={10} />
+              {mitre.techniqueId}
+            </span>
+          )}
         </div>
         <span className={`inv-risk-pill ${riskClass}`}>
           <ShieldAlert size={12} />
@@ -30,6 +36,14 @@ export default function InvestigationCard({ investigation, score, isCompleted })
         <h3 className="inv-card-title">
           <Link to={`/investigations/${id}`}>{title}</Link>
         </h3>
+
+        {realWorldCase && (
+          <div className="inv-realworld-tag">
+            <Zap size={11} className="text-amber" />
+            <span>Modeled on: {realWorldCase.split('(')[0].trim()}</span>
+          </div>
+        )}
+
         <p className="inv-card-summary">{incidentSummary}</p>
 
         <div className="inv-services-list">
@@ -49,6 +63,10 @@ export default function InvestigationCard({ investigation, score, isCompleted })
           <span className="evidence-count">
             <FileText size={12} />
             {evidence?.length || 0} artifacts
+          </span>
+          <span className="evidence-count terminal-count">
+            <Terminal size={12} />
+            {terminalCommands?.length || 4} CLI queries
           </span>
           {isCompleted && (
             <span className="inv-score-badge">
