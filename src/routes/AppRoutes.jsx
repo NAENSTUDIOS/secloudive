@@ -18,6 +18,7 @@ const RealLabs = lazy(() => import('../pages/RealLabs'))
 const JobPlaybookEngine = lazy(() => import('../pages/JobPlaybookEngine'))
 const CloudProjects = lazy(() => import('../pages/CloudProjects'))
 const BattleRooms = lazy(() => import('../pages/BattleRooms'))
+const CareerRampUpDirectory = lazy(() => import('../pages/CareerRampUpDirectory'))
 const CareerRoadmap = lazy(() => import('../components/CareerRoadmap'))
 const TimelineSummary = lazy(() => import('../components/AttackTimeline').then(m => ({ default: m.TimelineSummary })))
 
@@ -51,6 +52,7 @@ export default function AppRoutes() {
         <Route path="/projects/:id" element={<CloudProjects />} />
         <Route path="/battle-rooms" element={<BattleRooms />} />
         <Route path="/battle-rooms/:id" element={<BattleRooms />} />
+        <Route path="/ramp-up" element={<CareerRampUpDirectory />} />
         <Route path="/categories" element={<Categories />} />
         <Route path="/architecture-reviews" element={<ArchitectureRoute />} />
         <Route path="/internship-simulator" element={<SimulatorRoute />} />

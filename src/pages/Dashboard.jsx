@@ -20,7 +20,8 @@ import {
   Radio,
   FileCode2,
   Sparkles,
-  ExternalLink
+  ExternalLink,
+  GraduationCap
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import ScoreCard from '../components/ScoreCard'
@@ -188,6 +189,16 @@ export default function Dashboard() {
 
           <button 
             type="button" 
+            className={`track-tab-btn ${activeTrackTab === 'rampup' ? 'active tab-emerald' : ''}`}
+            onClick={() => setActiveTrackTab('rampup')}
+          >
+            <GraduationCap size={15} />
+            <span>Ramp-Up & All Labs</span>
+            <span className="tab-pill pill-emerald">20 Labs</span>
+          </button>
+
+          <button 
+            type="button" 
             className={`track-tab-btn ${activeTrackTab === 'investigations' ? 'active tab-cyan' : ''}`}
             onClick={() => setActiveTrackTab('investigations')}
           >
@@ -235,6 +246,43 @@ export default function Dashboard() {
             <span>6-Stage SOP Framework</span>
           </button>
         </div>
+
+        {/* Tab: Career Ramp-Up & Master Directory */}
+        {activeTrackTab === 'rampup' && (
+          <div className="track-featured-card card-rampup animate-reveal">
+            <div className="track-card-copy">
+              <div className="track-eyebrow">
+                <span className="pulse-dot" style={{ backgroundColor: '#10b981' }} /> CAREER BLUEPRINTS & MASTER LAB DIRECTORY /// ALL HYPERSCALERS
+              </div>
+              <h3>Cloud Security Roles, Ramp-Up Guides & 20 Master Labs</h3>
+              <p>
+                Authoritative career blueprints for every cloud security role (Cloud Security Engineer, IAM Architect, DevSecOps Lead, Forensics Analyst, and Security Architect), complete with authentic original links to AWS Workshops, TryHackMe cloud rooms, HackTheBox machines, and foundational labs (Linux, Python Boto3, VPC Networking, Docker, and Terraform IaC).
+              </p>
+              <div className="track-metrics-grid">
+                <div className="metric-box">
+                  <span>CAREER ROLES</span>
+                  <strong className="text-emerald">5 Key Roles</strong>
+                </div>
+                <div className="metric-box">
+                  <span>CURATED LABS</span>
+                  <strong className="text-cyan">20 Original Labs</strong>
+                </div>
+                <div className="metric-box">
+                  <span>FOUNDATION SCOPE</span>
+                  <strong className="text-purple">Linux • Py • Net • Docker • IaC</strong>
+                </div>
+              </div>
+              <div className="track-actions">
+                <Link to="/ramp-up" className="button button-primary">
+                  <GraduationCap size={16} /> Explore All Roles & Labs <ArrowRight size={15} />
+                </Link>
+                <Link to="/about" className="button button-ghost">
+                  Career Readiness Hub
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Tab 1: Battle Rooms (TryHackMe / HackTheBox Style) */}
         {activeTrackTab === 'battlerooms' && (

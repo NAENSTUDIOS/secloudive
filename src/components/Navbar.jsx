@@ -15,7 +15,8 @@ import {
   ShieldAlert,
   Radio,
   FileCode2,
-  Compass
+  Compass,
+  GraduationCap
 } from 'lucide-react'
 
 export default function Navbar() {
@@ -51,7 +52,7 @@ export default function Navbar() {
 
   const isSimulationsActive = ['/investigations', '/battle-rooms', '/internship-simulator'].some(p => location.pathname.startsWith(p))
   const isHandsOnActive = ['/labs', '/playbooks', '/projects'].some(p => location.pathname.startsWith(p))
-  const isCurriculumActive = ['/categories', '/architecture-reviews', '/challenge'].some(p => location.pathname.startsWith(p))
+  const isCurriculumActive = ['/categories', '/architecture-reviews', '/challenge', '/ramp-up'].some(p => location.pathname.startsWith(p))
 
   return (
     <header className="topbar clean-topbar" ref={navRef}>
@@ -193,6 +194,19 @@ export default function Navbar() {
 
           {activeDropdown === 'curriculum' && (
             <div className="nav-dropdown-menu nav-dropdown-sm">
+              <NavLink to="/ramp-up" className="dropdown-item" onClick={closeMenu}>
+                <div className="item-icon-box text-emerald">
+                  <GraduationCap size={16} />
+                </div>
+                <div className="item-copy">
+                  <div className="item-title">
+                    <span>Career Ramp-Up & All Labs</span>
+                    <span className="badge-pill badge-emerald">20 Labs</span>
+                  </div>
+                  <p>All cloud roles, TryHackMe, HackTheBox & Foundations guides.</p>
+                </div>
+              </NavLink>
+
               <NavLink to="/categories" className="dropdown-item" onClick={closeMenu}>
                 <div className="item-icon-box text-cyan">
                   <Compass size={16} />
