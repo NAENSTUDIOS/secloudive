@@ -93,8 +93,9 @@ export default function RealLabs() {
   // Export official Job Runbook & Proof Report (.MD)
   const handleExportLabReport = () => {
     if (!activeLab) return
+    const labSteps = activeLab.steps || []
     const completedStepIds = progress.labSteps?.[activeLab.id] || []
-    const completionPct = Math.round((completedStepIds.length / activeLab.steps.length) * 100)
+    const completionPct = Math.round((completedStepIds.length / Math.max(1, labSteps.length)) * 100)
 
     const markdown = `# CLOUD SECURITY JOB RUNBOOK & REMEDIATION PROOF REPORT
 ================================================================================
@@ -113,11 +114,11 @@ Platform:         SeCloudive Cloud Security Career Development Engine
 ${activeLab.scenarioSummary}
 
 Target AWS Services:
-${activeLab.targetServices.map(s => `* ${s}`).join('\n')}
+${(activeLab.targetServices || []).map(s => `* ${s}`).join('\n')}
 
 2. STANDARD OPERATING PROCEDURE (SOP) EXECUTION LOG
 --------------------------------------------------------------------------------
-${activeLab.steps
+${labSteps
   .map(
     (step, idx) => `### Step ${idx + 1}: ${step.title} (${step.phase})
 Status: ${completedStepIds.includes(step.stepId) ? '[X] COMPLETED & VERIFIED' : '[ ] PENDING EXECUTION'}
@@ -166,11 +167,22 @@ Digitally verified through SeCloudive Hands-On Cloud Security Job Labs
   // VIEW 1: ACTIVE LAB PLAYER
   // ==========================================
   if (activeLab) {
+    const labSteps = activeLab.steps || []
     const completedStepIds = progress.labSteps?.[activeLab.id] || []
-    const currentStep = activeLab.steps[activeStepIndex] || activeLab.steps[0]
+    const currentStep = labSteps[activeStepIndex] || labSteps[0] || {
+      stepId: 's1',
+      phase: 'Stage 1: Pre-Flight Scoping',
+      title: 'Scoping & Verification',
+      jobContext: 'Inspect the target environment and verify caller identity.',
+      consolePath: 'AWS Console > IAM',
+      cliCommand: 'aws sts get-caller-identity',
+      expectedOutput: '{}',
+      interviewTip: 'Always verify identity before state changes.',
+      pitfallWarning: 'Do not modify production without change approval.'
+    }
     const isStepDone = completedStepIds.includes(currentStep.stepId)
-    const isAllDone = completedStepIds.length === activeLab.steps.length
-    const progressPct = Math.round((completedStepIds.length / activeLab.steps.length) * 100)
+    const isAllDone = labSteps.length > 0 && completedStepIds.length === labSteps.length
+    const progressPct = Math.round((completedStepIds.length / Math.max(1, labSteps.length)) * 100)
 
     return (
       <main className="page-shell real-lab-player-page">
@@ -245,11 +257,11 @@ Digitally verified through SeCloudive Hands-On Cloud Security Job Labs
           <div className="navigator-header">
             <span className="nav-title">SOP EXECUTION TIMELINE</span>
             <span className="nav-progress-text">
-              {completedStepIds.length} of {activeLab.steps.length} Steps Mastered ({progressPct}%)
+              {completedStepIds.length} of {labSteps.length} Steps Mastered ({progressPct}%)
             </span>
           </div>
           <div className="steps-chips-bar" role="tablist">
-            {activeLab.steps.map((step, idx) => {
+            {labSteps.map((step, idx) => {
               const isSelected = activeStepIndex === idx
               const isCompleted = completedStepIds.includes(step.stepId)
 
@@ -435,9 +447,9 @@ Digitally verified through SeCloudive Hands-On Cloud Security Job Labs
               <button
                 type="button"
                 className="button button-primary btn-sm"
-                disabled={activeStepIndex === activeLab.steps.length - 1}
+                disabled={activeStepIndex >= labSteps.length - 1}
                 onClick={() => {
-                  setActiveStepIndex(prev => Math.min(activeLab.steps.length - 1, prev + 1))
+                  setActiveStepIndex(prev => Math.min(labSteps.length - 1, prev + 1))
                   setSimulatedExecution(null)
                 }}
               >

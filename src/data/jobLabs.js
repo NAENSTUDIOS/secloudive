@@ -64,7 +64,7 @@ export const jobProcessStages = [
   }
 ]
 
-export const realLabs = [
+const rawRealLabs = [
   {
     id: 'lab-iam-escalation',
     labNumber: 'LAB-01',
@@ -1910,5 +1910,15 @@ www-authenticate: Bearer error="invalid_token", error_description="Signature ver
     ]
   }
 ]
+
+export const realLabs = rawRealLabs.map(lab => ({
+  ...lab,
+  steps: lab.steps || lab.investigationSteps || [],
+  scenarioSummary: lab.scenarioSummary || lab.incidentContext || '',
+  estimatedMinutes: lab.estimatedMinutes || (typeof lab.timeEstimate === 'string' ? parseInt(lab.timeEstimate) : lab.timeEstimate) || 30,
+  targetServices: lab.targetServices || (lab.targetService ? [lab.targetService] : ['AWS IAM', 'AWS CloudTrail']),
+  mitreTechnique: lab.mitreTechnique || (Array.isArray(lab.mitreAttack) ? lab.mitreAttack[0] : lab.mitreAttack) || 'T1078 Valid Accounts'
+}))
+
 
 

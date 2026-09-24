@@ -161,7 +161,8 @@ export function ChallengeProvider({ children }) {
     let count = 0
     realLabs.forEach(lab => {
       const completedSteps = progress.labSteps?.[lab.id] || []
-      if (completedSteps.length === lab.steps.length) {
+      const totalSteps = lab.steps?.length || 0
+      if (totalSteps > 0 && completedSteps.length === totalSteps) {
         count += 1
       }
     })
