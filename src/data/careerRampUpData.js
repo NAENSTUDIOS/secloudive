@@ -17,6 +17,121 @@ export const rampUpCategories = [
   { id: 'iac', label: 'IaC & Terraform', count: 2 },
 ]
 
+/**
+ * Authoritative Official Ramp-Up Guide PDFs & Industry Whitepapers
+ * Direct links hosted on official AWS CDN and authoritative standards bodies.
+ */
+export const officialRampUpPdfs = [
+  {
+    id: 'pdf-security',
+    title: 'AWS Ramp-Up Guide: Security',
+    roleTag: 'Cloud Security / SecOps',
+    publisher: 'AWS Training & Certification',
+    officialPdfUrl: 'https://d1.awsstatic.com/training-and-certification/ramp-up_guides/Ramp-Up_Guide_Security.pdf',
+    badgeTone: 'cyan',
+    badgeText: 'AWS Official PDF',
+    pageCount: '12 Pages',
+    domainsCovered: ['Identity & Access Management', 'Detection & GuardDuty', 'Infrastructure Protection', 'Data Protection & KMS', 'Incident Response'],
+    summary: 'The authoritative AWS curriculum detailing foundational to advanced security courses, whitepapers, self-paced labs, and certification roadmaps for Cloud Security Engineers.'
+  },
+  {
+    id: 'pdf-architect',
+    title: 'AWS Ramp-Up Guide: Architect',
+    roleTag: 'Solutions Architect',
+    publisher: 'AWS Training & Certification',
+    officialPdfUrl: 'https://d1.awsstatic.com/training-and-certification/ramp-up_guides/Ramp-Up_Guide_Architect.pdf',
+    badgeTone: 'purple',
+    badgeText: 'AWS Official PDF',
+    pageCount: '14 Pages',
+    domainsCovered: ['Multi-Account Organizations', 'Resilient Compute & VPC', 'High Availability Storage', 'Well-Architected Reviews', 'Cost Optimization'],
+    summary: 'Authoritative architect learning pathway outlining steps to design highly available, cost-efficient, fault-tolerant, and secure distributed cloud systems on AWS.'
+  },
+  {
+    id: 'pdf-devops',
+    title: 'AWS Ramp-Up Guide: DevOps Engineer',
+    roleTag: 'DevSecOps & CI/CD',
+    publisher: 'AWS Training & Certification',
+    officialPdfUrl: 'https://d1.awsstatic.com/training-and-certification/ramp-up_guides/Ramp-Up_Guide_DevOps.pdf',
+    badgeTone: 'emerald',
+    badgeText: 'AWS Official PDF',
+    pageCount: '10 Pages',
+    domainsCovered: ['CodePipeline & CodeBuild', 'Infrastructure as Code', 'Automated Testing & SAST', 'Continuous Delivery', 'Monitoring & Observability'],
+    summary: 'Comprehensive roadmap for automating the software development lifecycle, implementing continuous delivery methodologies, and enforcing security gates in pipelines.'
+  },
+  {
+    id: 'pdf-operations',
+    title: 'AWS Ramp-Up Guide: Cloud Operations (SysOps)',
+    roleTag: 'Cloud SysOps & Operations',
+    publisher: 'AWS Training & Certification',
+    officialPdfUrl: 'https://d1.awsstatic.com/training-and-certification/ramp-up_guides/Ramp-Up_Guide_Operations.pdf',
+    badgeTone: 'amber',
+    badgeText: 'AWS Official PDF',
+    pageCount: '11 Pages',
+    domainsCovered: ['Systems Manager & Fleet Mgmt', 'CloudWatch Metrics & Alarms', 'Backup & Disaster Recovery', 'Patch Management', 'Cost Governance'],
+    summary: 'Step-by-step guidance for deploying, managing, automating, and maintaining workloads in cloud environments using AWS Systems Manager and observability tools.'
+  },
+  {
+    id: 'pdf-networking',
+    title: 'AWS Ramp-Up Guide: Advanced Networking',
+    roleTag: 'Cloud Network Engineer',
+    publisher: 'AWS Training & Certification',
+    officialPdfUrl: 'https://d1.awsstatic.com/training-and-certification/ramp-up_guides/Ramp-Up_Guide_Networking.pdf',
+    badgeTone: 'cyan',
+    badgeText: 'AWS Official PDF',
+    pageCount: '9 Pages',
+    domainsCovered: ['Transit Gateway & Direct Connect', 'VPC Flow Logs & Traffic Mirroring', 'Route 53 & Hybrid DNS', 'Network Firewall', 'PrivateLink'],
+    summary: 'Master enterprise-scale cloud network architectures, hybrid Direct Connect routing topologies, multi-VPC segmentation, and stateful packet inspection.'
+  },
+  {
+    id: 'pdf-cloud-essentials',
+    title: 'AWS Ramp-Up Guide: Cloud Essentials',
+    roleTag: 'Cloud Foundations',
+    publisher: 'AWS Training & Certification',
+    officialPdfUrl: 'https://d1.awsstatic.com/training-and-certification/ramp-up_guides/Ramp-Up_Guide_Cloud_Essentials.pdf',
+    badgeTone: 'rose',
+    badgeText: 'AWS Official PDF',
+    pageCount: '8 Pages',
+    domainsCovered: ['Core AWS Services (EC2, S3, IAM, VPC)', 'Shared Responsibility Model', 'Billing & Cost Explorer', 'Cloud Value Proposition', 'Security Basics'],
+    summary: 'Foundational roadmap for anyone starting their cloud journey—covers core concepts, global cloud infrastructure, basic security governance, and economics.'
+  },
+  {
+    id: 'pdf-developer',
+    title: 'AWS Ramp-Up Guide: Developer',
+    roleTag: 'Cloud Software Engineer',
+    publisher: 'AWS Training & Certification',
+    officialPdfUrl: 'https://d1.awsstatic.com/training-and-certification/ramp-up_guides/Ramp-Up_Guide_Developer.pdf',
+    badgeTone: 'purple',
+    badgeText: 'AWS Official PDF',
+    pageCount: '11 Pages',
+    domainsCovered: ['AWS SDKs & CLI', 'Serverless (Lambda & API Gateway)', 'DynamoDB NoSQL Data Modeling', 'Cognito Identity', 'AppSync & Event-Driven'],
+    summary: 'Curated resource guide for developers writing cloud-native applications, using AWS SDKs, managing state with DynamoDB, and building serverless microservices.'
+  },
+  {
+    id: 'pdf-well-architected-security',
+    title: 'AWS Well-Architected Framework: Security Pillar',
+    roleTag: 'Enterprise Architecture & SecOps',
+    publisher: 'AWS Technical Documentation',
+    officialPdfUrl: 'https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/wellarchitected-security-pillar.pdf',
+    badgeTone: 'emerald',
+    badgeText: 'Official Whitepaper PDF',
+    pageCount: '86 Pages',
+    domainsCovered: ['Identity & Permissions', 'Incident Response Playbooks', 'Data Classification & KMS', 'Network Segregation', 'Continuous Auditability'],
+    summary: 'The industry-standard definitive whitepaper by AWS architects detailing design principles and best practices for securing cloud workloads in production.'
+  },
+  {
+    id: 'pdf-cis-benchmark',
+    title: 'CIS AWS Foundations Benchmark v3.0 Specification',
+    roleTag: 'Compliance & Hardening',
+    publisher: 'Center for Internet Security (CIS)',
+    officialPdfUrl: 'https://www.cisecurity.org/benchmark/amazon_web_services',
+    badgeTone: 'amber',
+    badgeText: 'Industry Standard Spec',
+    pageCount: '150+ Pages',
+    domainsCovered: ['Root Account MFA & Protection', 'IAM Password Policies', 'CloudTrail Multi-Region Logging', 'S3 Bucket Block Public Access', 'VPC Flow Logs'],
+    summary: 'Consensus-driven security benchmarks used globally by regulated industries to configure baseline cloud security settings across AWS accounts.'
+  }
+]
+
 export const masterRampUpLabs = [
   // =========================================================================
   // 1. CLOUD ROLES & RAMP-UP GUIDES
@@ -27,6 +142,8 @@ export const masterRampUpLabs = [
     roleTitle: 'Cloud Security Engineer (SecOps & Detection)',
     labTitle: 'AWS Security Hub & GuardDuty Automated Incident Containment',
     originalLink: 'https://workshops.aws/card/AWS%20Security%20Hub%20Workshop',
+    officialPdfUrl: 'https://d1.awsstatic.com/training-and-certification/ramp-up_guides/Ramp-Up_Guide_Security.pdf',
+    officialGuideName: 'AWS Ramp-Up Guide: Security (Official PDF)',
     platform: 'AWS Official Workshops',
     difficulty: 'Intermediate',
     estimatedTime: '60 mins',
@@ -80,6 +197,8 @@ export const masterRampUpLabs = [
     roleTitle: 'Cloud IAM & Identity Architect',
     labTitle: 'IAM Policy Sifting & Permission Boundaries Enforcement',
     originalLink: 'https://workshops.aws/card/IAM%20Policy%20Validation',
+    officialPdfUrl: 'https://d1.awsstatic.com/training-and-certification/ramp-up_guides/Ramp-Up_Guide_Security.pdf',
+    officialGuideName: 'AWS Ramp-Up Guide: Security (Official PDF)',
     platform: 'AWS Official Workshops',
     difficulty: 'Advanced',
     estimatedTime: '75 mins',
@@ -133,6 +252,8 @@ export const masterRampUpLabs = [
     roleTitle: 'DevSecOps & Cloud Platform Security Lead',
     labTitle: 'Keyless GitHub Actions OIDC & Shift-Left Terraform Posture',
     originalLink: 'https://github.com/bridgecrewio/checkov',
+    officialPdfUrl: 'https://d1.awsstatic.com/training-and-certification/ramp-up_guides/Ramp-Up_Guide_DevOps.pdf',
+    officialGuideName: 'AWS Ramp-Up Guide: DevOps Engineer (Official PDF)',
     platform: 'Open Source Security / GitHub',
     difficulty: 'Intermediate',
     estimatedTime: '50 mins',
@@ -186,6 +307,8 @@ export const masterRampUpLabs = [
     roleTitle: 'Cloud Security Architect (Multi-Account & Perimeter)',
     labTitle: 'AWS Organizations SCPs & Transit Gateway Egress Firewall',
     originalLink: 'https://workshops.aws/card/AWS%20Network%20Firewall',
+    officialPdfUrl: 'https://d1.awsstatic.com/training-and-certification/ramp-up_guides/Ramp-Up_Guide_Architect.pdf',
+    officialGuideName: 'AWS Ramp-Up Guide: Architect (Official PDF)',
     platform: 'AWS Official Workshops',
     difficulty: 'Advanced',
     estimatedTime: '90 mins',
@@ -239,6 +362,8 @@ export const masterRampUpLabs = [
     roleTitle: 'Cloud Incident Responder & Digital Forensics Analyst',
     labTitle: 'EC2 Memory Dumps & Athena CloudTrail Kill-Chain Analysis',
     originalLink: 'https://workshops.aws/card/AWS%20Incident%20Response%20and%20Forensics',
+    officialPdfUrl: 'https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/wellarchitected-security-pillar.pdf',
+    officialGuideName: 'AWS Well-Architected Security Pillar (Whitepaper PDF)',
     platform: 'AWS Official Workshops',
     difficulty: 'Advanced',
     estimatedTime: '80 mins',
