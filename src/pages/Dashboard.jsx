@@ -7,7 +7,7 @@ import SecurityMaturityAssessment from '../components/SecurityMaturityAssessment
 import { useChallenges } from '../context/ChallengeContext'
 
 import JobProcessFramework from '../components/JobProcessFramework'
-import { Terminal, Code2, FolderGit2 } from 'lucide-react'
+import { Terminal, Code2, FolderGit2, Skull, Flag } from 'lucide-react'
 
 const studyAreas = [
   { key: 'iam', label: 'IAM Security', description: 'Policies, privilege boundaries, and trust relationships' },
@@ -298,6 +298,47 @@ export default function Dashboard() {
           </Link>
           <Link to="/projects" className="flagship-view-all-link">
             View 4 Free-Tier Projects & Safety Setup &rarr;
+          </Link>
+        </div>
+      </section>
+
+      {/* TryHackMe / HackTheBox Style Cloud Battle Rooms Banner */}
+      <section className="flagship-simulator-banner" style={{ background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.08) 0%, rgba(15, 23, 42, 0.8) 100%)', borderColor: 'rgba(239, 68, 68, 0.25)' }}>
+        <div className="flagship-banner-copy">
+          <div className="eyebrow">
+            <span className="pulse-dot" style={{ backgroundColor: '#ef4444' }} /> PURPLE TEAM ARENA /// TRYHACKME & HACKTHEBOX STYLE
+          </div>
+          <h2>Cloud Security Battle Rooms & CTF Arenas</h2>
+          <p>
+            Experience offensive cloud hacking and defensive engineering: exploit AWS Bedrock Agent prompt injection, SSRF into IMDSv1, bypass GitHub Actions OIDC trust, and submit real CTF flags to prove your layoff-proof skills.
+          </p>
+          <div className="flagship-banner-stats">
+            <div className="flagship-stat">
+              <span>ARENA ROOMS</span>
+              <strong style={{ color: '#f87171' }}>6 Battle Rooms</strong>
+            </div>
+            <div className="flagship-stat">
+              <span>ATTACK MODES</span>
+              <strong>Red vs Blue Team</strong>
+            </div>
+            <div className="flagship-stat">
+              <span>THREAT VECTORS</span>
+              <strong>GenAI, IMDSv2, CI/CD, EKS</strong>
+            </div>
+          </div>
+        </div>
+        <div className="flagship-banner-action">
+          <Link
+            className="button button-primary btn-large"
+            to="/battle-rooms"
+            style={{ background: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)' }}
+          >
+            <Skull size={18} />
+            <span>Enter Battle Rooms</span>
+            <ArrowRight size={17} />
+          </Link>
+          <Link to="/battle-rooms" className="flagship-view-all-link">
+            Explore 6 Purple Team Rooms & Flags &rarr;
           </Link>
         </div>
       </section>

@@ -21,6 +21,7 @@ import {
   Flame,
   Layers
 } from 'lucide-react'
+import CopyrightDisclaimer from '../components/CopyrightDisclaimer'
 
 const careerRoles = [
   {
@@ -370,6 +371,11 @@ export default function About() {
           </div>
         </section>
       )}
+
+      {/* Legal & Trademark Attribution */}
+      <div style={{ marginTop: '40px' }}>
+        <CopyrightDisclaimer />
+      </div>
     </main>
   )
 }

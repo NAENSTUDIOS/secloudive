@@ -13,6 +13,7 @@ export default function Navbar() {
       <NavLink to="/investigations" onClick={closeMenu} className="nav-highlight">Investigations</NavLink>
       <NavLink to="/labs" onClick={closeMenu} className="nav-labs-link">Real Labs & SOPs</NavLink>
       <NavLink to="/playbooks" onClick={closeMenu} className="nav-playbooks-link">Job Playbooks</NavLink>
+      <NavLink to="/battle-rooms" onClick={closeMenu} className="nav-battlerooms-link">Battle Rooms</NavLink>
       <NavLink to="/projects" onClick={closeMenu} className="nav-projects-link">Portfolio Projects ($0)</NavLink>
       <NavLink to="/categories" onClick={closeMenu}>Challenges</NavLink>
       <NavLink to="/internship-simulator" onClick={closeMenu}>SOC On-Call</NavLink>
