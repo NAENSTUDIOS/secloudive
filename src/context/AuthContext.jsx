@@ -361,8 +361,8 @@ export function AuthProvider({ children }) {
     }
 
     setLoading(false)
-    setAuthError('Email authentication requires a configured Supabase backend or previously registered profile.')
-    return { success: false, error: 'Account not found in local registry.' }
+    setAuthError('No profile matching this email was found on this device or cloud registry. You can create a new account or sign in with Google.')
+    return { success: false, error: 'Account not found in registry.' }
   }, [])
 
   // ─── METHOD 4: Supabase Email Sign Up ────────────────────────────────────────
@@ -443,7 +443,7 @@ export function AuthProvider({ children }) {
   const signInWithMagicLink = useCallback(async (email) => {
     setAuthError(null)
     if (!isSupabaseConfigured || !supabase) {
-      return { success: false, error: 'Magic link sign-in requires an active Supabase cloud connection.' }
+      return { success: false, error: 'Magic link sign-in is temporarily unavailable in offline mode. Please use Google sign-in or your Student ID.' }
     }
 
     try {

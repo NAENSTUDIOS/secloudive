@@ -253,7 +253,7 @@ export default function WelcomeOnboardingModal() {
                 Sign In / Claim Unique ID
               </h3>
               <p style={{ fontSize: '0.82rem', color: '#cbd5e1', lineHeight: 1.5, margin: '0 0 16px' }}>
-                Authenticate with Google OAuth, Supabase Cloud Email, or claim a Unique User ID to sync all your XP, completed investigations, and certificates.
+                Authenticate with Google OAuth, Cloud Account, or claim your Unique Student ID to sync all your XP, completed investigations, and certificates across devices.
               </p>
 
               <ul style={{
@@ -268,7 +268,7 @@ export default function WelcomeOnboardingModal() {
               }}>
                 <li style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <CheckCircle2 size={13} style={{ color: '#38bdf8', flexShrink: 0 }} />
-                  <span>Cross-device cloud & Supabase progress sync</span>
+                  <span>Cross-device cloud synchronization & instant restore</span>
                 </li>
                 <li style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <CheckCircle2 size={13} style={{ color: '#38bdf8', flexShrink: 0 }} />
