@@ -51,12 +51,13 @@ forbiddenTerms.forEach(term => {
 // 2. Verify Unified Combined Technologies & Ambient Sync Features
 const requiredAuthFeatures = [
   'Cloud Identity & Sync Center',
-  'Biometric Passkeys • Google Identity • Zero-Trust Cloud Sync',
+  'Biometric Passkeys • Google SSO • Email & Password • Student ID • Ambient Sync',
   'Unified Sign In & Cloud Sync',
   'triggerAmbientSync',
   'handlePasskeyAuthenticate',
   'handleEnrollPasskey',
   'handleGoogleSuccess',
+  'handleEmailPasswordSubmit',
   'handleStudentIdLogin',
   'handleInstantGenerateId'
 ]

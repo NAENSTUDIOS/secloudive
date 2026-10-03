@@ -26,7 +26,8 @@ import {
   Smartphone,
   Shield,
   UserCheck,
-  UserPlus
+  UserPlus,
+  Mail
 } from 'lucide-react'
 import { useChallenges } from '../context/ChallengeContext'
 import { useAuth } from '../context/AuthContext'
@@ -82,6 +83,12 @@ export default function UserSyncModal() {
   // Direct Google Account Fallback
   const [showDirectGoogle, setShowDirectGoogle] = useState(false)
   const [directGoogleEmail, setDirectGoogleEmail] = useState('')
+
+  // Email & Password Authentication State
+  const [emailInput, setEmailInput] = useState('')
+  const [passwordInput, setPasswordInput] = useState('')
+  const [userNameInput, setUserNameInput] = useState('')
+  const [isRegisterMode, setIsRegisterMode] = useState(false)
 
   // Vault Tools (Collapsible Drawer for power users)
   const [showVaultDrawer, setShowVaultDrawer] = useState(false)
@@ -260,7 +267,92 @@ export default function UserSyncModal() {
     }
   }
 
-  // ── AUTH METHOD 3: Student ID / Instant Claim ──────────────────────────────
+  // ── AUTH METHOD 3: Email & Password Sign In / Sign Up ───────────────────────
+  const handleEmailPasswordSubmit = async (e) => {
+    e?.preventDefault()
+    if (!emailInput.trim() || !passwordInput) {
+      setAuthError('Please enter both your email address and password.')
+      return
+    }
+    const cleanEmail = emailInput.trim().toLowerCase()
+    setIsProcessing(true)
+    setAuthError(null)
+
+    try {
+      if (isRegisterMode) {
+        // Sign Up Mode
+        let res = null
+        if (auth?.signUpWithEmail) {
+          res = await auth.signUpWithEmail(cleanEmail, passwordInput, {
+            name: userNameInput.trim() || cleanEmail.split('@')[0],
+            role: 'Cloud Security Engineer'
+          })
+        }
+
+        const existingProfiles = allProfiles || []
+        let profile = existingProfiles.find(p => p.email && p.email.toLowerCase() === cleanEmail)
+        if (!profile && res?.profile) {
+          profile = res.profile
+        } else if (!profile) {
+          const newId = generateUniqueUserId('SEC-USER')
+          const regRes = registerUniqueProfile({
+            userId: newId,
+            name: userNameInput.trim() || cleanEmail.split('@')[0],
+            email: cleanEmail,
+            role: 'Cloud Security Engineer',
+            migrateGuestData: isCurrentGuest
+          })
+          if (regRes.success) {
+            profile = regRes.profile
+          }
+        }
+
+        if (profile?.id) {
+          switchUserProfile(profile.id)
+          setActionSuccess(`Account Created & Synced: ${profile.id}`)
+          await triggerAmbientSync(profile.id)
+          setEmailInput('')
+          setPasswordInput('')
+          setUserNameInput('')
+          setTimeout(() => setActionSuccess(null), 4000)
+        } else if (res?.message) {
+          setActionSuccess(res.message)
+          setTimeout(() => setActionSuccess(null), 4000)
+        } else {
+          setAuthError(res?.error || 'Registration could not be completed.')
+        }
+      } else {
+        // Sign In Mode
+        let res = null
+        if (auth?.signInWithEmail) {
+          res = await auth.signInWithEmail(cleanEmail, passwordInput)
+        }
+
+        const existingProfiles = allProfiles || []
+        const matched = existingProfiles.find(p => p.email && p.email.toLowerCase() === cleanEmail)
+        const targetId = res?.profile?.id || matched?.id || res?.user?.id
+
+        if (targetId) {
+          switchUserProfile(targetId)
+          setActionSuccess(`Signed In & Synced: ${targetId}`)
+          await triggerAmbientSync(targetId)
+          setEmailInput('')
+          setPasswordInput('')
+          setTimeout(() => setActionSuccess(null), 4000)
+        } else if (res?.error) {
+          setAuthError(res.error)
+        } else {
+          setAuthError(`No account found for "${cleanEmail}". Click "New learner? Create email account" below to register.`)
+        }
+      }
+    } catch (err) {
+      setAuthError(err.message || 'Authentication failed. Please verify your credentials.')
+    } finally {
+      setIsProcessing(false)
+    }
+  }
+
+  // ── AUTH METHOD 4: Student ID / Instant Claim ──────────────────────────────
   const handleStudentIdLogin = async (e) => {
     e?.preventDefault()
     if (!studentIdInput.trim()) return
@@ -480,7 +572,7 @@ export default function UserSyncModal() {
                 </span>
               </div>
               <div style={{ fontSize: '11px', color: '#94a3b8', marginTop: '2px' }}>
-                Biometric Passkeys • Google Identity • Zero-Trust Cloud Sync
+                Biometric Passkeys • Google SSO • Email & Password • Student ID • Ambient Sync
               </div>
             </div>
           </div>
@@ -874,7 +966,133 @@ export default function UserSyncModal() {
               </form>
             )}
 
-            {/* Divider */}
+            {/* Divider: Email & Password */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              margin: '18px 0 12px',
+              color: '#64748b',
+              fontSize: '11px',
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              letterSpacing: '0.6px'
+            }}>
+              <div style={{ flex: 1, height: '1px', background: 'rgba(148, 163, 184, 0.15)' }} />
+              <span style={{ padding: '0 12px' }}>or sign in with Email & Password</span>
+              <div style={{ flex: 1, height: '1px', background: 'rgba(148, 163, 184, 0.15)' }} />
+            </div>
+
+            {/* Email & Password Form */}
+            <form onSubmit={handleEmailPasswordSubmit} style={{
+              background: 'rgba(2, 6, 23, 0.55)',
+              border: '1px solid rgba(148, 163, 184, 0.18)',
+              borderRadius: '10px',
+              padding: '14px',
+              marginBottom: '16px'
+            }}>
+              {isRegisterMode && (
+                <div style={{ marginBottom: '8px' }}>
+                  <input
+                    type="text"
+                    placeholder="Your Full Name (e.g. Alex Chen)"
+                    value={userNameInput}
+                    onChange={(e) => setUserNameInput(e.target.value)}
+                    style={{
+                      width: '100%',
+                      background: 'rgba(15, 23, 42, 0.9)',
+                      border: '1px solid rgba(148, 163, 184, 0.3)',
+                      borderRadius: '6px',
+                      padding: '8px 12px',
+                      color: '#f8fafc',
+                      fontSize: '12px'
+                    }}
+                  />
+                </div>
+              )}
+
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                gap: '8px',
+                marginBottom: '10px'
+              }}>
+                <input
+                  type="email"
+                  placeholder="name@example.com"
+                  value={emailInput}
+                  onChange={(e) => setEmailInput(e.target.value)}
+                  required
+                  style={{
+                    background: 'rgba(15, 23, 42, 0.9)',
+                    border: '1px solid rgba(148, 163, 184, 0.3)',
+                    borderRadius: '6px',
+                    padding: '8px 12px',
+                    color: '#f8fafc',
+                    fontSize: '12px'
+                  }}
+                />
+                <input
+                  type="password"
+                  placeholder="Password (min 6 characters)"
+                  value={passwordInput}
+                  onChange={(e) => setPasswordInput(e.target.value)}
+                  required
+                  style={{
+                    background: 'rgba(15, 23, 42, 0.9)',
+                    border: '1px solid rgba(148, 163, 184, 0.3)',
+                    borderRadius: '6px',
+                    padding: '8px 12px',
+                    color: '#f8fafc',
+                    fontSize: '12px'
+                  }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsRegisterMode(prev => !prev)
+                    setAuthError(null)
+                  }}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#38bdf8',
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    textDecoration: 'underline',
+                    padding: 0
+                  }}
+                >
+                  {isRegisterMode ? 'Already have an account? Sign in' : 'New learner? Create email account'}
+                </button>
+
+                <button
+                  type="submit"
+                  disabled={isProcessing}
+                  style={{
+                    background: isRegisterMode ? '#10b981' : '#0284c7',
+                    color: isRegisterMode ? '#020617' : '#ffffff',
+                    border: 'none',
+                    borderRadius: '6px',
+                    padding: '8px 18px',
+                    fontSize: '12px',
+                    fontWeight: 800,
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}
+                >
+                  <Mail size={13} />
+                  <span>{isProcessing ? 'Syncing…' : (isRegisterMode ? 'Create Account & Sync' : 'Sign In & Sync')}</span>
+                </button>
+              </div>
+            </form>
+
+            {/* Divider: Student ID */}
             <div style={{
               display: 'flex',
               alignItems: 'center',
