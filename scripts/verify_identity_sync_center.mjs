@@ -33,38 +33,40 @@ const forbiddenTerms = [
   'Step 4: Enable Google OAuth',
   'Supabase Cloud DB • Instant isolated sync',
   'Supabase Cloud</span',
-  'Create Supabase Cloud Account'
+  'Create Supabase Cloud Account',
+  '2036',
+  'SOVEREIGN'
 ]
 
-console.log('[CHECK 1] Scanning UserSyncModal.jsx for forbidden developer/backend leaks...')
+console.log('[CHECK 1] Scanning UserSyncModal.jsx for forbidden leaks & sci-fi jargon...')
 forbiddenTerms.forEach(term => {
   if (userSyncContent.includes(term)) {
-    console.error(`❌ FAIL: Found leaked technical term: "${term}"`)
+    console.error(`❌ FAIL: Found forbidden term: "${term}"`)
     failures++
   } else {
-    console.log(`✓ PASS: "${term}" is completely hidden`)
+    console.log(`✓ PASS: "${term}" is completely absent`)
   }
 })
 
-// 2. Verify 2036 Sovereign Identity & Ambient Sync Features
-const required2036Terms = [
-  'Identity & Ambient Sync Nexus',
-  'Passkeys • Biometric FIDO2 • Google Sovereign ID • Ambient Real-Time Sync',
+// 2. Verify Unified Combined Technologies & Ambient Sync Features
+const requiredAuthFeatures = [
+  'Cloud Identity & Sync Center',
+  'Biometric Passkeys • Google Identity • Zero-Trust Cloud Sync',
+  'Unified Sign In & Cloud Sync',
   'triggerAmbientSync',
   'handlePasskeyAuthenticate',
   'handleEnrollPasskey',
   'handleGoogleSuccess',
   'handleStudentIdLogin',
-  'handleInstantGenerateId',
-  'Windows Hello / Touch ID'
+  'handleInstantGenerateId'
 ]
 
-console.log('\n[CHECK 2] Verifying 2036 Sovereign Identity & Ambient Sync Features...')
-required2036Terms.forEach(term => {
+console.log('\n[CHECK 2] Verifying Unified Combined Authentication & Ambient Sync...')
+requiredAuthFeatures.forEach(term => {
   if (userSyncContent.includes(term)) {
-    console.log(`✓ PASS: Found 2036 feature string: "${term}"`)
+    console.log(`✓ PASS: Found required feature string: "${term}"`)
   } else {
-    console.error(`❌ FAIL: Missing 2036 feature string: "${term}"`)
+    console.error(`❌ FAIL: Missing required feature string: "${term}"`)
     failures++
   }
 })
@@ -101,8 +103,8 @@ if (supabaseContent.includes('url: rawUrl')) {
 
 console.log('\n============================================================')
 if (failures === 0) {
-  console.log('🎉 ALL AUDITS PASSED: 100% 2036 Sovereign Identity & Ambient Sync Nexus Ready!')
-  console.log('Zero clutter, automatic ambient sync on login, hardware biometric passkeys active.')
+  console.log('🎉 ALL AUDITS PASSED: Unified Authentication & Cloud Sync Ready!')
+  console.log('Zero clutter, combined authentication technologies, automatic ambient sync active.')
   console.log('============================================================')
   process.exit(0)
 } else {

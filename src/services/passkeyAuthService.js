@@ -1,6 +1,6 @@
 /**
- * SeCLOUDIVE — Next-Gen WebAuthn & Hardware Passkey Authentication Engine
- * Architecture: NAEN Studios / 2036 Sovereign Identity Specification
+ * SeCLOUDIVE — WebAuthn & Hardware Passkey Authentication Engine
+ * Architecture: NAEN Studios / FIDO2 & WebAuthn Specification
  * =============================================================================
  * Provides passwordless, phishing-resistant, biometric authentication:
  * - Touch ID (macOS / iOS)
@@ -102,7 +102,7 @@ export async function registerPasskey({ userId, userName, displayName }) {
         publicKey: {
           challenge,
           rp: {
-            name: 'SeCLOUDIVE Sovereign Vault',
+            name: 'SeCloudive Cloud Vault',
             id: window.location.hostname || 'localhost'
           },
           user: {
