@@ -19,25 +19,36 @@ import {
   ChevronDown, 
   ChevronRight,
   Flame,
-  ArrowRight
+  ArrowRight,
+  Award,
+  Sparkles
 } from 'lucide-react'
 import { cloudProjects, zeroBillingGuide } from '../data/cloudProjects'
+import { useChallenges } from '../context/ChallengeContext'
+import DefenderQuoteCallout from '../components/DefenderQuoteCallout'
 
 export default function CloudProjects() {
+  const {
+    cloudProjectsCompleted,
+    cloudProjectsTeardown,
+    toggleCloudProject,
+    toggleProjectTeardown,
+    completedCloudProjectsCount,
+    completedTeardownsCount
+  } = useChallenges()
+
   const [activeProject, setActiveProject] = useState(cloudProjects[0])
   const [activeTab, setActiveTab] = useState('build') // 'build' | 'teardown' | 'portfolio'
   const [copiedId, setCopiedId] = useState(null)
   const [showSafetyModal, setShowSafetyModal] = useState(false)
-  const [cleanedUp, setCleanedUp] = useState({})
+
+  const isVerified = Boolean(cloudProjectsCompleted?.[activeProject.id])
+  const isTornDown = Boolean(cloudProjectsTeardown?.[activeProject.id])
 
   const handleCopy = (text, id) => {
     navigator.clipboard.writeText(text)
     setCopiedId(id)
     setTimeout(() => setCopiedId(null), 2000)
-  }
-
-  const toggleCleaned = (projId) => {
-    setCleanedUp(prev => ({ ...prev, [projId]: !prev[projId] }))
   }
 
   return (
@@ -46,7 +57,7 @@ export default function CloudProjects() {
       <div className="projects-header">
         <div>
           <div className="eyebrow">
-            <span className="pulse-dot" style={{ backgroundColor: 'var(--green)' }} /> 100% AWS FREE TIER ELIGIBLE /// ZERO-DOLLAR BILLING GUARANTEE
+            <span className="pulse-dot" style={{ backgroundColor: 'var(--green)' }} /> 100% AWS FREE TIER ELIGIBLE /// VERIFIED $0 TEARDOWN WORKFLOW
           </div>
           <h1>
             Cloud Security Capstone Projects<span>.</span>
@@ -58,6 +69,21 @@ export default function CloudProjects() {
         </div>
 
         <div className="projects-header-actions">
+          <span style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px',
+            background: 'rgba(16, 185, 129, 0.15)',
+            border: '1px solid rgba(16, 185, 129, 0.35)',
+            color: '#34d399',
+            padding: '8px 14px',
+            borderRadius: '8px',
+            fontSize: '0.82rem',
+            fontWeight: 700
+          }}>
+            <Award size={15} />
+            <span>{completedCloudProjectsCount}/4 Verified ({completedCloudProjectsCount * 150} XP)</span>
+          </span>
           <button
             type="button"
             className="button button-ghost btn-safety"
@@ -71,6 +97,14 @@ export default function CloudProjects() {
           </Link>
         </div>
       </div>
+
+      {/* Motivational Builder Quote Callout */}
+      <DefenderQuoteCallout 
+        category="builder" 
+        autoCycle={true} 
+        cycleIntervalMs={14000} 
+        className="projects-quote-callout"
+      />
 
       {/* Zero Billing Alert Box */}
       {showSafetyModal && (
@@ -111,36 +145,72 @@ export default function CloudProjects() {
 
       {/* Project Selector Tabs */}
       <div className="project-selector-strip">
-        {cloudProjects.map(proj => (
-          <button
-            key={proj.id}
-            type="button"
-            className={`project-tab-card ${activeProject.id === proj.id ? 'active' : ''}`}
-            onClick={() => {
-              setActiveProject(proj)
-              setActiveTab('build')
-            }}
-          >
-            <div className="ptc-meta">
-              <span className="ptc-num">{proj.number}</span>
-              <span className="ptc-cost text-emerald">{proj.cost}</span>
-            </div>
-            <h4>{proj.title}</h4>
-            <div className="ptc-footer">
-              <span><Clock size={12} /> {proj.estimatedTime}</span>
-              <span className="text-cyan">{proj.role.split(' ')[0]}</span>
-            </div>
-          </button>
-        ))}
+        {cloudProjects.map(proj => {
+          const projVerified = Boolean(cloudProjectsCompleted?.[proj.id])
+          const projCleaned = Boolean(cloudProjectsTeardown?.[proj.id])
+          return (
+            <button
+              key={proj.id}
+              type="button"
+              className={`project-tab-card ${activeProject.id === proj.id ? 'active' : ''}`}
+              onClick={() => {
+                setActiveProject(proj)
+                setActiveTab('build')
+              }}
+            >
+              <div className="ptc-meta">
+                <span className="ptc-num">{proj.number}</span>
+                <span className="ptc-cost text-emerald">{proj.cost}</span>
+                {projVerified && (
+                  <span style={{ fontSize: '0.62rem', background: 'rgba(16, 185, 129, 0.25)', color: '#34d399', padding: '1px 5px', borderRadius: '4px', border: '1px solid rgba(16, 185, 129, 0.4)', fontWeight: 700 }}>
+                    ✓ Verified
+                  </span>
+                )}
+                {projCleaned && (
+                  <span style={{ fontSize: '0.62rem', background: 'rgba(56, 189, 248, 0.2)', color: '#38bdf8', padding: '1px 5px', borderRadius: '4px', border: '1px solid rgba(56, 189, 248, 0.4)', fontWeight: 700 }}>
+                    ✓ $0 Cleaned
+                  </span>
+                )}
+              </div>
+              <h4>{proj.title}</h4>
+              <div className="ptc-footer">
+                <span><Clock size={12} /> {proj.estimatedTime}</span>
+                <span className="text-cyan">{proj.role.split(' ')[0]}</span>
+              </div>
+            </button>
+          )
+        })}
       </div>
 
       {/* Active Project Workspace */}
       <div className="project-workspace-card">
         {/* Header Bar */}
         <div className="pw-header">
-          <div className="pwh-info">
+          <div className="pwh-info" style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
             <span className="project-badge">{activeProject.number}</span>
-            <h2>{activeProject.title}</h2>
+            <h2 style={{ margin: 0 }}>{activeProject.title}</h2>
+            <button
+              type="button"
+              onClick={() => toggleCloudProject(activeProject.id)}
+              style={{
+                background: isVerified ? 'rgba(16, 185, 129, 0.22)' : 'rgba(56, 189, 248, 0.15)',
+                border: `1px solid ${isVerified ? '#10b981' : 'rgba(56, 189, 248, 0.4)'}`,
+                color: isVerified ? '#34d399' : '#38bdf8',
+                borderRadius: '8px',
+                padding: '6px 14px',
+                fontSize: '0.8rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                transition: 'all 0.2s ease'
+              }}
+              title="Click to toggle verified status and sync evidence dossier with Dashboard"
+            >
+              <CheckCircle2 size={15} />
+              <span>{isVerified ? '✓ Verified in Personal AWS (+150 XP)' : 'Mark Verified & Record Evidence (+150 XP)'}</span>
+            </button>
           </div>
 
           <div className="pwh-tabs">
@@ -270,15 +340,26 @@ export default function CloudProjects() {
             <div className="next-action-prompt">
               <div>
                 <h4>Finished Testing Your Project?</h4>
-                <p>Proceed to the Tear-Down Runbook to remove test resources and preserve your 100% Free Tier status.</p>
+                <p>Record your verifiable portfolio proof and execute the tear-down runbook to ensure $0 billing.</p>
               </div>
-              <button
-                type="button"
-                className="button button-primary"
-                onClick={() => setActiveTab('teardown')}
-              >
-                <Trash2 size={15} /> <span>Open Zero-Billing Tear-Down Runbook</span>
-              </button>
+              <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                <button
+                  type="button"
+                  className="button button-ghost"
+                  onClick={() => toggleCloudProject(activeProject.id)}
+                  style={{ borderColor: isVerified ? '#10b981' : 'rgba(56, 189, 248, 0.4)', color: isVerified ? '#34d399' : '#38bdf8' }}
+                >
+                  <CheckCircle2 size={15} />
+                  <span>{isVerified ? '✓ Verified in Account' : 'Verify & Record Milestone'}</span>
+                </button>
+                <button
+                  type="button"
+                  className="button button-primary"
+                  onClick={() => setActiveTab('teardown')}
+                >
+                  <Trash2 size={15} /> <span>Open Zero-Billing Tear-Down Runbook</span>
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -292,18 +373,26 @@ export default function CloudProjects() {
                 <div>
                   <h3>Mandatory Zero-Billing Cleanup Runbook</h3>
                   <p>{activeProject.tearDownRunbook.zeroCostPromise}</p>
+                  <p style={{ marginTop: '8px', fontSize: '0.78rem', color: '#cbd5e1', fontStyle: 'italic', opacity: 0.9 }}>
+                    Follow every step and verify in your AWS billing console. We can't guarantee your account shows $0 if a step is skipped or AWS's own free-tier terms change.
+                  </p>
                 </div>
               </div>
 
               <div className="teardown-toggle-btn">
                 <button
                   type="button"
-                  className={`btn-clean-toggle ${cleanedUp[activeProject.id] ? 'is-cleaned' : ''}`}
-                  onClick={() => toggleCleaned(activeProject.id)}
+                  className={`btn-clean-toggle ${isTornDown ? 'is-cleaned' : ''}`}
+                  onClick={() => toggleProjectTeardown(activeProject.id)}
                 >
                   <CheckCircle2 size={16} />
-                  <span>{cleanedUp[activeProject.id] ? 'Tear-Down Verified Complete ($0 Cost)' : 'Mark Tear-Down Complete'}</span>
+                  <span>{isTornDown ? 'Tear-Down Verified Complete ($0 Cost)' : 'Mark Tear-Down Complete'}</span>
                 </button>
+                {isTornDown && (
+                  <div style={{ marginTop: '6px', fontSize: '0.75rem', color: '#34d399', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <Check size={13} /> Verified in AWS Billing Console • Synced to Profile & Dashboard (+50 XP)
+                  </div>
+                )}
               </div>
             </div>
 

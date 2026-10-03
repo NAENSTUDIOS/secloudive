@@ -1,0 +1,160 @@
+/* ==============================================================================
+   SeCloudive Encouraging Defender Quotes & Motivational Callouts
+   ============================================================================== */
+
+.defender-quote-callout {
+  position: relative;
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(8, 14, 28, 0.92) 100%);
+  border: 1px solid rgba(56, 189, 248, 0.22);
+  border-left: 3px solid #38bdf8;
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin: 16px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.defender-quote-callout:hover {
+  border-color: rgba(56, 189, 248, 0.45);
+  box-shadow: 0 6px 25px rgba(56, 189, 248, 0.12);
+}
+
+.defender-quote-callout.theme-tactical {
+  border-left-color: #f43f5e;
+}
+.defender-quote-callout.theme-tactical .quote-avatar-initials {
+  background: rgba(244, 63, 94, 0.15);
+  color: #f43f5e;
+  border-color: rgba(244, 63, 94, 0.35);
+}
+
+.defender-quote-callout.theme-builder {
+  border-left-color: #10b981;
+}
+.defender-quote-callout.theme-builder .quote-avatar-initials {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  border-color: rgba(16, 185, 129, 0.35);
+}
+
+.defender-quote-callout.theme-career {
+  border-left-color: #f59e0b;
+}
+.defender-quote-callout.theme-career .quote-avatar-initials {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+  border-color: rgba(245, 158, 11, 0.35);
+}
+
+.quote-left-wrapper {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  flex: 1;
+}
+
+.quote-avatar-initials {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'DM Mono', monospace;
+  font-weight: 800;
+  font-size: 0.8rem;
+  color: #38bdf8;
+  flex-shrink: 0;
+}
+
+.quote-text-container {
+  flex: 1;
+}
+
+.quote-body-text {
+  font-size: 0.86rem;
+  font-style: italic;
+  color: #e2e8f0;
+  line-height: 1.45;
+  margin: 0 0 4px 0;
+  transition: opacity 0.3s ease;
+}
+
+.quote-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 0.74rem;
+}
+
+.quote-author-name {
+  color: #f8fafc;
+  font-weight: 700;
+}
+
+.quote-author-role {
+  color: #64748b;
+}
+
+.quote-theme-pill {
+  padding: 1px 7px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  color: #94a3b8;
+  font-size: 0.68rem;
+  font-family: 'DM Mono', monospace;
+  text-transform: uppercase;
+}
+
+.quote-action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.quote-tool-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: rgba(30, 41, 59, 0.5);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.quote-tool-btn:hover {
+  background: rgba(56, 189, 248, 0.2);
+  border-color: rgba(56, 189, 248, 0.4);
+  color: #38bdf8;
+  transform: translateY(-1px);
+}
+
+/* Smooth fade transition */
+.quote-fade-in {
+  animation: quoteFade 0.35s ease-out forwards;
+}
+
+@keyframes quoteFade {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

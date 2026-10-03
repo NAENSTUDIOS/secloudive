@@ -1,0 +1,26 @@
+[
+  {
+    "source": "AWS Security Blog",
+    "title": "Automating IAM Credential Auditing Across AWS Organizations with IAM Access Analyzer",
+    "link": "https://aws.amazon.com/blogs/security/",
+    "description": "Learn how to detect unused access keys, enforce least-privilege boundary policies, and remediate over-permissive role trust policies across enterprise multi-account landing zones.",
+    "pubDate": "Fri, 26 Sep 2026 12:00:00 GMT",
+    "ingestedAt": "2026-09-26 12:00:00"
+  },
+  {
+    "source": "AWS What's New",
+    "title": "Amazon GuardDuty Expands Threat Detection Coverage for Container Workloads in Amazon EKS",
+    "link": "https://aws.amazon.com/about-aws/whats-new/recent/",
+    "description": "GuardDuty now features kernel-level monitoring for unauthorized privilege escalation, cryptocurrency mining activity, and unexpected outbound network connections inside EKS pods.",
+    "pubDate": "Fri, 26 Sep 2026 10:30:00 GMT",
+    "ingestedAt": "2026-09-26 10:30:00"
+  },
+  {
+    "source": "AWS Architecture Blog",
+    "title": "Designing Zero-Trust Network Perimeters with AWS Transit Gateway and VPC Lattice",
+    "link": "https://aws.amazon.com/blogs/architecture/",
+    "description": "Examine reference architectures for replacing legacy internet-facing reverse proxies with private service-to-service mTLS mesh communication, eliminating public IP exposures.",
+    "pubDate": "Fri, 26 Sep 2026 09:15:00 GMT",
+    "ingestedAt": "2026-09-26 09:15:00"
+  }
+]

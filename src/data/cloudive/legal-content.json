@@ -1,0 +1,32 @@
+{
+  "terms": {
+    "title": "Terms of Use",
+    "lastUpdated": "March 2026",
+    "summary": "Cloudive provides open, free educational blueprints and curriculum packs for individual self-study and university instruction. No commercial resale or scraping.",
+    "published": true
+  },
+  "refunds": {
+    "title": "Voluntary Support & Contribution Policy",
+    "lastUpdated": "March 2026",
+    "summary": "All Cloudive core curriculum packs, foundation workbooks, and roadmaps are 100% free to download. Financial support is voluntary. We do not sell subscriptions.",
+    "published": true
+  },
+  "disclaimer": {
+    "title": "Independent Educational Platform Disclaimer",
+    "lastUpdated": "March 2026",
+    "summary": "Cloudive is an independent educational publisher and is not affiliated with, sponsored by, or endorsed by Amazon Web Services, Inc. All trademarks belong to their respective owners.",
+    "published": true
+  },
+  "license": {
+    "title": "Open Educational Terms & License",
+    "lastUpdated": "March 2026",
+    "summary": "Cloudive curriculum is provided freely for personal, individual, and classroom educational use under open terms with standard non-commercial resale restrictions.",
+    "published": true
+  },
+  "accessibility": {
+    "title": "Accessibility Statement (WCAG 2.1 AA)",
+    "lastUpdated": "March 2026",
+    "summary": "Cloudive is committed to digital accessibility, maintaining WCAG 2.1 AA compliance with high-contrast text ratios, keyboard navigation, and semantic HTML.",
+    "published": true
+  }
+}

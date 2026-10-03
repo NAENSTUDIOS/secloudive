@@ -1,0 +1,114 @@
+{
+  "hero": {
+    "badge": "100% Free · No Paywall · No Email Gate",
+    "headline": "Dive Deep Into AWS.",
+    "headlineHighlight": "Master Production Architecture.",
+    "subtitle": "Authoritative, independent AWS career tracks, hands-on production IaC blueprints, and incident triage drills. 100% free to download. Support if you can.",
+    "ctaPrimary": "Download Free Career Packs",
+    "ctaSecondary": "Explore 13 Career Tracks",
+    "published": true
+  },
+  "diveLevels": {
+    "kicker": "CURRICULUM PROGRESSION",
+    "title": "The Four Depth Levels of Cloud Mastery",
+    "description": "Progress systematically from foundational shell scripts to complex enterprise landing zones.",
+    "levels": [
+      {
+        "depth": "0m - 40m",
+        "title": "Level 1: Engineering Foundations",
+        "desc": "Linux shell scripting, Python Boto3 SDK, Docker containers, Kubernetes, and GitOps workflows.",
+        "badge": "Foundations"
+      },
+      {
+        "depth": "40m - 100m",
+        "title": "Level 2: Core Cloud Associate & SysAdmin",
+        "desc": "VPC networking, multi-tier EC2 auto-scaling, IAM privilege boundaries, and CloudWatch alarms.",
+        "badge": "Core Track"
+      },
+      {
+        "depth": "100m - 150m",
+        "title": "Level 3: Senior Cloud & Solutions Architect",
+        "desc": "Multi-account AWS Control Tower, cross-region Transit Gateways, zero-trust IAM, and disaster recovery.",
+        "badge": "Senior Track"
+      },
+      {
+        "depth": "150m - 200m",
+        "title": "Level 4: Advanced Specializations & Platform Engineering",
+        "desc": "DevSecOps CI/CD security pipelines, Lakehouse Apache Iceberg, Bedrock Generative AI, and FinOps.",
+        "badge": "Specializations"
+      }
+    ],
+    "published": true
+  },
+  "about": {
+    "kicker": "OUR ETHOS & PURPOSE",
+    "title": "Why Cloudive Exists",
+    "content": "Most cloud certification courses teach you to pass multiple-choice exams by memorizing trivia. Cloudive teaches you how to operate production AWS environments as a senior engineer. We believe financial barriers should never stop someone from learning AWS. Everything is free to download directly.",
+    "published": true
+  },
+  "freeSample": {
+    "title": "Featured Hands-On Module",
+    "badge": "DIRECT DOWNLOAD",
+    "heading": "Explore an Engineering Module — 100% Free",
+    "description": "Examine a complete module from the Senior Cloud Engineer pack. Zero cost, no paywall, no email gate.",
+    "moduleTitle": "Module 02: Multi-Account Landing Zone with AWS Control Tower",
+    "version": "v2.0",
+    "lastUpdated": "March 2026",
+    "downloadUrl": "/downloads/cloudive-senior-cloud.zip",
+    "topics": [
+      "What AWS Control Tower is and why multi-account architecture is mandatory",
+      "Designing a multi-account structure (prod / staging / sandbox / shared-services)",
+      "Creating an account vending machine with Account Factory",
+      "Configuring IAM Identity Center (SSO) for cross-account role assumption",
+      "Applying Service Control Policies (SCPs) to enforce organizational guardrails",
+      "Common mistakes: root account exposure, missing CloudTrail, flat account structures"
+    ],
+    "whatsInsideEachPack": [
+      "6 in-depth production modules (not bullet lists — full engineering blueprints)",
+      "Reusable Terraform blueprints for each major service covered",
+      "Architecture decision matrices comparing real cloud service trade-offs",
+      "Capstone lab scenario with a guided production incident drill",
+      "Version number and last-checked date on every module",
+      "100% Free open educational curriculum — yours to download, keep and build with"
+    ],
+    "published": true
+  },
+  "faq": [
+    {
+      "question": "Is everything on Cloudive really free to download?",
+      "answer": "Yes, 100%. Every role pack, foundation workbook, and architecture roadmap is available to download directly from this site with no checkout, no credit card, and no paywall. Support is completely optional."
+    },
+    {
+      "question": "Why is Cloudive free?",
+      "answer": "Cloudive exists so that nobody struggles to learn AWS due to financial barriers. In many parts of the world, paid certification courses cost a week's or month's wage. By making everything free and open, students and engineers anywhere can build real AWS career skills."
+    },
+    {
+      "question": "Do I need to create an account or enter my email?",
+      "answer": "No. Every download link is direct to the file. There are no forms, no verification hoops, and no email gates. You can optionally subscribe to updates if you wish, but it is never required."
+    },
+    {
+      "question": "How can I support Cloudive?",
+      "answer": "If you are an employed engineer or in a position to give back, you can support us on our /support page. Contributions fund research, curriculum updates, and hosting for learners who cannot afford paid resources."
+    },
+    {
+      "question": "Can university educators and study groups use these materials?",
+      "answer": "Yes. University professors, bootcamp instructors, and community study leaders are encouraged to assign Cloudive modules in their courses and syllabi. See our /educators page for guidelines."
+    },
+    {
+      "question": "Are these official AWS certifications or affiliated with Amazon?",
+      "answer": "No. Cloudive is an independent educational platform and is not affiliated with, sponsored by, or endorsed by Amazon Web Services, Inc. All content is original educational material synthesized from public technical documentation under Nominative Fair Use."
+    },
+    {
+      "question": "Will running these labs cost money on AWS?",
+      "answer": "All of our core foundation and role pack labs are designed with zero-cost principles: they fit within the AWS Free Tier, use local emulation (LocalStack and Docker), or include automated teardown scripts (like 'terraform destroy') so you incur $0.00 in surprise bills. Check our /zero-cost-labs page for practical cost controls."
+    },
+    {
+      "question": "Do the packs cover AWS certification exam dumps or leaked questions?",
+      "answer": "No. We have an absolute zero-tolerance policy for exam dumps. We teach deep production engineering skills that align with official examination domains."
+    },
+    {
+      "question": "How is the curriculum maintained and updated?",
+      "answer": "AWS services evolve rapidly. All modules are reviewed periodically with last-checked dates stamped on each module. Because files are hosted directly, you always download the latest version."
+    }
+  ]
+}

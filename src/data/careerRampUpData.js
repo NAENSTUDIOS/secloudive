@@ -6,22 +6,98 @@
  */
 
 export const rampUpCategories = [
-  { id: 'all', label: 'All Modules', count: 20 },
-  { id: 'cloud-roles', label: 'Cloud Roles & Ramp-Up', count: 5 },
-  { id: 'tryhackme', label: 'TryHackMe Cloud', count: 4 },
-  { id: 'hackthebox', label: 'HackTheBox Cloud', count: 4 },
-  { id: 'linux', label: 'Linux Foundations', count: 2 },
-  { id: 'python', label: 'Python Automation', count: 2 },
-  { id: 'networking', label: 'Cloud Networking', count: 2 },
-  { id: 'docker', label: 'Docker & Containers', count: 2 },
-  { id: 'iac', label: 'IaC & Terraform', count: 2 },
+  { id: 'all', label: 'All Modules' },
+  { id: 'cloud-roles', label: 'Cloud Roles & Ramp-Up' },
+  { id: 'google-cloud', label: 'Google Cloud Ramp-Up' },
+  { id: 'azure-cloud', label: 'Microsoft Azure Ramp-Up' },
+  { id: 'tryhackme', label: 'TryHackMe Cloud' },
+  { id: 'hackthebox', label: 'HackTheBox Cloud' },
+  { id: 'roadmap-90', label: '90-Day Cloud Roadmap' },
+  { id: 'linux', label: 'Linux Foundations' },
+  { id: 'python', label: 'Python Automation' },
+  { id: 'networking', label: 'Cloud Networking' },
+  { id: 'docker', label: 'Docker & Containers' },
+  { id: 'iac', label: 'IaC & Terraform' },
 ]
 
 /**
  * Authoritative Official Ramp-Up Guide PDFs & Industry Whitepapers
- * Direct links hosted on official AWS CDN and authoritative standards bodies.
+ * Direct links hosted on official AWS CDN, Google Cloud, Microsoft Learn, TryHackMe & ZeroToCloud.
  */
 export const officialRampUpPdfs = [
+  {
+    id: 'pdf-gcp-security-rampup',
+    title: 'Google Cloud Ramp-Up Guide: Security, Identity and Compliance',
+    roleTag: 'Google Cloud Security Engineer (PCSE)',
+    publisher: 'Google Cloud Training & Certification',
+    officialPdfUrl: 'https://cloud.google.com/security',
+    badgeTone: 'cyan',
+    badgeText: 'Google Official Guide',
+    pageCount: '2 Pages (Curated Ramp-Up)',
+    domainsCovered: [
+      'Cloud IAM & Workload Identity Federation',
+      'Threat Detection & Security Command Center (SCC)',
+      'Data Protection & KMS/Sensitive Data Protection (DLP)',
+      'Infrastructure & GKE Container Hardening',
+      'Assured Workloads & Compliance Offerings',
+      'Professional Cloud Security Engineer (PCSE) Track'
+    ],
+    summary: 'The authoritative Google Cloud Ramp-Up guide detailing skills.google paths, Chronicle SecOps, KMS envelope encryption, VPC Service Controls, and the PCSE certification journey.'
+  },
+  {
+    id: 'pdf-azure-security-rampup',
+    title: 'Microsoft Learn Ramp-Up Guide: Security, Identity and Compliance',
+    roleTag: 'Azure & AI Security Engineer (SC-500 / SC-200)',
+    publisher: 'Microsoft Learn',
+    officialPdfUrl: 'https://learn.microsoft.com/security',
+    badgeTone: 'purple',
+    badgeText: 'Microsoft Learn Guide',
+    pageCount: '2 Pages (Curated Ramp-Up)',
+    domainsCovered: [
+      'Microsoft Entra ID & PIM Governance',
+      'Microsoft Sentinel SIEM & Defender XDR',
+      'Azure Key Vault & Purview Data Governance',
+      'Network Security Groups & Azure Firewall',
+      'Microsoft Cloud Security Benchmark (MCSB)',
+      'SC-500 Cloud & AI Security Engineer (Replaces AZ-500)'
+    ],
+    summary: 'Authoritative Microsoft Learn curriculum detailing Entra ID, Microsoft Sentinel threat hunting, Defender for Cloud, Key Vault, Purview compliance, and the new SC-500 Cloud and AI Security Engineer transition track.'
+  },
+  {
+    id: 'pdf-tryhackme-rampup',
+    title: 'TryHackMe Ramp-Up Guide: Offensive & Defensive Security',
+    roleTag: 'Hands-On Cyber & SOC Security',
+    publisher: 'TryHackMe Learning Platform',
+    officialPdfUrl: 'https://tryhackme.com/paths',
+    badgeTone: 'rose',
+    badgeText: 'TryHackMe Official Guide',
+    pageCount: '2 Pages (Curated Ramp-Up)',
+    domainsCovered: [
+      'Pre Security & Complete Beginner Foundations',
+      'Cyber Security 101 Track',
+      'SOC Level 1 & Splunk Threat Detection',
+      'Jr Penetration Tester & Web Exploitation',
+      'CompTIA Security+ SY0-701 & PenTest+',
+      'SEC1 / SAL1 / PT1 Certification Exams'
+    ],
+    summary: 'The authoritative browser-based hands-on cyber security ramp-up guide covering foundational networking/Linux, defensive SOC investigation, offensive penetration testing, and TryHackMe capstone certifications.'
+  },
+  {
+    id: 'pdf-90day-cloud-roadmap',
+    title: '90-Day Cloud Engineer Roadmap (Zero to Cloud)',
+    roleTag: 'Associate to Professional Cloud Engineer',
+    publisher: 'ZeroToCloud.co',
+    officialPdfUrl: 'https://zerotocloud.co',
+    badgeTone: 'emerald',
+    badgeText: 'ZeroToCloud Official Roadmap',
+    pageCount: '3 Pages (Month 1-3 Progression)',
+    domainsCovered: [
+      'Month 1: Tech Foundations (Linux, Net, Docker, Terraform, Python)',
+      'Month 2: High-Quality Cloud Projects (Beginner & Intermediate)',
+      'Month 3: Portfolio, STAR Interview Defense & Job Hunt'
+    ],
+    summary: 'Structured 3-month action plan transitioning beginners into job-ready Cloud Engineers: Month 1 Tech Foundations, Month 2 Project Building, and Month 3 Technical Interview & Portfolio Defense.'
+  },
   {
     id: 'pdf-security',
     title: 'AWS Ramp-Up Guide: Security',
@@ -1391,6 +1467,847 @@ export const masterRampUpLabs = [
         'Remediating compound cloud misconfigurations at the source of truth'
       ],
       interviewTalkingPoint: 'Rather than fighting misconfigurations reactively in the cloud console, I use Checkov and TerraGoat principles to ensure security policies are codified and enforced directly in Terraform prior to deployment.'
+    }
+  },
+
+  // =========================================================================
+  // 8. GOOGLE CLOUD (GCP) SECURITY RAMP-UP LABS
+  // =========================================================================
+  {
+    id: 'gcp-iam-workload-identity',
+    category: 'google-cloud',
+    roleTitle: 'Google Cloud Security Engineer (PCSE)',
+    labTitle: 'Google Cloud IAM & GKE Workload Identity Federation (Zero Static Keys)',
+    originalLink: 'https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity',
+    officialPdfUrl: 'https://cloud.google.com/security',
+    officialGuideName: 'Google Cloud Ramp-Up Guide: Security, Identity and Compliance',
+    platform: 'Google Cloud Skills Boost / Official Documentation',
+    difficulty: 'Intermediate',
+    estimatedTime: '45 mins',
+    badgeTone: 'cyan',
+    targetServices: ['Google Cloud IAM', 'GKE Workload Identity', 'Service Accounts', 'OIDC Federation'],
+    roleRampUpGuide: {
+      summary: 'Eliminate long-lived Google Cloud Service Account JSON keys by binding Kubernetes ServiceAccounts directly to Google Cloud IAM identities using Workload Identity Federation.',
+      dayInLife: 'Configuring least-privilege IAM roles, auditing service account key creation, and integrating GKE clusters with Google Cloud APIs.',
+      keyCertifications: ['Professional Cloud Security Engineer (PCSE)', 'Google Cloud Digital Leader'],
+      salaryRange: '$140,000 - $195,000'
+    },
+    stepsToComplete: [
+      {
+        step: 1,
+        title: 'Enable Workload Identity on GKE Cluster',
+        instruction: 'Enable Workload Identity on a GKE cluster to establish the identity namespace binding.',
+        commandOrAction: 'gcloud container clusters update prod-cluster --workload-pool=PROJECT_ID.svc.id.goog --zone=us-central1-a'
+      },
+      {
+        step: 2,
+        title: 'Create Google Cloud IAM Service Account (GSA)',
+        instruction: 'Provision a dedicated Google Service Account with scoped permissions (e.g. roles/storage.objectViewer on bucket).',
+        commandOrAction: 'gcloud iam service-accounts create gke-storage-reader --description="GSA for reading storage" --display-name="gke-storage-reader"'
+      },
+      {
+        step: 3,
+        title: 'Bind Kubernetes KSA to Google GSA via Workload Identity',
+        instruction: 'Grant the Kubernetes ServiceAccount the `roles/iam.workloadIdentityUser` role on the Google Service Account.',
+        commandOrAction: 'gcloud iam service-accounts add-iam-policy-binding gke-storage-reader@PROJECT_ID.iam.gserviceaccount.com --role roles/iam.workloadIdentityUser --member "serviceAccount:PROJECT_ID.svc.id.goog[default/ksa-storage-reader]"'
+      },
+      {
+        step: 4,
+        title: 'Annotate Kubernetes ServiceAccount and Validate Pod Access',
+        instruction: 'Annotate the KSA with the GSA email address and deploy a test pod to confirm token generation without storing any static key files.',
+        commandOrAction: 'kubectl annotate serviceaccount ksa-storage-reader iam.gke.io/gcp-service-account=gke-storage-reader@PROJECT_ID.iam.gserviceaccount.com'
+      }
+    ],
+    whatYouHaveLearnt: {
+      coreCompetencies: [
+        'Eliminating static JSON service account keys in Google Cloud',
+        'GKE Workload Identity Federation architecture',
+        'Binding Kubernetes ServiceAccounts to Google IAM principals',
+        'Scoped IAM permissions for microservice workloads'
+      ],
+      interviewTalkingPoint: 'I eliminated high-risk static JSON service account credentials across our Kubernetes fleet by implementing GKE Workload Identity Federation, ensuring pods authenticate via short-lived OIDC tokens.'
+    }
+  },
+  {
+    id: 'gcp-scc-threat-detection',
+    category: 'google-cloud',
+    roleTitle: 'Cloud Detection & SecOps Engineer',
+    labTitle: 'Google Cloud Security Command Center (SCC) & Chronicle Threat Detection',
+    originalLink: 'https://cloud.google.com/security-command-center',
+    officialPdfUrl: 'https://cloud.google.com/security',
+    officialGuideName: 'Google Cloud Ramp-Up Guide: Security, Identity and Compliance',
+    platform: 'Google Cloud Console & Chronicle SecOps',
+    difficulty: 'Intermediate',
+    estimatedTime: '55 mins',
+    badgeTone: 'cyan',
+    targetServices: ['Security Command Center (SCC)', 'Google SecOps (Chronicle)', 'Cloud Audit Logs', 'Event Threat Detection'],
+    roleRampUpGuide: {
+      summary: 'Centralize security posture, identify misconfigurations across cloud assets, and triage real-time security alerts using Google Cloud Security Command Center and Chronicle SecOps.',
+      dayInLife: 'Investigating high-severity SCC findings, correlating Cloud Audit Logs with threat intelligence, and configuring automated alert routing to Slack or PagerDuty.',
+      keyCertifications: ['Professional Cloud Security Engineer (PCSE)', 'Chronicle Certified Analyst'],
+      salaryRange: '$145,000 - $200,000'
+    },
+    stepsToComplete: [
+      {
+        step: 1,
+        title: 'Activate Security Command Center Standard / Premium',
+        instruction: 'Initialize Security Command Center at the organization level and enable built-in security services (Security Health Analytics and Event Threat Detection).',
+        commandOrAction: 'gcloud scc sources list --organization=ORGANIZATION_ID'
+      },
+      {
+        step: 2,
+        title: 'Export Cloud Audit Logs to BigQuery for SIEM Analysis',
+        instruction: 'Configure an organization-wide log sink routing Admin Activity and Data Access audit logs to a secure BigQuery dataset.',
+        commandOrAction: 'gcloud logging sinks create org-audit-sink bigquery.googleapis.com/projects/PROJECT_ID/datasets/audit_logs --organization=ORGANIZATION_ID --include-children'
+      },
+      {
+        step: 3,
+        title: 'Investigate Event Threat Detection Anomaly Alerts',
+        instruction: 'Simulate an anomalous IAM key generation or brute force event and triage the finding in SCC Event Threat Detection dashboard.',
+        commandOrAction: 'gcloud scc findings list ORGANIZATION_ID --source=SOURCE_ID --filter="state=\\"ACTIVE\\" AND severity=\\"HIGH\\""'
+      },
+      {
+        step: 4,
+        title: 'Automate Finding Notification via Cloud Pub/Sub & Cloud Functions',
+        instruction: 'Set up an SCC Continuous Export feed that publishes new high-severity findings to a Pub/Sub topic for automated security containment.',
+        commandOrAction: 'gcloud scc notifications create high-sev-alerts --organization=ORGANIZATION_ID --pubsub-topic=projects/PROJECT_ID/topics/security-alerts --filter="severity=\\"HIGH\\""'
+      }
+    ],
+    whatYouHaveLearnt: {
+      coreCompetencies: [
+        'Organization-level asset discovery with Cloud Asset Inventory',
+        'Real-time threat detection with Event Threat Detection and Chronicle',
+        'Cloud Audit Log centralization and forensic querying',
+        'Continuous export and automated incident notification pipelines'
+      ],
+      interviewTalkingPoint: 'I architected an organization-wide Security Command Center posture pipeline that correlates Cloud Audit Logs in Chronicle and streams high-severity findings to automated remediation functions in under 30 seconds.'
+    }
+  },
+  {
+    id: 'gcp-kms-dlp-protection',
+    category: 'google-cloud',
+    roleTitle: 'Cloud Data Security Specialist',
+    labTitle: 'Google Cloud KMS Envelope Encryption & Cloud Sensitive Data Protection (DLP)',
+    originalLink: 'https://cloud.google.com/kms/docs',
+    officialPdfUrl: 'https://cloud.google.com/security',
+    officialGuideName: 'Google Cloud Ramp-Up Guide: Security, Identity and Compliance',
+    platform: 'Google Cloud Security Services',
+    difficulty: 'Intermediate',
+    estimatedTime: '50 mins',
+    badgeTone: 'cyan',
+    targetServices: ['Cloud Key Management Service (KMS)', 'Sensitive Data Protection (DLP)', 'Cloud Storage (GCS)', 'CMEK'],
+    roleRampUpGuide: {
+      summary: 'Implement Customer-Managed Encryption Keys (CMEK) with Cloud KMS for data at rest and discover, classify, and de-identify sensitive PII using Sensitive Data Protection (Cloud DLP).',
+      dayInLife: 'Managing cryptographic key rotation, configuring CMEK on BigQuery and GCS buckets, and authoring DLP inspection templates for compliance audits.',
+      keyCertifications: ['PCSE', 'CDPSE'],
+      salaryRange: '$135,000 - $185,000'
+    },
+    stepsToComplete: [
+      {
+        step: 1,
+        title: 'Provision Cloud KMS Keyring and CryptoKey with Auto-Rotation',
+        instruction: 'Create a Cloud KMS keyring in `us-central1` and configure a symmetric encryption key with automated 90-day key rotation.',
+        commandOrAction: 'gcloud kms keyrings create data-protection-ring --location=us-central1 && gcloud kms keys create gcs-cmek-key --location=us-central1 --keyring=data-protection-ring --purpose=encryption --rotation-period=7776000s --next-rotation-time=2026-11-01T00:00:00Z'
+      },
+      {
+        step: 2,
+        title: 'Enforce CMEK Encryption on Cloud Storage Bucket',
+        instruction: 'Grant the GCS service agent `roles/cloudkms.cryptoKeyEncrypterDecrypter` and enforce the KMS key as the default bucket encryption standard.',
+        commandOrAction: 'gcloud storage buckets create gs://vault-cmek-protected --location=us-central1 --default-encryption-key=projects/PROJECT_ID/locations/us-central1/keyRings/data-protection-ring/cryptoKeys/gcs-cmek-key'
+      },
+      {
+        step: 3,
+        title: 'Configure Cloud DLP Sensitive Data Inspection Template',
+        instruction: 'Create a DLP inspection template configured to scan files for credit card numbers (CREDIT_CARD_NUMBER) and US social security numbers (US_SOCIAL_SECURITY_NUMBER).',
+        commandOrAction: 'gcloud dlp inspect-templates create --display-name="PII-Scanner" --info-types=CREDIT_CARD_NUMBER,US_SOCIAL_SECURITY_NUMBER'
+      },
+      {
+        step: 4,
+        title: 'Execute DLP Scan and De-Identify Test Records',
+        instruction: 'Run a Cloud DLP scan on sample customer data, verify masking of sensitive fields with cryptographic hashing, and review the inspection findings report.',
+        commandOrAction: 'gcloud dlp jobs create --inspect-template=projects/PROJECT_ID/inspectTemplates/PII-Scanner --storage-type=GCS --bucket=gs://vault-cmek-protected'
+      }
+    ],
+    whatYouHaveLearnt: {
+      coreCompetencies: [
+        'Cloud KMS envelope encryption and automated key rotation lifecycle',
+        'Configuring Customer-Managed Encryption Keys (CMEK) on GCS and BigQuery',
+        'Sensitive data classification and regex inspection using Cloud DLP',
+        'Meeting GDPR/HIPAA cryptographic storage mandates on Google Cloud'
+      ],
+      interviewTalkingPoint: 'I configured Cloud KMS CMEK with automated 90-day rotation for all production storage buckets and implemented Cloud DLP inspection templates to automatically mask PII before it reaches analytical datastores.'
+    }
+  },
+  {
+    id: 'gcp-vpc-firewall-armor',
+    category: 'google-cloud',
+    roleTitle: 'Cloud Network & Perimeter Defender',
+    labTitle: 'Google Cloud VPC Firewalls, Cloud Armor & GKE Hardening',
+    originalLink: 'https://cloud.google.com/armor',
+    officialPdfUrl: 'https://cloud.google.com/security',
+    officialGuideName: 'Google Cloud Ramp-Up Guide: Security, Identity and Compliance',
+    platform: 'Google Cloud Skills Boost',
+    difficulty: 'Intermediate to Advanced',
+    estimatedTime: '60 mins',
+    badgeTone: 'cyan',
+    targetServices: ['VPC Firewall Rules', 'Hierarchical Firewalls', 'Google Cloud Armor', 'VPC Service Controls'],
+    roleRampUpGuide: {
+      summary: 'Build layered perimeter defenses in Google Cloud: configure hierarchical firewall policies at the organization level, protect public endpoints with Google Cloud Armor WAF/DDoS, and enforce VPC Service Controls.',
+      dayInLife: 'Writing Cloud Armor WAF rules, preventing data exfiltration with VPC Service Controls perimeters, and validating zero-trust network boundaries.',
+      keyCertifications: ['Professional Cloud Network Engineer', 'PCSE'],
+      salaryRange: '$140,000 - $190,000'
+    },
+    stepsToComplete: [
+      {
+        step: 1,
+        title: 'Deploy Hierarchical Organization Firewall Policy',
+        instruction: 'Create an organization-wide hierarchical firewall policy that globally blocks inbound SSH (port 22) and RDP (port 3389) across all projects.',
+        commandOrAction: 'gcloud compute org-security-policies create --organization=ORGANIZATION_ID --display-name="Org-Baseline-Policy"'
+      },
+      {
+        step: 2,
+        title: 'Configure Google Cloud Armor Edge Security Policy',
+        instruction: 'Create a Cloud Armor security policy and attach pre-configured WAF rules that block SQL Injection (SQLi) and Cross-Site Scripting (XSS).',
+        commandOrAction: 'gcloud compute security-policies create edge-waf-policy && gcloud compute security-policies rules create 1000 --security-policy=edge-waf-policy --expression="evaluatePreconfiguredExpr(\'sqli-v33-stable\')" --action=deny-403'
+      },
+      {
+        step: 3,
+        title: 'Attach Cloud Armor Policy to External HTTP(S) Load Balancer',
+        instruction: 'Link the Cloud Armor policy to the backend service of the production external Application Load Balancer.',
+        commandOrAction: 'gcloud compute backend-services update prod-web-service --security-policy=edge-waf-policy --global'
+      },
+      {
+        step: 4,
+        title: 'Enforce VPC Service Controls Data Perimeter',
+        instruction: 'Create an Access Context Manager perimeter surrounding Google Cloud Storage and BigQuery to prevent unauthorized API requests originating outside approved networks.',
+        commandOrAction: 'gcloud access-context-manager perimeters create prod_data_perimeter --policy=POLICY_ID --resources=projects/PROJECT_NUMBER --restricted-services=storage.googleapis.com,bigquery.googleapis.com'
+      }
+    ],
+    whatYouHaveLearnt: {
+      coreCompetencies: [
+        'Hierarchical firewall policy inheritance across Google Cloud organizations',
+        'Google Cloud Armor WAF rules and OWASP Top 10 mitigation',
+        'VPC Service Controls data exfiltration defense',
+        'Securing GKE private clusters without external IP addresses'
+      ],
+      interviewTalkingPoint: 'By pairing hierarchical organization firewall rules with Google Cloud Armor WAF and VPC Service Controls perimeters, I established a defense-in-depth perimeter that stops both application exploits and credential exfiltration.'
+    }
+  },
+
+  // =========================================================================
+  // 9. MICROSOFT AZURE SECURITY RAMP-UP LABS
+  // =========================================================================
+  {
+    id: 'azure-entra-conditional-access',
+    category: 'azure-cloud',
+    roleTitle: 'Azure Identity & Access Architect',
+    labTitle: 'Microsoft Entra ID, PIM & Conditional Access Policy Enforcement',
+    originalLink: 'https://learn.microsoft.com/training/entra',
+    officialPdfUrl: 'https://learn.microsoft.com/security',
+    officialGuideName: 'Microsoft Learn Ramp-Up Guide: Security, Identity and Compliance',
+    platform: 'Microsoft Learn Training Hub',
+    difficulty: 'Intermediate',
+    estimatedTime: '50 mins',
+    badgeTone: 'purple',
+    targetServices: ['Microsoft Entra ID', 'Conditional Access', 'Privileged Identity Management (PIM)', 'MFA'],
+    roleRampUpGuide: {
+      summary: 'Master Microsoft Entra ID (formerly Azure Active Directory), configure Just-In-Time role elevation with Privileged Identity Management (PIM), and enforce zero-trust Conditional Access policies.',
+      dayInLife: 'Reviewing risky user sign-ins, managing PIM role activations, auditing managed identities, and configuring passwordless authentication.',
+      keyCertifications: ['Microsoft Certified: Identity and Access Administrator Associate (SC-300)', 'SC-900'],
+      salaryRange: '$135,000 - $185,000'
+    },
+    stepsToComplete: [
+      {
+        step: 1,
+        title: 'Audit Entra ID Role Assignments & Enable PIM',
+        instruction: 'Identify permanent Global Administrators and transition them to eligible roles managed by Privileged Identity Management (PIM) requiring approval.',
+        commandOrAction: 'az rest --method get --url "https://graph.microsoft.com/v1.0/roleManagement/directory/roleAssignments"'
+      },
+      {
+        step: 2,
+        title: 'Configure Conditional Access Policy for Administrative Portals',
+        instruction: 'Create an Entra ID Conditional Access policy targeting Azure Management that mandates Phishing-Resistant MFA and Compliant Devices.',
+        commandOrAction: 'Review Conditional Access policy template: Require MFA for Azure Management'
+      },
+      {
+        step: 3,
+        title: 'Implement Managed Identities for Azure Workloads',
+        instruction: 'Convert static client secrets in app code to Azure System-Assigned Managed Identities for Azure App Services and Virtual Machines.',
+        commandOrAction: 'az webapp identity assign --name prod-billing-app --resource-group prod-rg'
+      },
+      {
+        step: 4,
+        title: 'Simulate Risky Sign-in and Validate Automatic Remediation',
+        instruction: 'Simulate an untrusted IP connection using Tor or VPN and verify Entra Identity Protection flags the session as high risk and forces an immediate password reset.',
+        commandOrAction: 'az rest --method get --url "https://graph.microsoft.com/v1.0/identityProtection/riskyUsers"'
+      }
+    ],
+    whatYouHaveLearnt: {
+      coreCompetencies: [
+        'Zero-trust identity architecture with Microsoft Entra ID',
+        'Privileged Identity Management (PIM) just-in-time elevation',
+        'Risk-based Conditional Access policy authoring',
+        'Eliminating static credentials with Managed Identities'
+      ],
+      interviewTalkingPoint: 'I eliminated permanent administrative access across our Azure tenant by enforcing Microsoft Entra PIM with mandatory MFA approval, reducing our standing privilege attack surface to zero.'
+    }
+  },
+  {
+    id: 'azure-sentinel-defender-soc',
+    category: 'azure-cloud',
+    roleTitle: 'Azure Security Operations Analyst (SC-200)',
+    labTitle: 'Microsoft Sentinel SIEM & Defender for Cloud Threat Hunting (KQL)',
+    originalLink: 'https://learn.microsoft.com/training/defender',
+    officialPdfUrl: 'https://learn.microsoft.com/security',
+    officialGuideName: 'Microsoft Learn Ramp-Up Guide: Security, Identity and Compliance',
+    platform: 'Microsoft Learn Interactive Sandbox',
+    difficulty: 'Intermediate to Advanced',
+    estimatedTime: '60 mins',
+    badgeTone: 'purple',
+    targetServices: ['Microsoft Sentinel', 'Microsoft Defender for Cloud', 'Kusto Query Language (KQL)', 'Logic Apps'],
+    roleRampUpGuide: {
+      summary: 'Collect, detect, investigate, and respond to threats across multi-cloud and hybrid environments using Microsoft Sentinel cloud-native SIEM and Microsoft Defender XDR.',
+      dayInLife: 'Writing Kusto Query Language (KQL) threat hunting queries, tuning Defender for Cloud recommendations, investigating incident entities, and authoring automated playbooks.',
+      keyCertifications: ['Microsoft Certified: Security Operations Analyst Associate (SC-200)', 'SC-500'],
+      salaryRange: '$130,000 - $185,000'
+    },
+    stepsToComplete: [
+      {
+        step: 1,
+        title: 'Onboard Data Connectors to Microsoft Sentinel Workspace',
+        instruction: 'Connect Microsoft Entra ID, Azure Activity, and Microsoft Defender for Cloud telemetry into an Azure Log Analytics workspace.',
+        commandOrAction: 'az sentinel data-connector create --resource-group soc-rg --workspace-name soc-sentinel --name "AzureActivity" --kind "AzureActivity"'
+      },
+      {
+        step: 2,
+        title: 'Author KQL Threat Hunting Query for Brute-Force Activity',
+        instruction: 'Write a Kusto Query Language (KQL) query that detects IP addresses with more than 10 failed login attempts followed by a successful sign-in.',
+        commandOrAction: 'SigninLogs | where ResultType != "0" | summarize FailedCount = count() by IPAddress, UserPrincipalName | where FailedCount > 10'
+      },
+      {
+        step: 3,
+        title: 'Configure Analytics Rule with Automated Incident Creation',
+        instruction: 'Create an automated detection scheduled rule in Sentinel that maps findings to the MITRE ATT&CK Initial Access tactic.',
+        commandOrAction: 'az sentinel alert-rule create --resource-group soc-rg --workspace-name soc-sentinel --name "Suspicious-Brute-Force" --severity "High"'
+      },
+      {
+        step: 4,
+        title: 'Deploy Automated Response Playbook via Azure Logic Apps',
+        instruction: 'Trigger a Logic App playbook that automatically revokes user sessions in Entra ID whenever a high-severity Sentinel incident is confirmed.',
+        commandOrAction: 'az logic workflow create --resource-group soc-rg --name "Revoke-Compromised-User-Session"'
+      }
+    ],
+    whatYouHaveLearnt: {
+      coreCompetencies: [
+        'Cloud SIEM architecture with Microsoft Sentinel and Log Analytics',
+        'Kusto Query Language (KQL) threat hunting and forensic data analysis',
+        'Incident investigation, entity mapping, and timeline reconstruction',
+        'Automated incident containment with Azure Logic Apps playbooks'
+      ],
+      interviewTalkingPoint: 'I built custom KQL analytics rules in Microsoft Sentinel that detect brute force anomalies and trigger automated Logic App playbooks to revoke compromised Entra ID sessions in under 15 seconds.'
+    }
+  },
+  {
+    id: 'azure-keyvault-purview',
+    category: 'azure-cloud',
+    roleTitle: 'Cloud Data Governance & Encryption Architect',
+    labTitle: 'Azure Key Vault Managed HSM & Microsoft Purview Data Governance',
+    originalLink: 'https://learn.microsoft.com/azure/key-vault',
+    officialPdfUrl: 'https://learn.microsoft.com/security',
+    officialGuideName: 'Microsoft Learn Ramp-Up Guide: Security, Identity and Compliance',
+    platform: 'Microsoft Learn Enterprise Architecture',
+    difficulty: 'Intermediate',
+    estimatedTime: '45 mins',
+    badgeTone: 'purple',
+    targetServices: ['Azure Key Vault', 'Managed HSM', 'Microsoft Purview', 'Customer-Managed Keys (CMK)'],
+    roleRampUpGuide: {
+      summary: 'Protect cryptographic keys, secrets, and TLS certificates in Azure Key Vault and Managed HSM, and discover sensitive enterprise data across hybrid clouds with Microsoft Purview.',
+      dayInLife: 'Configuring access policies and RBAC on Key Vaults, automating certificate auto-renewal, and tracking data lineage in Microsoft Purview.',
+      keyCertifications: ['SC-500 (Replaces AZ-500)', 'Microsoft Certified: Azure Security Engineer'],
+      salaryRange: '$135,000 - $185,000'
+    },
+    stepsToComplete: [
+      {
+        step: 1,
+        title: 'Deploy Hardened Azure Key Vault with Private Endpoint',
+        instruction: 'Provision an Azure Key Vault with soft-delete and purge protection enabled, restricting access to approved virtual networks via Private Link.',
+        commandOrAction: 'az keyvault create --name "prod-keyvault-sec" --resource-group "prod-sec-rg" --location "eastus" --enable-purge-protection true --enable-soft-delete true'
+      },
+      {
+        step: 2,
+        title: 'Generate RSA Customer-Managed Encryption Key (CMK)',
+        instruction: 'Create an RSA-4096 cryptographic key with automated 1-year rotation for encrypting Azure Storage and SQL Database transparently.',
+        commandOrAction: 'az keyvault key create --vault-name "prod-keyvault-sec" --name "sql-db-cmek" --kty RSA --size 4096'
+      },
+      {
+        step: 3,
+        title: 'Configure Role-Based Access Control (Azure RBAC) for Key Vault',
+        instruction: 'Assign the "Key Vault Secrets User" role to the application managed identity, avoiding broad legacy access policies.',
+        commandOrAction: 'az role assignment create --role "Key Vault Secrets User" --assignee-object-id <APP_IDENTITY_ID> --scope /subscriptions/<SUB_ID>/resourceGroups/prod-sec-rg/providers/Microsoft.KeyVault/vaults/prod-keyvault-sec'
+      },
+      {
+        step: 4,
+        title: 'Register Data Source in Microsoft Purview Governance Portal',
+        instruction: 'Scan Azure Blob Storage using Microsoft Purview to automatically map data sensitivity labels and assess regulatory compliance.',
+        commandOrAction: 'Review Purview Compliance Manager dashboard: Microsoft Cloud Security Benchmark'
+      }
+    ],
+    whatYouHaveLearnt: {
+      coreCompetencies: [
+        'Azure Key Vault security controls (Soft-delete, Purge protection, Private Link)',
+        'Managing CMK encryption keys and automated cryptographic rotation',
+        'Azure Key Vault RBAC permission model',
+        'Data discovery and classification with Microsoft Purview'
+      ],
+      interviewTalkingPoint: 'I configured Azure Key Vault with purge protection and Private Link, ensuring our application retrieved database connection strings at runtime using Azure RBAC without static credentials.'
+    }
+  },
+  {
+    id: 'azure-firewall-jit-access',
+    category: 'azure-cloud',
+    roleTitle: 'Azure Cloud & AI Security Engineer (SC-500)',
+    labTitle: 'Azure Firewall, Network Security Groups & Just-In-Time (JIT) VM Access',
+    originalLink: 'https://learn.microsoft.com/azure/firewall/overview',
+    officialPdfUrl: 'https://learn.microsoft.com/security',
+    officialGuideName: 'Microsoft Learn Ramp-Up Guide: Security, Identity and Compliance',
+    platform: 'Microsoft Learn SC-5002 Lab Path',
+    difficulty: 'Intermediate to Advanced',
+    estimatedTime: '55 mins',
+    badgeTone: 'purple',
+    targetServices: ['Azure Firewall', 'Network Security Groups (NSGs)', 'Just-In-Time (JIT) VM Access', 'Application Security Groups'],
+    roleRampUpGuide: {
+      summary: 'Master network boundary security in Azure: configure Network Security Groups, deploy stateful Azure Firewall with Threat Intelligence filtering, and enforce Just-In-Time (JIT) VM access.',
+      dayInLife: 'Auditing open inbound ports on virtual networks, designing Hub-and-Spoke network topologies, and managing microsegmentation rules.',
+      keyCertifications: ['Cloud and AI Security Engineer Associate (SC-500)', 'AZ-700 Azure Network Engineer'],
+      salaryRange: '$140,000 - $195,000'
+    },
+    stepsToComplete: [
+      {
+        step: 1,
+        title: 'Architect Hub-and-Spoke Virtual Network Topology',
+        instruction: 'Create an Azure Hub VNet for central firewall routing and peer it with Application Spoke VNets.',
+        commandOrAction: 'az network vnet create --name "hub-vnet" --resource-group "net-rg" --address-prefixes "10.0.0.0/16" --subnet-name "AzureFirewallSubnet" --subnet-prefix "10.0.1.0/24"'
+      },
+      {
+        step: 2,
+        title: 'Deploy Azure Firewall Standard with Threat Intelligence',
+        instruction: 'Provision Azure Firewall Standard and configure threat intelligence mode to "Alert and Deny" for known malicious IP addresses.',
+        commandOrAction: 'az network firewall create --name "prod-azfirewall" --resource-group "net-rg" --location "eastus" --threat-intel-mode "Deny"'
+      },
+      {
+        step: 3,
+        title: 'Configure NSG Microsegmentation with Application Security Groups',
+        instruction: 'Use Application Security Groups (ASGs) to segment Web, Business Logic, and Database tiers without relying on brittle IP addresses.',
+        commandOrAction: 'az network asg create --name "asg-database" --resource-group "net-rg" --location "eastus"'
+      },
+      {
+        step: 4,
+        title: 'Enable Just-in-Time (JIT) VM Access in Defender for Cloud',
+        instruction: 'Lock down port 22 and 3389 so ports are closed by default and only open on-demand for authorized users for 3 hours after approval.',
+        commandOrAction: 'az security jit-policy add --resource-group "compute-rg" --location "eastus" --name "default" --vm-name "bastion-vm"'
+      }
+    ],
+    whatYouHaveLearnt: {
+      coreCompetencies: [
+        'Hub-and-Spoke enterprise Azure network architecture',
+        'Stateful Azure Firewall traffic inspection and Threat Intelligence filtering',
+        'Network microsegmentation using Application Security Groups (ASGs)',
+        'Just-In-Time (JIT) VM port lockdown mitigating automated brute-force bots'
+      ],
+      interviewTalkingPoint: 'I replaced permanent open management ports with Defender for Cloud Just-In-Time (JIT) VM Access and routed all outbound traffic through Azure Firewall, blocking 100% of unauthorized egress attempts.'
+    }
+  },
+
+  // =========================================================================
+  // 10. TRYHACKME OFFENSIVE & DEFENSIVE SECURITY LABS
+  // =========================================================================
+  {
+    id: 'thm-pre-security',
+    category: 'tryhackme',
+    roleTitle: 'Cyber Security Foundations',
+    labTitle: 'TryHackMe: Pre Security & Complete Beginner Foundations',
+    originalLink: 'https://tryhackme.com/path/presecurity',
+    officialPdfUrl: 'https://tryhackme.com/paths',
+    officialGuideName: 'TryHackMe Ramp-Up Guide: Offensive & Defensive Security',
+    platform: 'TryHackMe Free Tier',
+    difficulty: 'Beginner',
+    estimatedTime: '60 mins',
+    badgeTone: 'rose',
+    targetServices: ['Networking Basics', 'Web Fundamentals', 'Linux Command Line', 'Windows Basics'],
+    roleRampUpGuide: {
+      summary: 'The universal zero-experience entry point: learn how computers talk across networks, master web HTTP methods and status codes, and navigate Linux and Windows shells.',
+      dayInLife: 'Understanding the underlying protocols (DNS, TCP, HTTP) that cloud security controls are designed to defend.',
+      keyCertifications: ['TryHackMe SEC1 Capstone', 'CompTIA A+'],
+      salaryRange: 'Fundamental Prerequisite'
+    },
+    stepsToComplete: [
+      {
+        step: 1,
+        title: 'Complete Network OSI & TCP/IP Model Rooms',
+        instruction: 'Understand packets, frames, MAC addresses, and the 3-way TCP handshake (SYN, SYN-ACK, ACK).',
+        commandOrAction: 'Navigate to tryhackme.com/path/presecurity and complete Network Fundamentals'
+      },
+      {
+        step: 2,
+        title: 'Master HTTP Requests, Headers & Status Codes',
+        instruction: 'Learn how browsers communicate with web servers using GET, POST, PUT, DELETE, and examine response codes (200, 301, 403, 500).',
+        commandOrAction: 'curl -Iv https://tryhackme.com'
+      },
+      {
+        step: 3,
+        title: 'Complete Linux Fundamentals Rooms 1, 2, and 3',
+        instruction: 'Practice navigating Linux directories, manipulating files, reading logs, and configuring file permissions inside the in-browser VM.',
+        commandOrAction: 'cat /etc/os-release && whoami && ls -la'
+      },
+      {
+        step: 4,
+        title: 'Complete Complete Beginner Learning Path Capstone',
+        instruction: 'Synthesize networking, Linux, and web basics to solve the foundational challenge rooms and earn your Pre Security badge.',
+        commandOrAction: 'Submit completion flags on TryHackMe Pre Security path'
+      }
+    ],
+    whatYouHaveLearnt: {
+      coreCompetencies: [
+        'TCP/IP networking model and packet flow fundamentals',
+        'HTTP request/response structure and header analysis',
+        'Hands-on Linux command line navigation and file permissions',
+        'Foundational mental model for all cyber security specializations'
+      ],
+      interviewTalkingPoint: 'I built strong hands-on fundamentals on TryHackMe Pre Security, ensuring I understand the exact protocol behavior and packet flow behind every cloud firewall and proxy configuration.'
+    }
+  },
+  {
+    id: 'thm-soc-level-1',
+    category: 'tryhackme',
+    roleTitle: 'SOC Analyst Tier 1 / Blue Team',
+    labTitle: 'TryHackMe: SOC Level 1 Path & Splunk SIEM Threat Hunting',
+    originalLink: 'https://tryhackme.com/paths',
+    officialPdfUrl: 'https://tryhackme.com/paths',
+    officialGuideName: 'TryHackMe Ramp-Up Guide: Offensive & Defensive Security',
+    platform: 'TryHackMe Interactive AttackBox & VMs',
+    difficulty: 'Intermediate',
+    estimatedTime: '75 mins',
+    badgeTone: 'rose',
+    targetServices: ['Splunk SIEM', 'CyberChef', 'Wireshark', 'Phishing Analysis', 'YARA'],
+    roleRampUpGuide: {
+      summary: 'The industry-regarded training path for Security Operations Center (SOC) analysts: ingest raw system logs, detect adversary techniques in Splunk, analyze phishing emails, and decode malicious payloads in CyberChef.',
+      dayInLife: 'Triaging SIEM security alerts, analyzing suspicious email attachments, searching proxy logs for C2 beaconing, and writing incident response escalation tickets.',
+      keyCertifications: ['SAL1 (TryHackMe SOC Level 1)', 'CompTIA CySA+'],
+      salaryRange: '$90,000 - $130,000'
+    },
+    stepsToComplete: [
+      {
+        step: 1,
+        title: 'Ingest and Search Server Logs in Splunk',
+        instruction: 'Query authentication and web access logs in Splunk using Search Processing Language (SPL) to isolate failed login spikes.',
+        commandOrAction: 'index=web_logs sourcetype=access_combined status=403 | stats count by clientip | sort -count'
+      },
+      {
+        step: 2,
+        title: 'De-obfuscate Suspicious Payloads with CyberChef',
+        instruction: 'Take base64-encoded and XOR-obfuscated PowerShell commands discovered in incident logs and decode them to plain text.',
+        commandOrAction: 'Use CyberChef recipe: "From Base64" -> "Remove null bytes"'
+      },
+      {
+        step: 3,
+        title: 'Inspect Email Headers for Phishing Indicators',
+        instruction: 'Analyze raw email headers to verify SPF, DKIM, and DMARC alignment and extract originating mail server IPs and URLs.',
+        commandOrAction: 'Review Authentication-Results headers for spf=pass and dkim=pass'
+      },
+      {
+        step: 4,
+        title: 'Investigate Malware Sandbox Execution Report',
+        instruction: 'Analyze behavioral reports from real malware execution in an isolated sandbox, identifying registry persistence keys and outbound C2 domains.',
+        commandOrAction: 'Review Sysmon Event ID 1 (Process Create) and Event ID 3 (Network Connect)'
+      }
+    ],
+    whatYouHaveLearnt: {
+      coreCompetencies: [
+        'Splunk SPL log search and threat detection syntax',
+        'Phishing analysis and email header authentication (SPF/DKIM/DMARC)',
+        'Payload de-obfuscation and forensic analysis using CyberChef',
+        'Sysmon event log triage and process creation monitoring'
+      ],
+      interviewTalkingPoint: 'In the TryHackMe SOC Level 1 path, I practiced realistic alert triage, writing targeted Splunk queries to isolate brute force attacks and decoding obfuscated PowerShell scripts using CyberChef.'
+    }
+  },
+  {
+    id: 'thm-jr-pentester',
+    category: 'tryhackme',
+    roleTitle: 'Penetration Tester / Red Team (PT1 Track)',
+    labTitle: 'TryHackMe: Jr Penetration Tester & Web Fundamentals Path',
+    originalLink: 'https://tryhackme.com/paths',
+    officialPdfUrl: 'https://tryhackme.com/paths',
+    officialGuideName: 'TryHackMe Ramp-Up Guide: Offensive & Defensive Security',
+    platform: 'TryHackMe Labs',
+    difficulty: 'Intermediate',
+    estimatedTime: '90 mins',
+    badgeTone: 'rose',
+    targetServices: ['Burp Suite', 'OWASP Top 10', 'Privilege Escalation', 'Nmap', 'Metasploit'],
+    roleRampUpGuide: {
+      summary: 'Learn ethical hacking methodology: scan network targets with Nmap, intercept and tamper with web traffic using Burp Suite, exploit OWASP Top 10 vulnerabilities, and escalate privileges on Linux and Windows machines.',
+      dayInLife: 'Conducting web application security assessments, finding authorization bypasses (IDOR), and demonstrating real-world risk to engineering teams.',
+      keyCertifications: ['PT1 (TryHackMe Jr PenTester)', 'eJPT', 'CompTIA PenTest+'],
+      salaryRange: '$105,000 - $155,000'
+    },
+    stepsToComplete: [
+      {
+        step: 1,
+        title: 'Perform Host Discovery and Port Scanning with Nmap',
+        instruction: 'Execute service version detection and default NSE vulnerability scripts against the target machine.',
+        commandOrAction: 'nmap -sC -sV -p- -oN scan-results.txt 10.10.X.X'
+      },
+      {
+        step: 2,
+        title: 'Intercept Web Requests with Burp Suite Proxy',
+        instruction: 'Configure browser to proxy traffic through Burp Suite, capture HTTP POST requests, and use Burp Repeater to manipulate parameters.',
+        commandOrAction: 'Launch Burp Suite -> Proxy -> Intercept -> Send to Repeater'
+      },
+      {
+        step: 3,
+        title: 'Exploit Insecure Direct Object References (IDOR)',
+        instruction: 'Inspect customer profile API endpoints, modify user ID parameters (`user_id=101` -> `user_id=1`), and view unauthorized records.',
+        commandOrAction: 'curl -H "Cookie: session=xyz" http://10.10.X.X/profile?id=1'
+      },
+      {
+        step: 4,
+        title: 'Escalate Privileges via Sudo Misconfiguration',
+        instruction: 'Inspect `sudo -l` permissions, identify unprivileged commands that can spawn interactive shells, and obtain root flag.',
+        commandOrAction: 'sudo -l && sudo find . -exec /bin/sh \\; -quit'
+      }
+    ],
+    whatYouHaveLearnt: {
+      coreCompetencies: [
+        'Methodical penetration testing reconnaissance and enumeration',
+        'Burp Suite traffic interception, request tampering, and analysis',
+        'OWASP Top 10 vulnerabilities (SQLi, IDOR, Broken Authentication)',
+        'Linux privilege escalation techniques using misconfigured sudo rights'
+      ],
+      interviewTalkingPoint: 'Working through the TryHackMe Jr Penetration Tester path gave me hands-on familiarity with attacker tooling like Burp Suite and Nmap, enabling me to anticipate exploitation paths when hardening cloud web applications.'
+    }
+  },
+  {
+    id: 'thm-comptia-secplus',
+    category: 'tryhackme',
+    roleTitle: 'Security Operations & Compliance',
+    labTitle: 'TryHackMe: CompTIA Security+ (SY0-701) Hands-On Attack & Defense',
+    originalLink: 'https://tryhackme.com/paths',
+    officialPdfUrl: 'https://tryhackme.com/paths',
+    officialGuideName: 'TryHackMe Ramp-Up Guide: Offensive & Defensive Security',
+    platform: 'TryHackMe Rooms',
+    difficulty: 'Beginner to Intermediate',
+    estimatedTime: '60 mins',
+    badgeTone: 'rose',
+    targetServices: ['CompTIA Security+ SY0-701', 'Cryptography', 'Identity & Access', 'Vulnerability Assessment'],
+    roleRampUpGuide: {
+      summary: 'Practical hands-on rooms aligned directly to the CompTIA Security+ (SY0-701) exam objectives: General Security Concepts, Threats/Vulnerabilities, Security Architecture, Security Operations, and Security Program Management.',
+      dayInLife: 'Reviewing security posture, conducting basic vulnerability assessments, enforcing security hygiene, and preparing for industry certification.',
+      keyCertifications: ['CompTIA Security+ (SY0-701)', 'SEC1 Capstone'],
+      salaryRange: '$85,000 - $125,000'
+    },
+    stepsToComplete: [
+      {
+        step: 1,
+        title: 'Complete Cryptography & Symmetric/Asymmetric Ciphers Room',
+        instruction: 'Understand the mathematical difference between AES symmetric encryption and RSA/ECC asymmetric key pairs, and practice hashing with SHA-256.',
+        commandOrAction: 'echo -n "SecurityPlus701" | sha256sum'
+      },
+      {
+        step: 2,
+        title: 'Analyze Identity Federation and Authentication Protocols',
+        instruction: 'Compare SAML 2.0, OAuth 2.0, and OpenID Connect (OIDC) authentication flows and review access token structures in JWT.io.',
+        commandOrAction: 'Review TryHackMe Authentication Rooms: Tokens, Sessions, and Federation'
+      },
+      {
+        step: 3,
+        title: 'Conduct Vulnerability Assessment with OpenVAS / Nessus',
+        instruction: 'Run an automated vulnerability scan against an internal network subnet and prioritize findings based on CVSS v3.1 scores.',
+        commandOrAction: 'Analyze CVSS score metrics: Base Score, Exploitability, and Impact'
+      },
+      {
+        step: 4,
+        title: 'Complete Security+ Capstone Assessment Room',
+        instruction: 'Solve practical scenarios testing incident triage, firewall rule remediation, and business continuity planning to validate exam readiness.',
+        commandOrAction: 'Submit completion flags on TryHackMe Security+ aligned modules'
+      }
+    ],
+    whatYouHaveLearnt: {
+      coreCompetencies: [
+        'CompTIA Security+ SY0-701 domain knowledge tested in hands-on environments',
+        'Symmetric and asymmetric cryptographic architecture and PKI lifecycle',
+        'Modern federated authentication protocols (SAML, OAuth, OIDC)',
+        'CVSS vulnerability scoring and remediation prioritization'
+      ],
+      interviewTalkingPoint: 'I paired theoretical CompTIA Security+ study with hands-on practice on TryHackMe, reinforcing concepts like CVSS triage, PKI certificate chains, and federated identity with live virtual machines.'
+    }
+  },
+
+  // =========================================================================
+  // 11. 90-DAY CLOUD ENGINEER ROADMAP (ZEROTOCLOUD)
+  // =========================================================================
+  {
+    id: 'roadmap-month-1-foundations',
+    category: 'roadmap-90',
+    roleTitle: 'Cloud Engineer (Month 1: Tech Foundations)',
+    labTitle: '90-Day Roadmap Month 1: Multi-Tier VPC, Linux SSH Bastion & Terraform Provisioning',
+    originalLink: 'https://zerotocloud.co',
+    officialPdfUrl: 'https://zerotocloud.co',
+    officialGuideName: '90-Day Cloud Engineer Roadmap (Zero to Cloud)',
+    platform: 'ZeroToCloud.co Curriculum',
+    difficulty: 'Beginner to Intermediate',
+    estimatedTime: '90 mins',
+    badgeTone: 'emerald',
+    targetServices: ['Linux SSH Bastion', 'Amazon VPC Subnets', 'Terraform HCL', 'Docker Containers', 'Python Automation'],
+    roleRampUpGuide: {
+      summary: 'Month 1 Tech Foundations from the 90-Day Roadmap: create an AWS account, learn core compute and networking services, configure Linux SSH bastions, write Terraform code to deploy basic cloud resources, and package containers with Docker.',
+      dayInLife: 'Building cloud infrastructure from code, connecting via SSH, testing routing components, and learning foundational container basics.',
+      keyCertifications: ['AWS Certified Cloud Practitioner', 'HashiCorp Certified: Terraform Associate'],
+      salaryRange: '$95,000 - $135,000'
+    },
+    stepsToComplete: [
+      {
+        step: 1,
+        title: 'Create Cloud Account & Configure Zero-Billing Cost Alerts',
+        instruction: 'Create AWS account, enable root account MFA, and configure AWS Budgets with a $1.00 monthly threshold alert to prevent unexpected bills.',
+        commandOrAction: 'aws budgets create-budget --account-id ACCOUNT_ID --budget file://zero-spend-budget.json'
+      },
+      {
+        step: 2,
+        title: 'Build Tiered Network with Public and Private Subnets',
+        instruction: 'Create an Amazon VPC with public and private subnets, attach an Internet Gateway, and configure routing components for outbound access.',
+        commandOrAction: 'aws ec2 create-vpc --cidr-block 10.0.0.0/16'
+      },
+      {
+        step: 3,
+        title: 'Deploy Linux Compute Instance & Connect via SSH',
+        instruction: 'Launch an Amazon Linux 2023 instance, configure security group access rules, and connect securely using an SSH private key.',
+        commandOrAction: 'ssh -i ~/.ssh/cloud-key.pem ec2-user@<PUBLIC_IP>'
+      },
+      {
+        step: 4,
+        title: 'Provision Cloud Resources Declaratively with Terraform',
+        instruction: 'Write Terraform code (`main.tf`, `variables.tf`, `outputs.tf`) to automate provisioning of the VPC and compute instance, storing state remotely.',
+        commandOrAction: 'terraform init && terraform plan && terraform apply'
+      }
+    ],
+    whatYouHaveLearnt: {
+      coreCompetencies: [
+        'Setting up secure cloud accounts with zero-billing safeguards',
+        'Designing public and private subnet routing topologies',
+        'Connecting to Linux compute workloads via SSH key pairs',
+        'Automating infrastructure provisioning with Terraform HCL'
+      ],
+      interviewTalkingPoint: 'In Month 1 of my cloud roadmap, I built a complete multi-tier VPC from scratch using Terraform, incorporating Linux SSH bastions, stateful security groups, and automated cost budget alerts.'
+    }
+  },
+  {
+    id: 'roadmap-month-2-projects',
+    category: 'roadmap-90',
+    roleTitle: 'Cloud Engineer (Month 2: High-Quality Projects)',
+    labTitle: '90-Day Roadmap Month 2: Production-Grade Cloud Architecture & Automated CI/CD',
+    originalLink: 'https://zerotocloud.co',
+    officialPdfUrl: 'https://zerotocloud.co',
+    officialGuideName: '90-Day Cloud Engineer Roadmap (Zero to Cloud)',
+    platform: 'GitHub & Cloud Projects Portfolio',
+    difficulty: 'Intermediate',
+    estimatedTime: '120 mins',
+    badgeTone: 'emerald',
+    targetServices: ['High-Availability ECS/EKS', 'GitHub Actions CI/CD', 'Multi-AZ RDS', 'CloudWatch Observability'],
+    roleRampUpGuide: {
+      summary: 'Month 2 Projects from the 90-Day Roadmap: transition from tutorials to building 3-5 high-quality, production-grade cloud projects that demonstrate end-to-end engineering competence.',
+      dayInLife: 'Architecting resilient multi-AZ applications, setting up continuous delivery pipelines, troubleshooting deployment errors, and filling knowledge gaps.',
+      keyCertifications: ['AWS Certified Solutions Architect - Associate (SAA-C03)', 'CKA'],
+      salaryRange: '$115,000 - $165,000'
+    },
+    stepsToComplete: [
+      {
+        step: 1,
+        title: 'Architect Highly Available Multi-AZ Application Tier',
+        instruction: 'Deploy an auto-scaling application across multiple Availability Zones behind an Application Load Balancer with health checks.',
+        commandOrAction: 'aws autoscaling create-auto-scaling-group --auto-scaling-group-name prod-asg --min-size 2 --max-size 6 --vpc-zone-identifier "subnet-1,subnet-2"'
+      },
+      {
+        step: 2,
+        title: 'Provision Multi-AZ Relational Database with Auto-Failover',
+        instruction: 'Deploy an Amazon RDS PostgreSQL instance configured with Multi-AZ replication and automated daily snapshots.',
+        commandOrAction: 'aws rds create-db-instance --db-instance-identifier prod-db --multi-az --engine postgres --allocated-storage 20'
+      },
+      {
+        step: 3,
+        title: 'Automate Deployments with GitHub Actions CI/CD',
+        instruction: 'Create a GitHub Actions workflow that builds Docker images, runs security scans, and deploys to cloud infrastructure via OIDC role assumption.',
+        commandOrAction: 'git commit -m "feat: automated OIDC deployment workflow" && git push origin main'
+      },
+      {
+        step: 4,
+        title: 'Implement Centralized Observability & Alarms',
+        instruction: 'Set up CloudWatch custom metrics, application log streaming, and SNS notifications alerting when HTTP 5xx error rates exceed 1%.',
+        commandOrAction: 'aws cloudwatch put-metric-alarm --alarm-name "High-5xx-Error-Rate" --metric-name HTTPCode_Target_5XX_Count --threshold 10'
+      }
+    ],
+    whatYouHaveLearnt: {
+      coreCompetencies: [
+        'Building 3-5 portfolio-ready production cloud systems',
+        'Multi-AZ fault tolerance and automated database failover',
+        'CI/CD pipeline automation using GitHub Actions and OIDC',
+        'Centralized cloud observability, metric dashboards, and alert triggers'
+      ],
+      interviewTalkingPoint: 'For my Month 2 portfolio capstone, I engineered a highly available containerized application spanning two Availability Zones with automated GitHub Actions CI/CD and multi-AZ RDS failover.'
+    }
+  },
+  {
+    id: 'roadmap-month-3-interview-prep',
+    category: 'roadmap-90',
+    roleTitle: 'Candidate to Hired Cloud Engineer (Month 3: Job & Interview Prep)',
+    labTitle: '90-Day Roadmap Month 3: Technical Portfolio, STAR Interview Defense & Job Hunt',
+    originalLink: 'https://zerotocloud.co',
+    officialPdfUrl: 'https://zerotocloud.co',
+    officialGuideName: '90-Day Cloud Engineer Roadmap (Zero to Cloud)',
+    platform: 'Career & Interview Command Deck',
+    difficulty: 'Intermediate to Advanced',
+    estimatedTime: '90 mins',
+    badgeTone: 'emerald',
+    targetServices: ['Cloud Architecture Defense', 'STAR Behavioral Framing', 'Technical Resume Alignment', 'Mock Interviews'],
+    roleRampUpGuide: {
+      summary: 'Month 3 Job & Interview Prep from the 90-Day Roadmap: document projects publicly (GitHub, LinkedIn, Medium), rewrite your resume to highlight cloud impact, prepare architecture and STAR behavioral questions, and run mock interviews.',
+      dayInLife: 'Refining portfolio architecture diagrams, practicing behavioral interview stories, applying strategically, and networking with engineering managers.',
+      keyCertifications: ['All Foundation & Role Credentials Verified'],
+      salaryRange: '$120,000 - $175,000 (Target Offer)'
+    },
+    stepsToComplete: [
+      {
+        step: 1,
+        title: 'Publish Comprehensive Technical Project Documentation',
+        instruction: 'Document your top 3 cloud projects on GitHub with architecture diagrams (using draw.io or Cloudcraft), technical tradeoffs, and reproduction steps.',
+        commandOrAction: 'git push origin main && publish project walkthrough on LinkedIn/Medium'
+      },
+      {
+        step: 2,
+        title: 'Rewrite Resume Aligned to Cloud Engineer Role',
+        instruction: 'Revise resume bullet points to quantify impact using the formula: "Accomplished [X] as measured by [Y] by doing [Z]" (e.g. reduced deployment time by 80% using Terraform).',
+        commandOrAction: 'Review resume against SeCloudive Career Guide & ATS keyword baselines'
+      },
+      {
+        step: 3,
+        title: 'Prepare Architectural Defense & STAR Behavioral Stories',
+        instruction: 'Formulate 5 core STAR (Situation, Task, Action, Result) stories covering troubleshooting an outage, handling disagreement, and resolving security vulnerabilities.',
+        commandOrAction: 'Practice model answers in SeCloudive Interview Simulator'
+      },
+      {
+        step: 4,
+        title: 'Execute Consistent Outreach & Track Applications',
+        instruction: 'Establish a structured tracker for job applications, connect directly with technical recruiters and engineering managers, and iterate based on interview feedback.',
+        commandOrAction: 'Track 10 weekly targeted applications and conduct weekly mock interviews'
+      }
+    ],
+    whatYouHaveLearnt: {
+      coreCompetencies: [
+        'Documenting cloud architecture and architectural decisions clearly',
+        'Quantifying technical achievements on engineering resumes',
+        'Mastering the STAR method for behavioral and leadership interviews',
+        'Defending system design tradeoffs and failure recovery in technical interviews'
+      ],
+      interviewTalkingPoint: 'By rigorously practicing architectural defense and structuring my experiences into STAR format stories, I can clearly explain the business rationale and security tradeoffs behind every engineering choice I make.'
     }
   }
 ]

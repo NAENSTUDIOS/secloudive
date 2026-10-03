@@ -29,12 +29,17 @@ import {
   Zap,
   Radio,
   Briefcase,
-  Circle
+  Circle,
+  Play
 } from 'lucide-react'
 import { useChallenges } from '../context/ChallengeContext'
 import EvidenceViewer from '../components/EvidenceViewer'
 import InvestigationCard from '../components/InvestigationCard'
 import InteractiveTerminal from '../components/InteractiveTerminal'
+import DynamicAttackGraph from '../components/DynamicAttackGraph'
+import LabNotesScratchpad from '../components/LabNotesScratchpad'
+import DefenderQuoteCallout from '../components/DefenderQuoteCallout'
+import { downloadHardenedTerraformModule, exportAuditPackAllFormats } from '../utils/auditExportEngine'
 
 export default function InvestigationSimulator() {
   const { id } = useParams()
@@ -227,7 +232,7 @@ ${activeInvestigation.awsBestPractices.map(bp => `* ${bp}`).join('\n')}
 ${activeInvestigation.lessonsLearned}
 
 ================================================================================
-Report digitally signed by SeCloudive SOC Incident Response Simulator
+Report integrity-checked by SeCloudive SOC Incident Response Simulator
 ================================================================================
 `
     const blob = new Blob([markdown], { type: 'text/markdown;charset=utf-8' })
@@ -270,7 +275,7 @@ Report digitally signed by SeCloudive SOC Incident Response Simulator
             <span className="crumb-sep">/</span>
             <span className="crumb-cat">{activeInvestigation.category}</span>
           </div>
-          <div className="workspace-status-badge">
+          <div className="workspace-status-badge" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             {showDossier ? (
               <span className="badge-resolved">
                 <CheckCircle2 size={13} />
@@ -282,6 +287,16 @@ Report digitally signed by SeCloudive SOC Incident Response Simulator
                 <span>Active Triage</span>
               </span>
             )}
+            <button
+              type="button"
+              className="button button-ghost btn-sm"
+              onClick={() => window.dispatchEvent(new CustomEvent('open-lab-notes'))}
+              style={{ fontSize: '0.78rem', color: '#38bdf8', borderColor: 'rgba(56, 189, 248, 0.4)', padding: '4px 10px' }}
+              title="Open Incident Notes & Interview Talking Points Scratchpad"
+            >
+              <FileText size={13} />
+              <span>Notes & Scratchpad</span>
+            </button>
           </div>
         </div>
 
@@ -410,6 +425,16 @@ Report digitally signed by SeCloudive SOC Incident Response Simulator
                 <Briefcase size={13} />
                 <span>Job SOP Runbook (Step-by-Step)</span>
               </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={evidenceMode === 'topology'}
+                className={`evidence-mode-tab ${evidenceMode === 'topology' ? 'active' : ''}`}
+                onClick={() => setEvidenceMode('topology')}
+              >
+                <Layers size={13} />
+                <span>Live Attack Graph & SIEM</span>
+              </button>
             </div>
           </div>
 
@@ -417,6 +442,14 @@ Report digitally signed by SeCloudive SOC Incident Response Simulator
             <EvidenceViewer evidenceList={activeInvestigation.evidence} />
           ) : evidenceMode === 'terminal' ? (
             <InteractiveTerminal investigation={activeInvestigation} />
+          ) : evidenceMode === 'topology' ? (
+            <div style={{ marginTop: '12px' }}>
+              <DynamicAttackGraph
+                scenarioId={activeInvestigation.categoryKey || 'ssrf'}
+                scenarioTitle={activeInvestigation.title}
+                mode="live"
+              />
+            </div>
           ) : (
             <div className="incident-runbook-container animate-reveal">
               <div className="runbook-lead-banner">
@@ -793,7 +826,27 @@ Report digitally signed by SeCloudive SOC Incident Response Simulator
                   </div>
                 </div>
 
-                <div className="dossier-actions-row">
+                <div className="dossier-actions-row" style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                  <button
+                    type="button"
+                    onClick={() => downloadHardenedTerraformModule({ scenarioId: activeInvestigation.id, scenarioTitle: activeInvestigation.title })}
+                    className="button button-ghost btn-sm"
+                    style={{ color: '#38bdf8', display: 'flex', alignItems: 'center', gap: '5px' }}
+                    title="Download auto-remediated Terraform blueprint with Checkov & tfsec GitHub Actions workflow"
+                  >
+                    <Download size={13} />
+                    <span>Download Hardened Terraform Module</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => exportAuditPackAllFormats({ scenario: activeInvestigation, learnerName: 'Incident Responder' })}
+                    className="button button-ghost btn-sm"
+                    style={{ color: '#34d399', display: 'flex', alignItems: 'center', gap: '5px' }}
+                    title="Export complete JSON with HMAC-SHA256 integrity envelope, PDF dossier, and Markdown summary"
+                  >
+                    <FileText size={13} />
+                    <span>Export Audit Pack (Integrity-Checked)</span>
+                  </button>
                   <button
                     type="button"
                     onClick={handleExportPostMortem}
@@ -965,6 +1018,15 @@ Report digitally signed by SeCloudive SOC Incident Response Simulator
             </div>
           </section>
         )}
+
+        {/* Student In-Lab Notes & Incident Scratchpad Drawer */}
+        <LabNotesScratchpad
+          contextId={activeInvestigation.id}
+          contextTitle={`${activeInvestigation.ticket}: ${activeInvestigation.title}`}
+          contextType="Security Incident Response Ticket"
+          targetServices={activeInvestigation.affectedServices}
+          mitreTechnique={activeInvestigation.mitre ? `${activeInvestigation.mitre.techniqueId} (${activeInvestigation.mitre.techniqueName})` : null}
+        />
       </main>
     )
   }
@@ -1014,6 +1076,14 @@ Report digitally signed by SeCloudive SOC Incident Response Simulator
           </div>
         </div>
       </div>
+
+      {/* Motivational Security Callout */}
+      <DefenderQuoteCallout 
+        category="tactical" 
+        autoCycle={true} 
+        cycleIntervalMs={14000} 
+        className="investigation-hub-quote"
+      />
 
       {/* Category Progress Trackers */}
       <div className="category-trackers-grid">

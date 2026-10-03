@@ -1,0 +1,1660 @@
+{
+  "phases": [
+    {
+      "id": "foundation",
+      "number": "01",
+      "title": "Foundation",
+      "subtitle": "Curated Reading & Architecture Notes",
+      "description": "Essential architectural whitepapers, official AWS documentation mappings, mental models, and service boundary definitions without cognitive overload."
+    },
+    {
+      "id": "implementation",
+      "number": "02",
+      "title": "Implementation",
+      "subtitle": "Production IaC & Step-by-Step Topologies",
+      "description": "Declarative infrastructure as code via Terraform / OpenTofu and AWS CDK, configuring resilient Multi-AZ resources from scratch with strict zero-trust parameters."
+    },
+    {
+      "id": "stress-test",
+      "number": "03",
+      "title": "Stress Test",
+      "subtitle": "Scenario Incident Triage & Failure Drills",
+      "description": "Simulated production incidents, least-privilege permission denials, cross-region latency spikes, and live troubleshooting drills under realistic pressure."
+    },
+    {
+      "id": "professional-edge",
+      "number": "04",
+      "title": "Professional Edge",
+      "subtitle": "Portfolio Artifacts & Resume Proofs",
+      "description": "Cost-governed capstones, verifiable architectural diagrams, technical trade-off documents, and quantified resume accomplishment metrics."
+    }
+  ],
+  "coreRoles": [
+    {
+      "id": "cloud-associate",
+      "slug": "cloud-associate",
+      "title": "Cloud Associate / SysAdmin",
+      "category": "Core Role",
+      "accentColor": "#0066CC",
+      "estimatedHours": "85 hours",
+      "targetAudience": "IT Technicians, System Administrators, and Students transitioning into AWS Cloud administration.",
+      "shortDescription": "Master core compute, storage, networking, and identity primitives to operate and maintain enterprise AWS accounts.",
+      "suggestedExamPath": "AWS Certified Cloud Practitioner → AWS Certified CloudOps Engineer - Associate",
+      "capstoneLab": "Multi-Tier Web Fleet with Auto Scaling, Application Load Balancers, and CloudWatch Alarms",
+      "iacFirst": true,
+      "formats": [
+        "Terraform / OpenTofu",
+        "AWS CDK",
+        "AWS CLI"
+      ],
+      "marketingHook": "No console clicking. Every lab is built, tested, and destroyed via code you can push straight to your GitHub.",
+      "modules": [
+        {
+          "number": 1,
+          "title": "IAM Governance, Least Privilege & Root Account Hardening",
+          "foundation": "AWS security best practices, credential boundaries, role delegation mechanics, and root account protection guidelines.",
+          "implementation": "Deploy hardened IAM role policies, permission boundaries, and MFA enforcement rules via Terraform; audit account posture with AWS CLI.",
+          "stressTest": "Scenario Incident #101: Triage a locked-out development role unable to assume cross-account access due to an explicit boundary condition.",
+          "professionalEdge": "Resume Bullet (Example: replace with your own measured results): 'Hardened 4 AWS environments with IAM permission boundaries and automated MFA enforcement, eliminating 100% of root credential usage.'",
+          "topics": [
+            "Root MFA Enforcement",
+            "IAM Policies & Boundaries",
+            "Role Assume Mechanics",
+            "AWS Organizations SCPs"
+          ],
+          "lastChecked": "March 2026",
+          "labCostCard": {
+            "estimatedCost": "$0.00",
+            "costNote": "Within AWS Free Tier or LocalStack emulation",
+            "cleanupCommand": "terraform destroy -auto-approve",
+            "servicesUsed": "Root MFA Enforcement, IAM Policies & Boundaries, Role Assume Mechanics"
+          },
+          "published": true
+        },
+        {
+          "number": 2,
+          "title": "VPC Fundamentals, Subnetting & Internet Gateways",
+          "foundation": "CIDR subnet calculations, public vs. private isolation topologies, route table prioritization, and NAT Gateway egress billing mechanics.",
+          "implementation": "Build a modular, 3-tier VPC with public, private, and database subnets across 2 Availability Zones using Terraform and AWS CDK.",
+          "stressTest": "Scenario Incident #102: Private EC2 instances in private subnets failing to download OS security patches after an incorrect default route deletion.",
+          "professionalEdge": "[Example: replace with your own measured results] Vector Architecture Diagram: Multi-AZ 3-tier VPC network topology package ready for LinkedIn and portfolio case studies.",
+          "topics": [
+            "CIDR Allocation",
+            "Public vs Private Subnets",
+            "Route Tables & IGW",
+            "NAT Gateways & Elastic IPs"
+          ],
+          "lastChecked": "March 2026",
+          "labCostCard": {
+            "estimatedCost": "$0.00",
+            "costNote": "Within AWS Free Tier or LocalStack emulation",
+            "cleanupCommand": "terraform destroy -auto-approve",
+            "servicesUsed": "CIDR Allocation, Public vs Private Subnets, Route Tables & IGW"
+          },
+          "published": true
+        },
+        {
+          "number": 3,
+          "title": "EC2 Elastic Compute, EBS Volume Optimization & AMIs",
+          "foundation": "Nitro System performance architecture, gp3 vs. io2 storage volume latency profiles, instance lifecycle states, and user data bootstrap scripts.",
+          "implementation": "Deploy an EC2 Auto Scaling group behind an Application Load Balancer with dynamic CPU target-tracking policies via Terraform.",
+          "stressTest": "Scenario Incident #103: Debug an instance initialization failure where user-data scripts fail silently during boot, causing ALB unhealthy host deregistration.",
+          "professionalEdge": "[Example: replace with your own measured results] Automated Golden AMI pipeline specification using HashiCorp Packer and AWS Systems Manager.",
+          "topics": [
+            "Instance Types & Families",
+            "GP3 vs IO2 Storage",
+            "Custom Golden AMIs",
+            "EC2 User Data Automation"
+          ],
+          "lastChecked": "March 2026",
+          "labCostCard": {
+            "estimatedCost": "$0.00",
+            "costNote": "Within AWS Free Tier or LocalStack emulation",
+            "cleanupCommand": "terraform destroy -auto-approve",
+            "servicesUsed": "Instance Types & Families, GP3 vs IO2 Storage, Custom Golden AMIs"
+          },
+          "published": true
+        },
+        {
+          "number": 4,
+          "title": "S3 Storage Classes, Bucket Policies & Lifecycle Rules",
+          "foundation": "S3 strong consistency guarantees, lifecycle transition cost thresholds, Cross-Region Replication (CRR), and KMS SSE encryption policies.",
+          "implementation": "Provision encrypted, versioned S3 buckets with automated Intelligent-Tiering transition rules, bucket locks, and strict public-access blocks via CDK.",
+          "stressTest": "Scenario Incident #104: A private application Lambda receives AccessDenied 403 fetching objects from S3 due to a conflicting KMS key policy and VPC endpoint policy.",
+          "professionalEdge": "[Example: replace with your own measured results] Enterprise S3 Data Security & Tiering Standard Operating Procedure (SOP) saving up to 40% on inactive object storage.",
+          "topics": [
+            "Standard vs Glacier Deep Archive",
+            "KMS SSE Encryption",
+            "Bucket Policies vs IAM",
+            "Cross-Region Replication"
+          ],
+          "lastChecked": "March 2026",
+          "labCostCard": {
+            "estimatedCost": "$0.00",
+            "costNote": "Within AWS Free Tier or LocalStack emulation",
+            "cleanupCommand": "terraform destroy -auto-approve",
+            "servicesUsed": "Standard vs Glacier Deep Archive, KMS SSE Encryption, Bucket Policies vs IAM"
+          },
+          "published": true
+        },
+        {
+          "number": 5,
+          "title": "CloudWatch Metrics, Unified Agent & Metric Alarms",
+          "foundation": "Custom metrics, aggregation intervals, Unified CloudWatch Agent configuration, and Composite Alarms for high-signal alerting.",
+          "implementation": "Deploy the Unified CloudWatch Agent across Linux fleets using AWS Systems Manager, collecting memory, disk, and journalctl structured logs.",
+          "stressTest": "Scenario Incident #105: Diagnose an alarm storm triggered by an EC2 memory leak cascading across worker pools without generating duplicate PagerDuty alerts.",
+          "professionalEdge": "[Example: replace with your own measured results] Production CloudWatch Dashboard configuration script monitoring latency (p95/p99), CPU utilization, and 5xx error spikes.",
+          "topics": [
+            "Memory & Disk Telemetry",
+            "Alarm Actions & SNS",
+            "CloudWatch Logs Insights",
+            "Synthetics Canaries"
+          ],
+          "lastChecked": "March 2026",
+          "labCostCard": {
+            "estimatedCost": "$0.00",
+            "costNote": "Within AWS Free Tier or LocalStack emulation",
+            "cleanupCommand": "terraform destroy -auto-approve",
+            "servicesUsed": "Memory & Disk Telemetry, Alarm Actions & SNS, CloudWatch Logs Insights"
+          },
+          "published": true
+        },
+        {
+          "number": 6,
+          "title": "Fleet Maintenance, AWS Systems Manager & Patch Management",
+          "foundation": "Agentless fleet control, Run Command concurrency controls, Session Manager auditing, and compliance baseline enforcement.",
+          "implementation": "Automate patch baselines across Linux/Windows instances with AWS SSM Maintenance Windows and zero permanent open SSH ports (Port 22).",
+          "stressTest": "Scenario Incident #106: Triage an SSM Managed Instance deregistration event preventing zero-downtime maintenance window execution across a hybrid fleet.",
+          "professionalEdge": "[Example: replace with your own measured results] Enterprise Zero-SSH Fleet Access Policy: Complete architecture migration documentation eliminating bastion hosts.",
+          "topics": [
+            "Session Manager No-SSH Access",
+            "Patch Baselines",
+            "Parameter Store Secrets",
+            "State Manager Automation"
+          ],
+          "lastChecked": "March 2026",
+          "labCostCard": {
+            "estimatedCost": "$0.00",
+            "costNote": "Within AWS Free Tier or LocalStack emulation",
+            "cleanupCommand": "terraform destroy -auto-approve",
+            "servicesUsed": "Session Manager No-SSH Access, Patch Baselines, Parameter Store Secrets"
+          },
+          "published": true
+        }
+      ],
+      "iacBannerText": "IaC-first labs — with practical console exposure for exam familiarity where AWS certifications require it.",
+      "certPathVerifiedOn": "March 2026",
+      "published": true,
+      "officialResources": {
+        "checkedOn": "March 2026",
+        "resources": [
+          {
+            "label": "AWS Certified Cloud Practitioner Exam Guide",
+            "url": "https://aws.amazon.com/certification/certified-cloud-practitioner/",
+            "type": "Exam guide"
+          },
+          {
+            "label": "AWS Cloud Quest: Cloud Practitioner Interactive Training",
+            "url": "https://aws.amazon.com/training/digital/aws-cloud-quest/",
+            "type": "Free training"
+          },
+          {
+            "label": "AWS General Reference: Security Best Practices",
+            "url": "https://docs.aws.amazon.com/general/latest/gr/aws-security-best-practices.html",
+            "type": "Official docs"
+          },
+          {
+            "label": "AWS Free Tier & Service Pricing Overview",
+            "url": "https://aws.amazon.com/pricing/",
+            "type": "Pricing page"
+          }
+        ]
+      }
+    },
+    {
+      "id": "senior-cloud-engineer",
+      "slug": "senior-cloud-engineer",
+      "title": "Senior Cloud Engineer",
+      "category": "Core Role",
+      "accentColor": "#6DB3FF",
+      "estimatedHours": "120 hours",
+      "targetAudience": "Mid-level cloud engineers and developers aiming to lead enterprise cloud engineering and platform operations.",
+      "shortDescription": "Architect, automate, and operate enterprise multi-account architectures using modern Terraform and immutable infrastructure.",
+      "suggestedExamPath": "AWS Certified Solutions Architect - Associate → AWS Certified DevOps Engineer - Professional",
+      "capstoneLab": "Autonomous GitOps Deployment of Microservices across Multi-Region EKS Clusters with Failover",
+      "iacFirst": true,
+      "formats": [
+        "Terraform / OpenTofu",
+        "AWS CDK (TypeScript/Python)",
+        "AWS CLI Commands"
+      ],
+      "marketingHook": "No console clicking. Every lab is built, tested, and destroyed via code you can push straight to your GitHub.",
+      "modules": [
+        {
+          "number": 1,
+          "title": "Advanced Compute, Orchestration & Auto-Scaling",
+          "foundation": "Kernel tuning for EC2, Nitro System deep-dive, Spot instance diversification strategies, Graviton architecture migrations.",
+          "implementation": "Build a resilient, multi-AZ Karpenter autoscaler on Amazon EKS using Terraform; configure zero-downtime rolling deployments with AWS Systems Manager (SSM) Patch Baselines.",
+          "stressTest": "Simulate Spot instance termination interruption via AWS Fault Injection Service (FIS); triage a worker node eviction loop caused by memory pressure.",
+          "professionalEdge": "Resume Bullet (Example: replace with your own measured results): 'Architected automated Spot Fleet failover on EKS using Karpenter, cutting batch compute expenditure by 58% while maintaining 99.95% workload availability.'",
+          "topics": [
+            "EC2 Nitro Tuning & Graviton Migrations",
+            "EKS Karpenter Autoscaler with Terraform",
+            "FIS Spot Interruption Simulation",
+            "Patch Baselines & Rolling Deployments"
+          ],
+          "lastChecked": "March 2026",
+          "labCostCard": {
+            "estimatedCost": "$0.00",
+            "costNote": "Within AWS Free Tier or LocalStack emulation",
+            "cleanupCommand": "terraform destroy -auto-approve",
+            "servicesUsed": "EC2 Nitro Tuning & Graviton Migrations, EKS Karpenter Autoscaler with Terraform, FIS Spot Interruption Simulation"
+          },
+          "published": true
+        },
+        {
+          "number": 2,
+          "title": "Complex Networking & Hybrid Connectivity",
+          "foundation": "AWS Transit Gateway route tables, IPAM (IP Address Manager), Direct Connect with VPN failover, VPC peering edge-cases.",
+          "implementation": "Deploy a hub-and-spoke multi-VPC topology in Terraform with centralized egress inspection via AWS Network Firewall and PrivateLink.",
+          "stressTest": "Debug an asymmetric routing blackhole between an on-premises simulated IPsec VPN and a private EKS pod network.",
+          "professionalEdge": "[Example: replace with your own measured results] Architecture diagram package: Multi-VPC Hub & Spoke network layout with isolated inspection VPC and centralized NAT.",
+          "topics": [
+            "Transit Gateway Route Isolation",
+            "Centralized Inspection via AWS Network Firewall",
+            "PrivateLink VPC Endpoints",
+            "Asymmetric Routing Incident Triage"
+          ],
+          "lastChecked": "March 2026",
+          "labCostCard": {
+            "estimatedCost": "$0.00",
+            "costNote": "Within AWS Free Tier or LocalStack emulation",
+            "cleanupCommand": "terraform destroy -auto-approve",
+            "servicesUsed": "Transit Gateway Route Isolation, Centralized Inspection via AWS Network Firewall, PrivateLink VPC Endpoints"
+          },
+          "published": true
+        },
+        {
+          "number": 3,
+          "title": "Data Persistence, Storage Tiers & Disaster Recovery",
+          "foundation": "IOPS provisioning (io2 Block Express vs. gp3), S3 Intelligent-Tiering mechanics, cross-region replication (CRR), EFS performance modes.",
+          "implementation": "Set up automated AWS Backup plans across accounts with cross-region replication, WORM (Write Once, Read Many) S3 Object Lock, and KMS customer-managed key (CMK) rotations.",
+          "stressTest": "Execute an automated point-in-time recovery (PITR) drill for an Aurora PostgreSQL cluster under simulated ransomware data corruption.",
+          "professionalEdge": "[Example: replace with your own measured results] Disaster recovery standard operating procedure (SOP) template detailing strict RTO (< 15 mins) and RPO (< 5 mins) metrics.",
+          "topics": [
+            "io2 Block Express vs gp3 Performance",
+            "Cross-Region AWS Backup & S3 Object Lock",
+            "Aurora PITR Ransomware Drill",
+            "Enterprise DR SOP with RTO/RPO Metrics"
+          ],
+          "lastChecked": "March 2026",
+          "labCostCard": {
+            "estimatedCost": "$0.00",
+            "costNote": "Within AWS Free Tier or LocalStack emulation",
+            "cleanupCommand": "terraform destroy -auto-approve",
+            "servicesUsed": "io2 Block Express vs gp3 Performance, Cross-Region AWS Backup & S3 Object Lock, Aurora PITR Ransomware Drill"
+          },
+          "published": true
+        },
+        {
+          "number": 4,
+          "title": "Infrastructure as Code (IaC) Engineering & Drift Management",
+          "foundation": "State file security, remote locking with DynamoDB, structural module decomposition, drift detection mechanisms.",
+          "implementation": "Create an enterprise-ready OpenTofu/Terraform module registry; integrate GitHub Actions CI/CD with tfsec, checkov, and automatic PR plan comments.",
+          "stressTest": "Resolve a state lock collision and reconcile unmanaged out-of-band manual console changes without destroying production databases.",
+          "professionalEdge": "[Example: replace with your own measured results] Reusable enterprise root module blueprint ready for production white-labeling.",
+          "topics": [
+            "OpenTofu / Terraform Module Registry",
+            "Remote State & DynamoDB Locking",
+            "GitHub Actions CI/CD with Checkov",
+            "State Lock Collision & Drift Reconciliation"
+          ],
+          "lastChecked": "March 2026",
+          "labCostCard": {
+            "estimatedCost": "$0.00",
+            "costNote": "Within AWS Free Tier or LocalStack emulation",
+            "cleanupCommand": "terraform destroy -auto-approve",
+            "servicesUsed": "OpenTofu / Terraform Module Registry, Remote State & DynamoDB Locking, GitHub Actions CI/CD with Checkov"
+          },
+          "published": true
+        },
+        {
+          "number": 5,
+          "title": "GitOps, Secure CI/CD & Delivery Pipelines",
+          "foundation": "Ephemeral deployment environments, immutable image builds, OpenID Connect (OIDC) identity federation between GitHub and AWS.",
+          "implementation": "Set up a keyless GitHub Actions pipeline authenticating via AWS IAM OIDC roles to build and push container images to Amazon ECR, deploying via ArgoCD.",
+          "stressTest": "Triage a compromised deployment pipeline token alert from AWS GuardDuty; isolate compromised resources without stalling active deployments.",
+          "professionalEdge": "[Example: replace with your own measured results] Security checklist for eliminating permanent AWS IAM user access keys across the developer lifecycle.",
+          "topics": [
+            "Keyless OIDC Identity Federation",
+            "Container Signatures & ECR Pipelines",
+            "ArgoCD GitOps Synchronizations",
+            "GuardDuty Pipeline Token Triage"
+          ],
+          "lastChecked": "March 2026",
+          "labCostCard": {
+            "estimatedCost": "$0.00",
+            "costNote": "Within AWS Free Tier or LocalStack emulation",
+            "cleanupCommand": "terraform destroy -auto-approve",
+            "servicesUsed": "Keyless OIDC Identity Federation, Container Signatures & ECR Pipelines, ArgoCD GitOps Synchronizations"
+          },
+          "published": true
+        },
+        {
+          "number": 6,
+          "title": "Observability, SRE Telemetry & Automated Governance",
+          "foundation": "CloudWatch metric filters, OpenTelemetry (ADOT), distributed tracing with AWS X-Ray, CloudTrail Lake audit queries.",
+          "implementation": "Deploy an end-to-end observability stack shipping structured JSON application logs and distributed traces to Amazon Managed Grafana and Prometheus.",
+          "stressTest": "Triage a cascading 504 Gateway Timeout bottleneck across three microservices using X-Ray traces to pinpoint database connection pool exhaustion.",
+          "professionalEdge": "[Example: replace with your own measured results] Executive-ready MTTR (Mean Time to Resolution) post-mortem root cause analysis (RCA) template.",
+          "topics": [
+            "AWS Distro for OpenTelemetry (ADOT)",
+            "Amazon Managed Grafana & Prometheus",
+            "Distributed Tracing with AWS X-Ray",
+            "Cascading 504 Gateway Timeout RCA"
+          ],
+          "lastChecked": "March 2026",
+          "labCostCard": {
+            "estimatedCost": "$0.00",
+            "costNote": "Within AWS Free Tier or LocalStack emulation",
+            "cleanupCommand": "terraform destroy -auto-approve",
+            "servicesUsed": "AWS Distro for OpenTelemetry (ADOT), Amazon Managed Grafana & Prometheus, Distributed Tracing with AWS X-Ray"
+          },
+          "published": true
+        }
+      ],
+      "iacBannerText": "Zero console. Every lab is built, tested, and destroyed via Terraform / OpenTofu, AWS CDK, and AWS CLI — ready to push straight to your GitHub.",
+      "certPathVerifiedOn": "March 2026",
+      "published": true,
+      "officialResources": {
+        "checkedOn": "March 2026",
+        "resources": [
+          {
+            "label": "AWS Certified SysOps Administrator - Associate Exam Guide",
+            "url": "https://aws.amazon.com/certification/certified-sysops-admin-associate/",
+            "type": "Exam guide"
+          },
+          {
+            "label": "AWS Skill Builder Digital Cloud Engineer Curriculum",
+            "url": "https://aws.amazon.com/training/digital/",
+            "type": "Free training"
+          },
+          {
+            "label": "Amazon EC2 Auto Scaling & Compute Documentation",
+            "url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/concepts.html",
+            "type": "Official docs"
+          },
+          {
+            "label": "Amazon EC2 On-Demand & Spot Pricing Calculator",
+            "url": "https://aws.amazon.com/ec2/pricing/",
+            "type": "Pricing page"
+          }
+        ]
+      }
+    },
+    {
+      "id": "cloud-architect",
+      "slug": "cloud-architect",
+      "title": "Cloud Solutions Architect",
+      "category": "Core Role",
+      "accentColor": "#C4B5FD",
+      "estimatedHours": "140 hours",
+      "targetAudience": "Senior engineers, consultants, and technical leads responsible for holistic high-level cloud system architecture.",
+      "shortDescription": "Synthesize the 6 pillars of the Well-Architected Framework into battle-tested distributed enterprise systems.",
+      "suggestedExamPath": "AWS Certified Solutions Architect - Associate → AWS Certified Solutions Architect - Professional",
+      "capstoneLab": "Global Enterprise E-Commerce Engine: Multi-Region Active-Active with EventBridge, DynamoDB Global Tables & CloudFront",
+      "iacFirst": true,
+      "formats": [
+        "Terraform / OpenTofu",
+        "AWS CDK (TypeScript/Python)",
+        "AWS CLI Commands"
+      ],
+      "marketingHook": "No console clicking. Every lab is built, tested, and destroyed via code you can push straight to your GitHub.",
+      "modules": [
+        {
+          "number": 1,
+          "title": "AWS Well-Architected Framework & Production Reviews",
+          "foundation": "Deep dive into the 6 Pillars (Operational Excellence, Security, Reliability, Performance Efficiency, Cost Optimization, Sustainability).",
+          "implementation": "Build an automated Well-Architected Tool custom lens running continuous workload posture validation.",
+          "stressTest": "Review a legacy monolith architecture blueprint and present a structured modernization proposal addressing 8 critical high-risk issues.",
+          "professionalEdge": "[Example: replace with your own measured results] Executive slide deck template for leading a C-level Architecture Review Board (ARB).",
+          "topics": [
+            "6 Pillars Deep Dive & Evaluation Lenses",
+            "Custom Automated Well-Architected Lens",
+            "Legacy Monolith Modernization Review",
+            "Executive C-Level ARB Deck Template"
+          ],
+          "lastChecked": "March 2026",
+          "labCostCard": {
+            "estimatedCost": "$0.00",
+            "costNote": "Within AWS Free Tier or LocalStack emulation",
+            "cleanupCommand": "terraform destroy -auto-approve",
+            "servicesUsed": "6 Pillars Deep Dive & Evaluation Lenses, Custom Automated Well-Architected Lens, Legacy Monolith Modernization Review"
+          },
+          "published": true
+        },
+        {
+          "number": 2,
+          "title": "Enterprise Multi-Account Governance & Landing Zones",
+          "foundation": "AWS Organizations, Service Control Policies (SCPs), AWS Control Tower, Resource Access Manager (RAM).",
+          "implementation": "Write a comprehensive set of baseline SCPs blocking root account usage, restricting resource deployment to designated regions, and enforcing IMDSv2.",
+          "stressTest": "Remediate an organization-wide compliance violation where a subsidiary account unlinks CloudTrail logging and attempts to run unauthorized crypto-mining EC2 instances.",
+          "professionalEdge": "[Example: replace with your own measured results] Enterprise Landing Zone topology blueprint mapping out Security, Audit, Shared Services, Core Network, and Application OUs.",
+          "topics": [
+            "AWS Organizations & Control Tower Baseline",
+            "Root Account Blocking & IMDSv2 SCPs",
+            "Unauthorized Crypto-Mining Remediation",
+            "Enterprise Multi-OU Landing Zone Blueprint"
+          ],
+          "lastChecked": "March 2026",
+          "labCostCard": {
+            "estimatedCost": "$0.00",
+            "costNote": "Within AWS Free Tier or LocalStack emulation",
+            "cleanupCommand": "terraform destroy -auto-approve",
+            "servicesUsed": "AWS Organizations & Control Tower Baseline, Root Account Blocking & IMDSv2 SCPs, Unauthorized Crypto-Mining Remediation"
+          },
+          "published": true
+        },
+        {
+          "number": 3,
+          "title": "Advanced FinOps, Unit Economics & Cost Allocation",
+          "foundation": "Cost Categories, Cost and Usage Report (CUR) Athena queries, Savings Plans vs. Reserved Instances mechanics, commitment break-even analysis.",
+          "implementation": "Build an automated serverless cost anomaly detector using AWS Lambda, Amazon Athena, and EventBridge delivering daily Slack summaries with resource tags.",
+          "stressTest": "Analyze an unallocated $45,000 monthly AWS invoice spike, identify the offending unattached EBS volumes and NAT Gateway idle data charges, and calculate corrective ROI.",
+          "professionalEdge": "[Example: replace with your own measured results] Formal FinOps proposal template for presenting an annualized $120,000 cloud cost reduction roadmap to executive leadership.",
+          "topics": [
+            "Cost and Usage Report (CUR) Athena Queries",
+            "Automated Slack Cost Anomaly Detector",
+            "Unallocated $45,000 Invoice Spike Forensic",
+            "Annualized $120k FinOps Executive Proposal"
+          ],
+          "lastChecked": "March 2026",
+          "labCostCard": {
+            "estimatedCost": "$0.00",
+            "costNote": "Within AWS Free Tier or LocalStack emulation",
+            "cleanupCommand": "terraform destroy -auto-approve",
+            "servicesUsed": "Cost and Usage Report (CUR) Athena Queries, Automated Slack Cost Anomaly Detector, Unallocated $45,000 Invoice Spike Forensic"
+          },
+          "published": true
+        },
+        {
+          "number": 4,
+          "title": "High Availability (HA) & Disaster Recovery (DR) at Scale",
+          "foundation": "Active-Active vs. Pilot Light vs. Warm Standby architectures, Route 53 Application Recovery Controller (ARC), cross-region data replication lag.",
+          "implementation": "Deploy a multi-region active-passive web application using Route 53 ARC routing controls, Aurora Global Database, and automated health checks.",
+          "stressTest": "Simulate a catastrophic AWS region-wide outage; execute an automated DNS failover while preserving database transactional integrity.",
+          "professionalEdge": "[Example: replace with your own measured results] Board-level Disaster Recovery Plan (DRP) containing verified Recovery Time Objectives (RTO) and Recovery Point Objectives (RPO).",
+          "topics": [
+            "Active-Active vs Warm Standby Architectures",
+            "Route 53 ARC Failover Routing Controls",
+            "Aurora Global Database Regional Outage Simulation",
+            "Board-Level DRP with Strict RTO/RPO"
+          ],
+          "lastChecked": "March 2026",
+          "labCostCard": {
+            "estimatedCost": "$0.00",
+            "costNote": "Within AWS Free Tier or LocalStack emulation",
+            "cleanupCommand": "terraform destroy -auto-approve",
+            "servicesUsed": "Active-Active vs Warm Standby Architectures, Route 53 ARC Failover Routing Controls, Aurora Global Database Regional Outage Simulation"
+          },
+          "published": true
+        },
+        {
+          "number": 5,
+          "title": "Enterprise Cloud Migration Strategy & Modernization",
+          "foundation": "The 7 Rs of Migration (Rehost, Replatform, Refactor, Repurchase, Relocate, Retain, Retire), AWS Application Migration Service (MGN).",
+          "implementation": "Plan and simulate an end-to-end database migration from an on-premises PostgreSQL instance to Amazon Aurora using AWS DMS with minimal downtime.",
+          "stressTest": "Re-align a stalled database migration experiencing replication drift and network bandwidth throttling without losing transaction records.",
+          "professionalEdge": "[Example: replace with your own measured results] 90-day Cloud Migration Planning matrix and dependency mapping playbook.",
+          "topics": [
+            "The 7 Rs of Cloud Migration Strategy",
+            "AWS DMS & MGN Live Database Cutover",
+            "Replication Drift & Bandwidth Throttling Triage",
+            "90-Day Enterprise Migration Playbook"
+          ],
+          "lastChecked": "March 2026",
+          "labCostCard": {
+            "estimatedCost": "$0.00",
+            "costNote": "Within AWS Free Tier or LocalStack emulation",
+            "cleanupCommand": "terraform destroy -auto-approve",
+            "servicesUsed": "The 7 Rs of Cloud Migration Strategy, AWS DMS & MGN Live Database Cutover, Replication Drift & Bandwidth Throttling Triage"
+          },
+          "published": true
+        },
+        {
+          "number": 6,
+          "title": "Regulatory Compliance, Security Posture & Enterprise Audits",
+          "foundation": "SOC 2 Type II, HIPAA, PCI-DSS requirements mapped to AWS services, AWS Security Hub, AWS Config conformance packs.",
+          "implementation": "Deploy an automated AWS Config auto-remediation workflow that flags and instantly restricts any S3 bucket or security group made public.",
+          "stressTest": "Run an end-to-end simulated SOC 2 audit readiness check, isolating failing access control evidence across all development and production accounts.",
+          "professionalEdge": "[Example: replace with your own measured results] Audit-defense checklist and automated compliance report generation script.",
+          "topics": [
+            "SOC 2, HIPAA & PCI-DSS AWS Control Mapping",
+            "AWS Config Auto-Remediation Event Rules",
+            "Simulated SOC 2 Audit Readiness Isolation",
+            "Enterprise Audit-Defense Evidence Generator"
+          ],
+          "lastChecked": "March 2026",
+          "labCostCard": {
+            "estimatedCost": "$0.00",
+            "costNote": "Within AWS Free Tier or LocalStack emulation",
+            "cleanupCommand": "terraform destroy -auto-approve",
+            "servicesUsed": "SOC 2, HIPAA & PCI-DSS AWS Control Mapping, AWS Config Auto-Remediation Event Rules, Simulated SOC 2 Audit Readiness Isolation"
+          },
+          "published": true
+        }
+      ],
+      "iacBannerText": "Architecture-first: labs are spec'd in IaC, with Well-Architected review artifacts you can present to a client or an ARB.",
+      "certPathVerifiedOn": "March 2026",
+      "published": true,
+      "officialResources": {
+        "checkedOn": "March 2026",
+        "resources": [
+          {
+            "label": "AWS Certified Solutions Architect - Associate Exam Guide",
+            "url": "https://aws.amazon.com/certification/certified-solutions-architect-associate/",
+            "type": "Exam guide"
+          },
+          {
+            "label": "AWS Solutions Architect Learning Path on Skill Builder",
+            "url": "https://aws.amazon.com/training/learn-about/architect/",
+            "type": "Free training"
+          },
+          {
+            "label": "AWS Well-Architected Framework Whitepapers & Docs",
+            "url": "https://docs.aws.amazon.com/wellarchitected/latest/framework/welcome.html",
+            "type": "Official docs"
+          },
+          {
+            "label": "AWS Official Pricing Calculator: Multi-AZ Architecture",
+            "url": "https://aws.amazon.com/calculator/",
+            "type": "Pricing page"
+          }
+        ]
+      }
+    },
+    {
+      "id": "devsecops-engineer",
+      "slug": "devsecops-engineer",
+      "title": "DevSecOps & Platform Engineer",
+      "category": "Core Role",
+      "accentColor": "#FF9900",
+      "estimatedHours": "115 hours",
+      "targetAudience": "DevOps practitioners, software developers, and security champions embedding security into automated delivery pipelines.",
+      "shortDescription": "Shift security left by integrating automated static analysis, container image vulnerability scanning, and policy-as-code.",
+      "suggestedExamPath": "AWS Certified Developer - Associate → AWS Certified DevOps Engineer - Professional",
+      "capstoneLab": "Zero-Trust GitHub Actions to AWS OIDC Pipeline with Checkov, Trivy, Amazon Inspector & Canary ECS Deployments",
+      "iacFirst": true,
+      "formats": [
+        "Terraform / OpenTofu",
+        "AWS CDK (TypeScript/Python)",
+        "AWS CLI Commands"
+      ],
+      "marketingHook": "No console clicking. Every lab is built, tested, and destroyed via code you can push straight to your GitHub.",
+      "modules": [
+        {
+          "number": 1,
+          "title": "CI/CD Pipeline Hardening & Cryptographic Identity",
+          "foundation": "Zero-Trust pipeline access, secretless deployments, software supply chain security (SLSA framework).",
+          "implementation": "Configure an end-to-end CI/CD pipeline in GitHub Actions using AWS IAM OIDC federation; sign container images using Cosign and store signatures in Amazon ECR.",
+          "stressTest": "Detect, block, and flag a malicious PR attempting to print pipeline environment secrets or extract AWS STS session tokens.",
+          "professionalEdge": "[Example: replace with your own measured results] Pre-built CI/CD policy configuration ensuring no long-lived access keys exist across your engineering organization.",
+          "topics": [
+            "SLSA Framework & Zero-Trust Pipelines",
+            "Keyless GitHub Actions OIDC Federation",
+            "Malicious PR Secret Extraction Triage",
+            "Organization Zero Static Key Policy"
+          ],
+          "lastChecked": "March 2026",
+          "labCostCard": {
+            "estimatedCost": "$0.00",
+            "costNote": "Within AWS Free Tier or LocalStack emulation",
+            "cleanupCommand": "terraform destroy -auto-approve",
+            "servicesUsed": "SLSA Framework & Zero-Trust Pipelines, Keyless GitHub Actions OIDC Federation, Malicious PR Secret Extraction Triage"
+          },
+          "published": true
+        },
+        {
+          "number": 2,
+          "title": "Infrastructure as Code (IaC) Security & Policy-as-Code",
+          "foundation": "Static analysis for IaC, shifting security left, open-source compliance tooling.",
+          "implementation": "Write Open Policy Agent (OPA) and Rego policies that evaluate Terraform plan files, rejecting resources without approved tags or using unencrypted EBS volumes.",
+          "stressTest": "Implement a pull-request blocker catching a subtle IAM privilege escalation vulnerability (iam:PassRole combined with lambda:CreateFunction).",
+          "professionalEdge": "[Example: replace with your own measured results] Enterprise Policy-as-Code library containing 15 production-tested Rego security checks.",
+          "topics": [
+            "Shifting Security Left with Static Analysis",
+            "Open Policy Agent (OPA) & Rego Policies",
+            "iam:PassRole Privilege Escalation Blocker",
+            "15 Production-Tested Rego Security Checks"
+          ],
+          "lastChecked": "March 2026",
+          "labCostCard": {
+            "estimatedCost": "$0.00",
+            "costNote": "Within AWS Free Tier or LocalStack emulation",
+            "cleanupCommand": "terraform destroy -auto-approve",
+            "servicesUsed": "Shifting Security Left with Static Analysis, Open Policy Agent (OPA) & Rego Policies, iam:PassRole Privilege Escalation Blocker"
+          },
+          "published": true
+        },
+        {
+          "number": 3,
+          "title": "Container, Host & Kubernetes Hardening",
+          "foundation": "Container vulnerability scanning, non-root user execution, read-only root filesystems, CIS Benchmarks for Amazon Linux and EKS.",
+          "implementation": "Build minimal, hardened Chainguard/Distroless container images; configure EKS Pod Identity and enforce Kubernetes Pod Security Standards.",
+          "stressTest": "Detect and neutralize an active container breakout attempt inside an EKS cluster using runtime security alerts from Amazon GuardDuty.",
+          "professionalEdge": "[Example: replace with your own measured results] Container hardening checklist ready to pass enterprise penetration testing.",
+          "topics": [
+            "CIS Benchmarks for Linux & Kubernetes",
+            "Chainguard & Distroless Image Hardening",
+            "EKS Container Breakout Neutralization Drill",
+            "Enterprise Penetration Testing Checklist"
+          ],
+          "lastChecked": "March 2026",
+          "labCostCard": {
+            "estimatedCost": "$0.00",
+            "costNote": "Within AWS Free Tier or LocalStack emulation",
+            "cleanupCommand": "terraform destroy -auto-approve",
+            "servicesUsed": "CIS Benchmarks for Linux & Kubernetes, Chainguard & Distroless Image Hardening, EKS Container Breakout Neutralization Drill"
+          },
+          "published": true
+        },
+        {
+          "number": 4,
+          "title": "Automated Threat Detection & Real-Time Security Telemetry",
+          "foundation": "Amazon GuardDuty ML models, AWS Security Hub aggregation, VPC Flow Logs analysis, Athena forensics queries.",
+          "implementation": "Build a serverless security orchestrator: pipe GuardDuty critical findings via EventBridge to AWS Lambda for automated IAM credential revocation and security-team notification.",
+          "stressTest": "Trace an active SSH brute-force attack on a bastion host through VPC Flow Logs and trigger an automated security group IP quarantine rule.",
+          "professionalEdge": "[Example: replace with your own measured results] Security incident runbook detailing steps from initial alert to post-compromise cleanup.",
+          "topics": [
+            "GuardDuty ML Models & Security Hub",
+            "Serverless Automated IAM Revocation Lambda",
+            "SSH Brute-Force Flow Log Forensic & IP Quarantine",
+            "Post-Compromise Security Incident Runbook"
+          ],
+          "lastChecked": "March 2026",
+          "labCostCard": {
+            "estimatedCost": "$0.00",
+            "costNote": "Within AWS Free Tier or LocalStack emulation",
+            "cleanupCommand": "terraform destroy -auto-approve",
+            "servicesUsed": "GuardDuty ML Models & Security Hub, Serverless Automated IAM Revocation Lambda, SSH Brute-Force Flow Log Forensic & IP Quarantine"
+          },
+          "published": true
+        },
+        {
+          "number": 5,
+          "title": "Secrets Governance, KMS & Key Management Automation",
+          "foundation": "Envelope encryption mechanics, AWS KMS key policies, AWS Secrets Manager rotation, HashiCorp Vault integrations.",
+          "implementation": "Deploy automated 30-day password rotation for RDS PostgreSQL databases using AWS Secrets Manager and a Lambda rotation function.",
+          "stressTest": "Safely revoke, rotate, and reissue an exposed database master credential in production without dropping active customer connections.",
+          "professionalEdge": "[Example: replace with your own measured results] Cryptographic key hierarchy diagram explaining envelope encryption for internal security reviews.",
+          "topics": [
+            "Envelope Encryption & KMS Key Policies",
+            "Automated 30-Day RDS Password Rotation",
+            "Zero-Downtime Exposed Master Key Revocation",
+            "Cryptographic Key Hierarchy Review Diagram"
+          ],
+          "lastChecked": "March 2026",
+          "labCostCard": {
+            "estimatedCost": "$0.00",
+            "costNote": "Within AWS Free Tier or LocalStack emulation",
+            "cleanupCommand": "terraform destroy -auto-approve",
+            "servicesUsed": "Envelope Encryption & KMS Key Policies, Automated 30-Day RDS Password Rotation, Zero-Downtime Exposed Master Key Revocation"
+          },
+          "published": true
+        },
+        {
+          "number": 6,
+          "title": "Cloud Incident Response, Forensics & Chaos Engineering",
+          "foundation": "Chaos engineering principles, AWS Fault Injection Service (FIS), compromised instance isolation techniques.",
+          "implementation": "Build a one-click automated incident response Lambda function that detaches an infected EC2 instance's ENI, snapshots the EBS volume for forensics, and isolates it via a quarantine security group.",
+          "stressTest": "Run an automated chaos experiment injecting network latency and packet loss into a critical microservice to test circuit-breaker failover.",
+          "professionalEdge": "[Example: replace with your own measured results] Post-incident review (PIR) template used by high-tier SRE and DevSecOps organizations.",
+          "topics": [
+            "Chaos Engineering & AWS FIS Scenarios",
+            "One-Click Infected EC2 ENI Forensics Snapshot",
+            "Circuit Breaker Network Latency Chaos Drill",
+            "Executive Post-Incident Review (PIR) Runbook"
+          ],
+          "lastChecked": "March 2026",
+          "labCostCard": {
+            "estimatedCost": "$0.00",
+            "costNote": "Within AWS Free Tier or LocalStack emulation",
+            "cleanupCommand": "terraform destroy -auto-approve",
+            "servicesUsed": "Chaos Engineering & AWS FIS Scenarios, One-Click Infected EC2 ENI Forensics Snapshot, Circuit Breaker Network Latency Chaos Drill"
+          },
+          "published": true
+        }
+      ],
+      "iacBannerText": "Pipeline-native: every security control ships as code — OPA policies, Rego rules, and Checkov checks live in version control alongside your Terraform.",
+      "certPathVerifiedOn": "March 2026",
+      "published": true,
+      "officialResources": {
+        "checkedOn": "March 2026",
+        "resources": [
+          {
+            "label": "AWS Certified DevOps Engineer - Professional Exam Guide",
+            "url": "https://aws.amazon.com/certification/certified-devops-engineer-professional/",
+            "type": "Exam guide"
+          },
+          {
+            "label": "AWS DevOps CI/CD Free Learning Plan on Skill Builder",
+            "url": "https://aws.amazon.com/training/learn-about/devops/",
+            "type": "Free training"
+          },
+          {
+            "label": "AWS CodePipeline & Automated CI/CD User Guide",
+            "url": "https://docs.aws.amazon.com/codepipeline/latest/userguide/welcome.html",
+            "type": "Official docs"
+          },
+          {
+            "label": "AWS Developer Tools Pricing Breakdown",
+            "url": "https://aws.amazon.com/devops/pricing/",
+            "type": "Pricing page"
+          }
+        ]
+      }
+    },
+    {
+      "id": "cloud-security-engineer",
+      "slug": "cloud-security-engineer",
+      "title": "Cloud Security & Compliance Engineer",
+      "category": "Core Role",
+      "accentColor": "#34D399",
+      "estimatedHours": "130 hours",
+      "targetAudience": "Information security analysts, SOC engineers, and cloud architects specializing in threat detection and zero-trust perimeter defense.",
+      "shortDescription": "Harden AWS cloud perimeters, detect sophisticated intrusions, and orchestrate automated incident response.",
+      "suggestedExamPath": "AWS Certified Solutions Architect - Associate → AWS Certified Security - Specialty",
+      "capstoneLab": "Automated Threat Containment: GuardDuty Detective Triage Triggering Step Functions IAM Revocation & Network Isolation",
+      "iacFirst": true,
+      "formats": [
+        "Terraform / OpenTofu",
+        "AWS CDK",
+        "AWS CLI"
+      ],
+      "marketingHook": "No console clicking. Every lab is built, tested, and destroyed via code you can push straight to your GitHub.",
+      "modules": [
+        {
+          "number": 1,
+          "title": "Zero-Trust Perimeter & AWS Network Firewall",
+          "foundation": "Stateful Suricata rules, egress domain filtering architectures, TLS decryption inspection, and Transit Gateway routing patterns.",
+          "implementation": "Deploy centralized AWS Network Firewall rule groups in an isolated inspection VPC using Terraform; enforce strict outbound TLS domain filtering.",
+          "stressTest": "Scenario Incident #301: Neutralize an outbound C2 beaconing callback attempt detected in egress traffic by dynamically blackholing the destination domain.",
+          "professionalEdge": "[Example: replace with your own measured results] Zero-Trust Network Inspection Blueprint: Architecture topology package for SOC 2 and PCI-DSS compliance audits.",
+          "topics": [
+            "Stateful Suricata Rule Inspection",
+            "Egress Filtering & Domain Allowlisting",
+            "VPC Peering Inspection TGW Routing",
+            "TLS Inspection"
+          ],
+          "lastChecked": "March 2026",
+          "labCostCard": {
+            "estimatedCost": "$0.00",
+            "costNote": "Within AWS Free Tier or LocalStack emulation",
+            "cleanupCommand": "terraform destroy -auto-approve",
+            "servicesUsed": "Stateful Suricata Rule Inspection, Egress Filtering & Domain Allowlisting, VPC Peering Inspection TGW Routing"
+          },
+          "published": true
+        },
+        {
+          "number": 2,
+          "title": "Cryptographic Engineering: AWS KMS & CloudHSM",
+          "foundation": "Envelope encryption mathematics, Customer Managed Key (CMK) lifecycle states, multi-region keys, and FIPS 140-2 Level 3 hardware security modules.",
+          "implementation": "Configure automated annual KMS key rotations, multi-account key grants, and application-level client-side envelope encryption scripts in Python.",
+          "stressTest": "Scenario Incident #302: Safely revoke an exposed KMS key grant without causing a catastrophic outage across dependent production microservices.",
+          "professionalEdge": "[Example: replace with your own measured results] Cryptographic Key Hierarchy Specification and Disaster Recovery Key Rotation Runbook.",
+          "topics": [
+            "Customer Managed Keys (CMK)",
+            "Cryptographic Erasure",
+            "Envelope Encryption in Custom Code",
+            "CloudHSM FIPS 140-2 Level 3"
+          ],
+          "lastChecked": "March 2026",
+          "labCostCard": {
+            "estimatedCost": "$0.00",
+            "costNote": "Within AWS Free Tier or LocalStack emulation",
+            "cleanupCommand": "terraform destroy -auto-approve",
+            "servicesUsed": "Customer Managed Keys (CMK), Cryptographic Erasure, Envelope Encryption in Custom Code"
+          },
+          "published": true
+        },
+        {
+          "number": 3,
+          "title": "Continuous Threat Detection: Amazon GuardDuty & Inspector",
+          "foundation": "Machine learning anomaly detection across VPC Flow Logs, DNS queries, CloudTrail events, and EKS audit logs.",
+          "implementation": "Enable GuardDuty across an entire AWS Organization with delegated administrator accounts and automated S3 malware scanning pipelines.",
+          "stressTest": "Scenario Incident #303: Triage an active IAM credential exfiltration alert (UnauthorizedAccess:IAMUser/InstanceCredentialExfiltration.OutsideAWS).",
+          "professionalEdge": "[Example: replace with your own measured results] Automated Incident Response Runbook for active credential theft containment with sub-2-minute execution.",
+          "topics": [
+            "ML-Driven Anomaly Findings",
+            "S3 Malware Detection",
+            "EKS Runtime Audit Logs",
+            "DNS Exfiltration Detection"
+          ],
+          "lastChecked": "March 2026",
+          "labCostCard": {
+            "estimatedCost": "$0.00",
+            "costNote": "Within AWS Free Tier or LocalStack emulation",
+            "cleanupCommand": "terraform destroy -auto-approve",
+            "servicesUsed": "ML-Driven Anomaly Findings, S3 Malware Detection, EKS Runtime Audit Logs"
+          },
+          "published": true
+        },
+        {
+          "number": 4,
+          "title": "Security Hub, Macie Data Discovery & Detective Forensics",
+          "foundation": "Automated CIS AWS Foundations Benchmark compliance, sensitive data discovery (PII) with Amazon Macie, and graph-based forensic analysis with Amazon Detective.",
+          "implementation": "Deploy Security Hub automated standards with customized suppression rules and centralized cross-account finding aggregation.",
+          "stressTest": "Scenario Incident #304: Conduct a graph-based investigation into an unauthorized IAM role assumption chain across three linked AWS accounts.",
+          "professionalEdge": "[Example: replace with your own measured results] Executive Compliance Dashboard and Audit Readiness Scorecard aligned with ISO 27001 and HIPAA standards.",
+          "topics": [
+            "PCI-DSS & CIS Benchmark Standards",
+            "PII Discovery with Macie",
+            "Detective Graph Visualizations",
+            "Root Cause Incident Analysis"
+          ],
+          "lastChecked": "March 2026",
+          "labCostCard": {
+            "estimatedCost": "$0.00",
+            "costNote": "Within AWS Free Tier or LocalStack emulation",
+            "cleanupCommand": "terraform destroy -auto-approve",
+            "servicesUsed": "PCI-DSS & CIS Benchmark Standards, PII Discovery with Macie, Detective Graph Visualizations"
+          },
+          "published": true
+        },
+        {
+          "number": 5,
+          "title": "Automated Security Remediation with AWS Step Functions",
+          "foundation": "Event-driven security orchestration, automation guardrails, state machine rollback handling, and audited approval workflows.",
+          "implementation": "Construct an automated AWS Step Functions state machine that quarantines compromised EC2 instances, takes forensic EBS snapshots, and disables rogue IAM keys.",
+          "stressTest": "Scenario Incident #305: Handle an automated remediation failure where an API throttling limit prevents immediate security group isolation of an active compromised host.",
+          "professionalEdge": "[Example: replace with your own measured results] Production Step Functions State Machine JSON blueprint with exponential backoff and error handling ready to deploy.",
+          "topics": [
+            "EventBridge Security Trigger Patterns",
+            "EC2 Quarantine & Snapshot Automation",
+            "Compromised IAM Session Revocation",
+            "Slack/PagerDuty Dispatch"
+          ],
+          "lastChecked": "March 2026",
+          "labCostCard": {
+            "estimatedCost": "$0.00",
+            "costNote": "Within AWS Free Tier or LocalStack emulation",
+            "cleanupCommand": "terraform destroy -auto-approve",
+            "servicesUsed": "EventBridge Security Trigger Patterns, EC2 Quarantine & Snapshot Automation, Compromised IAM Session Revocation"
+          },
+          "published": true
+        },
+        {
+          "number": 6,
+          "title": "CloudTrail Forensics, S3 Object Lock & Immutable Logs",
+          "foundation": "Multi-region Organization Trails, CloudTrail digest file validation, WORM (Write Once, Read Many) compliance mode, and query optimization with Athena.",
+          "implementation": "Provision a dedicated, isolated Log Archive account with S3 Object Lock in Compliance Mode, enforcing immutable storage and automated Athena partitioning.",
+          "stressTest": "Scenario Incident #306: Reconstruct the exact sequence of events from raw CloudTrail JSON logs following an unauthorized S3 bucket policy alteration.",
+          "professionalEdge": "[Example: replace with your own measured results] Athena Forensic Query Library containing 20 pre-built SQL queries for detecting privilege escalation and lateral movement.",
+          "topics": [
+            "Organization Trails Aggregation",
+            "CloudTrail Log File Validation",
+            "S3 Compliance Mode Object Lock",
+            "Athena Forensic SQL Queries"
+          ],
+          "lastChecked": "March 2026",
+          "labCostCard": {
+            "estimatedCost": "$0.00",
+            "costNote": "Within AWS Free Tier or LocalStack emulation",
+            "cleanupCommand": "terraform destroy -auto-approve",
+            "servicesUsed": "Organization Trails Aggregation, CloudTrail Log File Validation, S3 Compliance Mode Object Lock"
+          },
+          "published": true
+        }
+      ],
+      "iacBannerText": "Zero console. Incident response playbooks, Step Functions state machines, and forensic Athena queries are all code you can audit and version.",
+      "certPathVerifiedOn": "March 2026",
+      "published": true,
+      "officialResources": {
+        "checkedOn": "March 2026",
+        "resources": [
+          {
+            "label": "AWS Certified Security - Specialty Official Exam Guide",
+            "url": "https://aws.amazon.com/certification/certified-security-specialty/",
+            "type": "Exam guide"
+          },
+          {
+            "label": "AWS Security Fundamentals & Threat Mitigation Training",
+            "url": "https://aws.amazon.com/training/learn-about/security/",
+            "type": "Free training"
+          },
+          {
+            "label": "AWS IAM Policies & Security Best Practices Guide",
+            "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html",
+            "type": "Official docs"
+          },
+          {
+            "label": "Amazon GuardDuty & Security Hub Pricing Matrix",
+            "url": "https://aws.amazon.com/guardduty/pricing/",
+            "type": "Pricing page"
+          }
+        ]
+      }
+    },
+    {
+      "id": "cloud-data-engineer",
+      "slug": "cloud-data-engineer",
+      "title": "Cloud Data & Analytics Engineer",
+      "category": "Core Role",
+      "accentColor": "#00897B",
+      "estimatedHours": "110 hours",
+      "targetAudience": "Data analysts, database administrators, and software engineers transitioning to cloud data lakes and real-time streaming architectures.",
+      "shortDescription": "Ingest, transform, and analyze exabyte-scale structured and streaming datasets with Athena, Glue, Redshift, and Kinesis.",
+      "suggestedExamPath": "AWS Certified Solutions Architect - Associate → AWS Certified Data Engineer - Associate",
+      "capstoneLab": "Real-Time Financial Telemetry Lakehouse: Amazon Data Firehose, Apache Iceberg on S3, AWS Glue & Redshift Serverless",
+      "iacFirst": true,
+      "formats": [
+        "Terraform / OpenTofu",
+        "AWS CDK",
+        "AWS CLI"
+      ],
+      "marketingHook": "No console clicking. Every lab is built, tested, and destroyed via code you can push straight to your GitHub.",
+      "modules": [
+        {
+          "number": 1,
+          "title": "Modern Data Lakehouse on AWS S3 & Apache Iceberg",
+          "foundation": "Open table formats, ACID transactions on object storage, metadata management, and S3 partition layout strategies.",
+          "implementation": "Deploy an Apache Iceberg lakehouse on Amazon S3 using AWS Glue Catalog and Terraform, configuring schema evolution and time-travel queries.",
+          "stressTest": "Scenario Incident #401: Resolve an Iceberg metadata lock contention error caused by concurrent streaming writes during high-volume ingestion.",
+          "professionalEdge": "Resume Bullet (Example: replace with your own measured results): 'Designed Apache Iceberg lakehouse architecture on S3, cutting data query latency by 62% and reducing storage expenditure by $35k annually.'",
+          "topics": [
+            "Lake Formation Permissions",
+            "ACID Transactions on S3",
+            "Parquet Columnar Partitioning",
+            "Storage Cost Optimization"
+          ],
+          "lastChecked": "March 2026",
+          "labCostCard": {
+            "estimatedCost": "$0.00",
+            "costNote": "Within AWS Free Tier or LocalStack emulation",
+            "cleanupCommand": "terraform destroy -auto-approve",
+            "servicesUsed": "Lake Formation Permissions, ACID Transactions on S3, Parquet Columnar Partitioning"
+          },
+          "published": true
+        },
+        {
+          "number": 2,
+          "title": "Serverless ETL with AWS Glue & Dynamic Frames",
+          "foundation": "Distributed PySpark execution models, DynamicFrame optimizations, Glue Crawler cost control, and Job Bookmarks state preservation.",
+          "implementation": "Build an automated serverless ETL pipeline using AWS Glue 4.0 PySpark scripts, transforming uncompressed JSON into Snappy Parquet.",
+          "stressTest": "Scenario Incident #402: Triage a Glue job OOM (Out Of Memory) executor failure caused by skewed data partitions without increasing DPU capacity.",
+          "professionalEdge": "[Example: replace with your own measured results] Production PySpark ETL Template with automated data quality validation and schema enforcement.",
+          "topics": [
+            "Glue Data Catalog & Crawlers",
+            "PySpark Distributed Transforms",
+            "Job Bookmarks for Incremental Data",
+            "Glue Workflow Automation"
+          ],
+          "lastChecked": "March 2026",
+          "labCostCard": {
+            "estimatedCost": "$0.00",
+            "costNote": "Within AWS Free Tier or LocalStack emulation",
+            "cleanupCommand": "terraform destroy -auto-approve",
+            "servicesUsed": "Glue Data Catalog & Crawlers, PySpark Distributed Transforms, Job Bookmarks for Incremental Data"
+          },
+          "published": true
+        },
+        {
+          "number": 3,
+          "title": "Real-Time Streaming Ingestion with Amazon Kinesis & MSK",
+          "foundation": "Partition keys, shard capacity mathematics, consumer lag, Kinesis Data Streams vs. Apache Kafka (MSK), and deduplication techniques.",
+          "implementation": "Deploy an auto-scaling Amazon Kinesis Data Stream with Lambda consumers and Amazon Data Firehose writing batch Parquet to S3 via Terraform.",
+          "stressTest": "Scenario Incident #403: Debug severe shard iterator age spikes caused by hot partition key hashing during a 10x traffic surge.",
+          "professionalEdge": "[Example: replace with your own measured results] Streaming Architecture Topology Package with documented buffer tuning (5MB / 300s) and backpressure handling.",
+          "topics": [
+            "Kinesis Shard Scaling",
+            "Amazon Data Firehose Buffering",
+            "Amazon Managed Streaming for Apache Kafka",
+            "Windowed Streaming Analytics"
+          ],
+          "lastChecked": "March 2026",
+          "labCostCard": {
+            "estimatedCost": "$0.00",
+            "costNote": "Within AWS Free Tier or LocalStack emulation",
+            "cleanupCommand": "terraform destroy -auto-approve",
+            "servicesUsed": "Kinesis Shard Scaling, Amazon Data Firehose Buffering, Amazon Managed Streaming for Apache Kafka"
+          },
+          "published": true
+        },
+        {
+          "number": 4,
+          "title": "Serverless SQL Analytics with Amazon Athena & Presto",
+          "foundation": "Trino/Presto query engine internals, partition projection, cost reduction via columnar formats, and workgroup query limits.",
+          "implementation": "Configure Athena Workgroups with strict per-query data scan limits, CTAS table materialization, and automated query performance monitoring via CDK.",
+          "stressTest": "Scenario Incident #404: Optimize a runaway analytical query scanning 8 TB of unpartitioned data, slashing query execution time from 14 minutes to 11 seconds.",
+          "professionalEdge": "[Example: replace with your own measured results] Athena Query Cost Optimizer Playbook saving up to 90% on scanned analytical query billing.",
+          "topics": [
+            "Partition Projection Mechanics",
+            "CTAS Materialized Results",
+            "Cost Reduction via Columnar Formats",
+            "Athena Federated Querying"
+          ],
+          "lastChecked": "March 2026",
+          "labCostCard": {
+            "estimatedCost": "$0.00",
+            "costNote": "Within AWS Free Tier or LocalStack emulation",
+            "cleanupCommand": "terraform destroy -auto-approve",
+            "servicesUsed": "Partition Projection Mechanics, CTAS Materialized Results, Cost Reduction via Columnar Formats"
+          },
+          "published": true
+        },
+        {
+          "number": 5,
+          "title": "Cloud Data Warehousing with Amazon Redshift Serverless",
+          "foundation": "Columnar data storage, Distribution Styles (KEY, EVEN, ALL), Sort Keys (Compound vs. Interleaved), and Concurrency Scaling.",
+          "implementation": "Deploy Amazon Redshift Serverless with automated data loading from S3 via auto-copy, integrated with AWS Secrets Manager credentials.",
+          "stressTest": "Scenario Incident #405: Diagnose an analytical dashboard freeze caused by unvacuumed tables and sub-optimal distribution keys generating cross-slice network broadcast overhead.",
+          "professionalEdge": "[Example: replace with your own measured results] Enterprise Data Warehouse Design Blueprint with benchmarked SQL query performance comparisons.",
+          "topics": [
+            "Distribution & Sort Key Strategies",
+            "Redshift Spectrum S3 Querying",
+            "Workload Management (WLM)",
+            "Concurrency Scaling"
+          ],
+          "lastChecked": "March 2026",
+          "labCostCard": {
+            "estimatedCost": "$0.00",
+            "costNote": "Within AWS Free Tier or LocalStack emulation",
+            "cleanupCommand": "terraform destroy -auto-approve",
+            "servicesUsed": "Distribution & Sort Key Strategies, Redshift Spectrum S3 Querying, Workload Management (WLM)"
+          },
+          "published": true
+        },
+        {
+          "number": 6,
+          "title": "Data Governance, Auditing & Lineage with Lake Formation",
+          "foundation": "Fine-grained access control (FGAC), cell-level security, column filtering, and regulatory compliance (GDPR/HIPAA) in data lakes.",
+          "implementation": "Configure AWS Lake Formation tag-based access control (TBAC) managing access permissions across Athena, Redshift Spectrum, and EMR via Terraform.",
+          "stressTest": "Scenario Incident #406: Audit and revoke unauthorized column-level access to sensitive customer PII without disrupting active automated BI reporting pipelines.",
+          "professionalEdge": "[Example: replace with your own measured results] Enterprise Data Governance & Audit Compliance Checklist ready for Chief Data Officer (CDO) architecture review.",
+          "topics": [
+            "Column- and Row-Level Permissions",
+            "Data Filtering Policies",
+            "Data Lineage Tracking",
+            "GDPR/CCPA Compliance Erasure"
+          ],
+          "lastChecked": "March 2026",
+          "labCostCard": {
+            "estimatedCost": "$0.00",
+            "costNote": "Within AWS Free Tier or LocalStack emulation",
+            "cleanupCommand": "terraform destroy -auto-approve",
+            "servicesUsed": "Column- and Row-Level Permissions, Data Filtering Policies, Data Lineage Tracking"
+          },
+          "published": true
+        }
+      ],
+      "iacBannerText": "IaC-first labs — Glue, Kinesis, and Redshift Serverless all provisioned via Terraform so your data platform is reproducible and cost-governable.",
+      "certPathVerifiedOn": "March 2026",
+      "published": true,
+      "officialResources": {
+        "checkedOn": "March 2026",
+        "resources": [
+          {
+            "label": "AWS Certified Data Engineer - Associate Exam Guide",
+            "url": "https://aws.amazon.com/certification/certified-data-engineer-associate/",
+            "type": "Exam guide"
+          },
+          {
+            "label": "AWS Data Analytics & Data Lakes Learning Plan",
+            "url": "https://aws.amazon.com/training/learn-about/data-analytics/",
+            "type": "Free training"
+          },
+          {
+            "label": "AWS Glue Serverless ETL Official Developer Guide",
+            "url": "https://docs.aws.amazon.com/glue/latest/dg/what-is-glue.html",
+            "type": "Official docs"
+          },
+          {
+            "label": "Amazon Athena Serverless Analytics Pricing",
+            "url": "https://aws.amazon.com/athena/pricing/",
+            "type": "Pricing page"
+          }
+        ]
+      }
+    }
+  ],
+  "specializations": [
+    {
+      "id": "ml-engineer",
+      "slug": "ml-engineer",
+      "title": "Machine Learning Engineer",
+      "category": "Specialization",
+      "status": "Second Wave",
+      "accentColor": "#5E35B1",
+      "estimatedHours": "60 hours",
+      "shortDescription": "Deploy, monitor, and scale distributed ML models with Amazon SageMaker, Feature Store, and Triton Inference.",
+      "suggestedExamPath": "AWS Certified Machine Learning Engineer - Associate",
+      "modules": [
+        {
+          "number": 1,
+          "title": "SageMaker Model Training, Spot Instances & Checkpointing",
+          "lastChecked": "March 2026",
+          "labCostCard": {
+            "estimatedCost": "$0.00",
+            "costNote": "Within AWS Free Tier or LocalStack emulation",
+            "cleanupCommand": "terraform destroy -auto-approve",
+            "servicesUsed": "AWS Free Tier primitives"
+          },
+          "published": true
+        },
+        {
+          "number": 2,
+          "title": "Production Inference Endpoints & Auto-Scaling",
+          "lastChecked": "March 2026",
+          "labCostCard": {
+            "estimatedCost": "$0.00",
+            "costNote": "Within AWS Free Tier or LocalStack emulation",
+            "cleanupCommand": "terraform destroy -auto-approve",
+            "servicesUsed": "AWS Free Tier primitives"
+          },
+          "published": true
+        },
+        {
+          "number": 3,
+          "title": "MLOps Pipelines, Model Registry & Data Drift Monitoring",
+          "lastChecked": "March 2026",
+          "labCostCard": {
+            "estimatedCost": "$0.00",
+            "costNote": "Within AWS Free Tier or LocalStack emulation",
+            "cleanupCommand": "terraform destroy -auto-approve",
+            "servicesUsed": "AWS Free Tier primitives"
+          },
+          "published": true
+        }
+      ],
+      "iacBannerText": "IaC-first labs — the console is used only where the role or exam requires it.",
+      "certPathVerifiedOn": "March 2026",
+      "published": true,
+      "officialResources": {
+        "checkedOn": "March 2026",
+        "resources": [
+          {
+            "label": "AWS Certified Machine Learning - Specialty Exam Guide",
+            "url": "https://aws.amazon.com/certification/certified-machine-learning-specialty/",
+            "type": "Exam guide"
+          },
+          {
+            "label": "Amazon SageMaker Foundations & ML Training",
+            "url": "https://aws.amazon.com/training/learn-about/machine-learning/",
+            "type": "Free training"
+          },
+          {
+            "label": "Amazon SageMaker Developer Guide: Build, Train & Deploy",
+            "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/whatis.html",
+            "type": "Official docs"
+          },
+          {
+            "label": "Amazon SageMaker Compute & Training Pricing",
+            "url": "https://aws.amazon.com/sagemaker/pricing/",
+            "type": "Pricing page"
+          }
+        ]
+      }
+    },
+    {
+      "id": "cloud-network-engineer",
+      "slug": "cloud-network-engineer",
+      "title": "Cloud Network Specialist",
+      "category": "Specialization",
+      "status": "Second Wave",
+      "accentColor": "#0288D1",
+      "estimatedHours": "55 hours",
+      "shortDescription": "Master enterprise global hybrid backbones, Direct Connect, BGP peering, and SD-WAN integrations.",
+      "suggestedExamPath": "AWS Certified Advanced Networking - Specialty",
+      "modules": [
+        {
+          "number": 1,
+          "title": "Direct Connect Routing Policies & Transit VIFs",
+          "lastChecked": "March 2026",
+          "labCostCard": {
+            "estimatedCost": "$0.00",
+            "costNote": "Within AWS Free Tier or LocalStack emulation",
+            "cleanupCommand": "terraform destroy -auto-approve",
+            "servicesUsed": "AWS Free Tier primitives"
+          },
+          "published": true
+        },
+        {
+          "number": 2,
+          "title": "AWS Cloud WAN & Global Backbone Segmentation",
+          "lastChecked": "March 2026",
+          "labCostCard": {
+            "estimatedCost": "$0.00",
+            "costNote": "Within AWS Free Tier or LocalStack emulation",
+            "cleanupCommand": "terraform destroy -auto-approve",
+            "servicesUsed": "AWS Free Tier primitives"
+          },
+          "published": true
+        },
+        {
+          "number": 3,
+          "title": "DNS Traffic Management with Route 53 Resolver Endpoints",
+          "lastChecked": "March 2026",
+          "labCostCard": {
+            "estimatedCost": "$0.00",
+            "costNote": "Within AWS Free Tier or LocalStack emulation",
+            "cleanupCommand": "terraform destroy -auto-approve",
+            "servicesUsed": "AWS Free Tier primitives"
+          },
+          "published": true
+        }
+      ],
+      "iacBannerText": "IaC-first labs — the console is used only where the role or exam requires it.",
+      "certPathVerifiedOn": "March 2026",
+      "published": true,
+      "officialResources": {
+        "checkedOn": "March 2026",
+        "resources": [
+          {
+            "label": "AWS Certified Advanced Networking - Specialty Exam Guide",
+            "url": "https://aws.amazon.com/certification/certified-advanced-networking-specialty/",
+            "type": "Exam guide"
+          },
+          {
+            "label": "AWS Advanced Networking Learning Path on Skill Builder",
+            "url": "https://aws.amazon.com/training/learn-about/networking/",
+            "type": "Free training"
+          },
+          {
+            "label": "Amazon Virtual Private Cloud (VPC) User Guide",
+            "url": "https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html",
+            "type": "Official docs"
+          },
+          {
+            "label": "AWS Transit Gateway & Direct Connect Pricing",
+            "url": "https://aws.amazon.com/transit-gateway/pricing/",
+            "type": "Pricing page"
+          }
+        ]
+      }
+    },
+    {
+      "id": "sre-engineer",
+      "slug": "sre-engineer",
+      "title": "Site Reliability Engineer (SRE)",
+      "category": "Specialization",
+      "status": "Second Wave",
+      "accentColor": "#E65100",
+      "estimatedHours": "50 hours",
+      "shortDescription": "Engineer 99.999% cloud uptime, error budgets, synthetic monitoring, and self-healing systems.",
+      "suggestedExamPath": "AWS Certified DevOps Engineer - Professional",
+      "modules": [
+        {
+          "number": 1,
+          "title": "SLO, SLI & Error Budget Architectural Formulation",
+          "lastChecked": "March 2026",
+          "labCostCard": {
+            "estimatedCost": "$0.00",
+            "costNote": "Within AWS Free Tier or LocalStack emulation",
+            "cleanupCommand": "terraform destroy -auto-approve",
+            "servicesUsed": "AWS Free Tier primitives"
+          },
+          "published": true
+        },
+        {
+          "number": 2,
+          "title": "AWS Fault Injection Service (FIS) & Chaos Engineering",
+          "lastChecked": "March 2026",
+          "labCostCard": {
+            "estimatedCost": "$0.00",
+            "costNote": "Within AWS Free Tier or LocalStack emulation",
+            "cleanupCommand": "terraform destroy -auto-approve",
+            "servicesUsed": "AWS Free Tier primitives"
+          },
+          "published": true
+        },
+        {
+          "number": 3,
+          "title": "Automated Canary Analysis & Self-Healing Rollbacks",
+          "lastChecked": "March 2026",
+          "labCostCard": {
+            "estimatedCost": "$0.00",
+            "costNote": "Within AWS Free Tier or LocalStack emulation",
+            "cleanupCommand": "terraform destroy -auto-approve",
+            "servicesUsed": "AWS Free Tier primitives"
+          },
+          "published": true
+        }
+      ],
+      "iacBannerText": "IaC-first labs — the console is used only where the role or exam requires it.",
+      "certPathVerifiedOn": "March 2026",
+      "published": true,
+      "officialResources": {
+        "checkedOn": "March 2026",
+        "resources": [
+          {
+            "label": "AWS Certified DevOps Engineer - SRE Track Exam Guide",
+            "url": "https://aws.amazon.com/certification/certified-devops-engineer-professional/",
+            "type": "Exam guide"
+          },
+          {
+            "label": "AWS Observability & Cloud Operations Training",
+            "url": "https://aws.amazon.com/training/learn-about/operations/",
+            "type": "Free training"
+          },
+          {
+            "label": "Amazon CloudWatch Observability & Telemetry Guide",
+            "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/WhatIsCloudWatch.html",
+            "type": "Official docs"
+          },
+          {
+            "label": "Amazon CloudWatch Metrics & Log Ingestion Pricing",
+            "url": "https://aws.amazon.com/cloudwatch/pricing/",
+            "type": "Pricing page"
+          }
+        ]
+      }
+    },
+    {
+      "id": "finops-engineer",
+      "slug": "finops-engineer",
+      "title": "Cloud Financial Operations (FinOps)",
+      "category": "Specialization",
+      "status": "Second Wave",
+      "accentColor": "#2E7D32",
+      "estimatedHours": "45 hours",
+      "shortDescription": "Demystify cloud economics, cost allocation tags, Savings Plans, and automated waste reclamation.",
+      "suggestedExamPath": "FinOps Certified Practitioner + AWS Solutions Architect",
+      "modules": [
+        {
+          "number": 1,
+          "title": "AWS Cost Explorer, CUR 2.0 & Cost Allocation Tags",
+          "lastChecked": "March 2026",
+          "labCostCard": {
+            "estimatedCost": "$0.00",
+            "costNote": "Within AWS Free Tier or LocalStack emulation",
+            "cleanupCommand": "terraform destroy -auto-approve",
+            "servicesUsed": "AWS Free Tier primitives"
+          },
+          "published": true
+        },
+        {
+          "number": 2,
+          "title": "Compute Savings Plans vs Reserved Instances Math",
+          "lastChecked": "March 2026",
+          "labCostCard": {
+            "estimatedCost": "$0.00",
+            "costNote": "Within AWS Free Tier or LocalStack emulation",
+            "cleanupCommand": "terraform destroy -auto-approve",
+            "servicesUsed": "AWS Free Tier primitives"
+          },
+          "published": true
+        },
+        {
+          "number": 3,
+          "title": "Automated Unattached Resource Cleanup with Lambda & EventBridge",
+          "lastChecked": "March 2026",
+          "labCostCard": {
+            "estimatedCost": "$0.00",
+            "costNote": "Within AWS Free Tier or LocalStack emulation",
+            "cleanupCommand": "terraform destroy -auto-approve",
+            "servicesUsed": "AWS Free Tier primitives"
+          },
+          "published": true
+        }
+      ],
+      "iacBannerText": "IaC-first labs — the console is used only where the role or exam requires it.",
+      "certPathVerifiedOn": "March 2026",
+      "published": true,
+      "officialResources": {
+        "checkedOn": "March 2026",
+        "resources": [
+          {
+            "label": "AWS Cloud Financial Management Certification Guide",
+            "url": "https://aws.amazon.com/certification/certified-cloud-practitioner/",
+            "type": "Exam guide"
+          },
+          {
+            "label": "AWS Cloud Financial Management Free Digital Course",
+            "url": "https://aws.amazon.com/training/course-descriptions/cloud-financial-management/",
+            "type": "Free training"
+          },
+          {
+            "label": "AWS Cost Explorer & Billing Management Documentation",
+            "url": "https://docs.aws.amazon.com/cost-management/latest/userguide/ce-what-is.html",
+            "type": "Official docs"
+          },
+          {
+            "label": "AWS Cost Optimization & Savings Plans Calculator",
+            "url": "https://aws.amazon.com/pricing/cost-optimization/",
+            "type": "Pricing page"
+          }
+        ]
+      }
+    },
+    {
+      "id": "database-specialist",
+      "slug": "database-specialist",
+      "title": "Database Specialist",
+      "category": "Specialization",
+      "status": "Second Wave",
+      "accentColor": "#6A1B9A",
+      "estimatedHours": "50 hours",
+      "shortDescription": "Architect mission-critical databases with Aurora, DynamoDB, Neptune, MemoryDB, and DMS.",
+      "modules": [
+        {
+          "number": 1,
+          "title": "Aurora Multi-Master & Cross-Region Read Replicas",
+          "lastChecked": "March 2026",
+          "labCostCard": {
+            "estimatedCost": "$0.00",
+            "costNote": "Within AWS Free Tier or LocalStack emulation",
+            "cleanupCommand": "terraform destroy -auto-approve",
+            "servicesUsed": "AWS Free Tier primitives"
+          },
+          "published": true
+        },
+        {
+          "number": 2,
+          "title": "DynamoDB Advanced Single-Table Indexing & Streams",
+          "lastChecked": "March 2026",
+          "labCostCard": {
+            "estimatedCost": "$0.00",
+            "costNote": "Within AWS Free Tier or LocalStack emulation",
+            "cleanupCommand": "terraform destroy -auto-approve",
+            "servicesUsed": "AWS Free Tier primitives"
+          },
+          "published": true
+        },
+        {
+          "number": 3,
+          "title": "In-Memory Microsecond Caching with Amazon MemoryDB for Redis",
+          "lastChecked": "March 2026",
+          "labCostCard": {
+            "estimatedCost": "$0.00",
+            "costNote": "Within AWS Free Tier or LocalStack emulation",
+            "cleanupCommand": "terraform destroy -auto-approve",
+            "servicesUsed": "AWS Free Tier primitives"
+          },
+          "published": true
+        }
+      ],
+      "iacBannerText": "IaC-first labs — the console is used only where the role or exam requires it.",
+      "certPathVerifiedOn": "March 2026",
+      "published": true,
+      "officialResources": {
+        "checkedOn": "March 2026",
+        "resources": [
+          {
+            "label": "AWS Certified Database - Specialty Exam Blueprint",
+            "url": "https://aws.amazon.com/certification/certified-database-specialty/",
+            "type": "Exam guide"
+          },
+          {
+            "label": "AWS Databases Learning Plan: Relational & NoSQL",
+            "url": "https://aws.amazon.com/training/learn-about/databases/",
+            "type": "Free training"
+          },
+          {
+            "label": "Amazon Aurora High Availability Architecture Guide",
+            "url": "https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/CHAP_AuroraOverview.html",
+            "type": "Official docs"
+          },
+          {
+            "label": "Amazon Aurora & RDS Storage Pricing Calculator",
+            "url": "https://aws.amazon.com/rds/aurora/pricing/",
+            "type": "Pricing page"
+          }
+        ]
+      }
+    },
+    {
+      "id": "cloud-consultant",
+      "slug": "cloud-consultant",
+      "title": "Senior Cloud Consultant",
+      "category": "Specialization",
+      "status": "Second Wave",
+      "accentColor": "#37474F",
+      "estimatedHours": "40 hours",
+      "shortDescription": "Advise enterprise CTOs, manage cloud migrations, and lead Well-Architected governance reviews.",
+      "suggestedExamPath": "AWS Certified Solutions Architect - Professional",
+      "modules": [
+        {
+          "number": 1,
+          "title": "Enterprise Cloud Business Case & TCO Calculations",
+          "lastChecked": "March 2026",
+          "labCostCard": {
+            "estimatedCost": "$0.00",
+            "costNote": "Within AWS Free Tier or LocalStack emulation",
+            "cleanupCommand": "terraform destroy -auto-approve",
+            "servicesUsed": "AWS Free Tier primitives"
+          },
+          "published": true
+        },
+        {
+          "number": 2,
+          "title": "Conducting Formal AWS Well-Architected Framework Reviews",
+          "lastChecked": "March 2026",
+          "labCostCard": {
+            "estimatedCost": "$0.00",
+            "costNote": "Within AWS Free Tier or LocalStack emulation",
+            "cleanupCommand": "terraform destroy -auto-approve",
+            "servicesUsed": "AWS Free Tier primitives"
+          },
+          "published": true
+        },
+        {
+          "number": 3,
+          "title": "Executive Stakeholder Communication & Architecture Diagrams",
+          "lastChecked": "March 2026",
+          "labCostCard": {
+            "estimatedCost": "$0.00",
+            "costNote": "Within AWS Free Tier or LocalStack emulation",
+            "cleanupCommand": "terraform destroy -auto-approve",
+            "servicesUsed": "AWS Free Tier primitives"
+          },
+          "published": true
+        }
+      ],
+      "iacBannerText": "IaC-first labs — the console is used only where the role or exam requires it.",
+      "certPathVerifiedOn": "March 2026",
+      "published": true,
+      "officialResources": {
+        "checkedOn": "March 2026",
+        "resources": [
+          {
+            "label": "AWS Certified Solutions Architect - Professional Exam Guide",
+            "url": "https://aws.amazon.com/certification/certified-solutions-architect-professional/",
+            "type": "Exam guide"
+          },
+          {
+            "label": "AWS Cloud Strategy & Migration Enablement Path",
+            "url": "https://aws.amazon.com/training/partner/",
+            "type": "Free training"
+          },
+          {
+            "label": "AWS Cloud Adoption Framework (AWS CAF) Documentation",
+            "url": "https://docs.aws.amazon.com/wellarchitected/latest/cloud-adoption-framework/welcome.html",
+            "type": "Official docs"
+          },
+          {
+            "label": "AWS TCO & Total Migration Estimation Calculator",
+            "url": "https://aws.amazon.com/calculator/",
+            "type": "Pricing page"
+          }
+        ]
+      }
+    },
+    {
+      "id": "genai-engineer",
+      "slug": "genai-engineer",
+      "title": "Generative AI Cloud Engineer",
+      "category": "Specialization",
+      "status": "Second Wave",
+      "accentColor": "#D81B60",
+      "estimatedHours": "55 hours",
+      "shortDescription": "Build production GenAI applications, RAG pipelines, and agent swarms with Amazon Bedrock.",
+      "suggestedExamPath": "AWS Certified AI Practitioner → AWS Certified Generative AI Developer - Professional",
+      "modules": [
+        {
+          "number": 1,
+          "title": "Amazon Bedrock Foundation Models & Prompt Engineering",
+          "lastChecked": "March 2026",
+          "labCostCard": {
+            "estimatedCost": "$0.00",
+            "costNote": "Within AWS Free Tier or LocalStack emulation",
+            "cleanupCommand": "terraform destroy -auto-approve",
+            "servicesUsed": "AWS Free Tier primitives"
+          },
+          "published": true
+        },
+        {
+          "number": 2,
+          "title": "RAG Architecture with OpenSearch Serverless Vector Engine",
+          "lastChecked": "March 2026",
+          "labCostCard": {
+            "estimatedCost": "$0.00",
+            "costNote": "Within AWS Free Tier or LocalStack emulation",
+            "cleanupCommand": "terraform destroy -auto-approve",
+            "servicesUsed": "AWS Free Tier primitives"
+          },
+          "published": true
+        },
+        {
+          "number": 3,
+          "title": "Bedrock Agents, Guardrails & Responsible AI Governance",
+          "lastChecked": "March 2026",
+          "labCostCard": {
+            "estimatedCost": "$0.00",
+            "costNote": "Within AWS Free Tier or LocalStack emulation",
+            "cleanupCommand": "terraform destroy -auto-approve",
+            "servicesUsed": "AWS Free Tier primitives"
+          },
+          "published": true
+        }
+      ],
+      "iacBannerText": "IaC-first labs — the console is used only where the role or exam requires it.",
+      "certPathVerifiedOn": "March 2026",
+      "published": true,
+      "officialResources": {
+        "checkedOn": "March 2026",
+        "resources": [
+          {
+            "label": "AWS Certified AI Practitioner Official Exam Guide",
+            "url": "https://aws.amazon.com/certification/certified-ai-practitioner/",
+            "type": "Exam guide"
+          },
+          {
+            "label": "AWS Generative AI Learning Plan for Developers",
+            "url": "https://aws.amazon.com/training/learn-about/generative-ai/",
+            "type": "Free training"
+          },
+          {
+            "label": "Amazon Bedrock Foundation Models & RAG User Guide",
+            "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/what-is-bedrock.html",
+            "type": "Official docs"
+          },
+          {
+            "label": "Amazon Bedrock Model Inference & Token Pricing",
+            "url": "https://aws.amazon.com/bedrock/pricing/",
+            "type": "Pricing page"
+          }
+        ]
+      }
+    }
+  ]
+}

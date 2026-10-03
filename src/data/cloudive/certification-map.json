@@ -1,0 +1,39 @@
+{
+  "header": {
+    "badge": "Interactive Career Engine",
+    "title": "AWS Career Decision Tree & Skills Audit",
+    "subtitle": "Eliminate ambiguity. Answer 3 quick architectural questions to identify your optimal career path, then audit and track your hands-on competencies."
+  },
+  "verificationNotice": "Exam pathways and code alignments verified as of March 2026 against official AWS Certification blueprints. Exam codes subject to retirement cycles.",
+  "examPaths": [
+    {
+      "tier": "Foundational & Associate",
+      "exam": "AWS Certified Solutions Architect – Associate (SAA-C03)",
+      "targetRole": "Cloud Associate / Solutions Architect",
+      "description": "High-availability Multi-AZ VPCs, IAM policies, S3 lifecycle, EC2 auto-scaling, and RDS failover."
+    },
+    {
+      "tier": "Professional",
+      "exam": "AWS Certified Solutions Architect – Professional (SAP-C02)",
+      "targetRole": "Senior Cloud Solutions Architect",
+      "description": "Multi-account AWS Organizations, Control Tower, Direct Connect, Transit Gateway, and disaster recovery."
+    },
+    {
+      "tier": "Specialty / Specialty Role",
+      "exam": "AWS Certified Security – Specialty (SCS-C02)",
+      "targetRole": "Cloud Security & DevSecOps Engineer",
+      "description": "KMS key policies, GuardDuty automated remediation, IAM permission boundaries, and SCP guardrails."
+    },
+    {
+      "tier": "Specialty / Data & AI",
+      "exam": "AWS Certified Data Engineer – Associate (DEA-C01)",
+      "targetRole": "Cloud Data & Analytics Engineer",
+      "description": "S3 Lakehouse, Apache Iceberg, Glue ETL (PySpark), Athena partitioning, and Redshift Serverless."
+    }
+  ],
+  "downloadGuide": {
+    "title": "The Cloud Navigator 2026 Visual Roadmap",
+    "description": "Download our comprehensive offline PDF career roadmap containing the full visual tree and course checklists.",
+    "downloadUrl": "/downloads/the-cloud-navigator-2026.pdf"
+  }
+}

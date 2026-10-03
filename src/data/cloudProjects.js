@@ -1,8 +1,8 @@
 /**
- * Real-Life Cloud Security Portfolio Projects (100% AWS Free-Tier & Zero Billing Guaranteed)
+ * Real-Life Cloud Security Portfolio Projects (100% AWS Free-Tier & Verified $0 Teardown Workflow)
  * 
  * Specifically engineered for students and aspiring engineers to build in real AWS accounts
- * without spending a single penny, including strict tear-down runbooks and resume portfolio write-ups.
+ * with zero surprise costs when following the verified teardown checklists.
  */
 
 export const zeroBillingGuide = {

@@ -1,0 +1,152 @@
+[
+  {
+    "id": "freeRoadmap",
+    "name": "The Cloud Navigator (AWS Roadmap)",
+    "url": "/downloads/the-cloud-navigator-2026.pdf",
+    "format": "NAEN PDF",
+    "size": "Official PDF",
+    "description": "Interactive visual career decision tree and complete 2026 certification roadmap.",
+    "lastChecked": "March 2026",
+    "published": true
+  },
+  {
+    "id": "foundationsLinux",
+    "name": "Foundations: Linux Shell & Cloud Scripting",
+    "url": "/downloads/foundations-linux.pdf",
+    "format": "NAEN PDF + Code",
+    "size": "Official PDF + Code",
+    "description": "Bash automation, file permissions, SUID audit, process management, and cloud-init.",
+    "lastChecked": "March 2026",
+    "published": true
+  },
+  {
+    "id": "foundationsPython",
+    "name": "Foundations: Python & AWS Boto3 SDK",
+    "url": "/downloads/foundations-python.pdf",
+    "format": "NAEN PDF + Code",
+    "size": "Official PDF + Code",
+    "description": "Automating AWS resources, IAM least-privilege auditor, Lambda triggers, and API clients.",
+    "lastChecked": "March 2026",
+    "published": true
+  },
+  {
+    "id": "foundationsDocker",
+    "name": "Foundations: Docker Containers for Cloud",
+    "url": "/downloads/foundations-docker.pdf",
+    "format": "NAEN PDF + Code",
+    "size": "Official PDF + Code",
+    "description": "Container fundamentals, multi-stage builds, non-root execution, and Trivy CVE scanning.",
+    "lastChecked": "March 2026",
+    "published": true
+  },
+  {
+    "id": "foundationsKubernetes",
+    "name": "Foundations: Kubernetes & Amazon EKS",
+    "url": "/downloads/foundations-kubernetes.pdf",
+    "format": "NAEN PDF + Code",
+    "size": "Official PDF + Code",
+    "description": "Pods, Deployments, Services, NetworkPolicies, IRSA, and AWS Load Balancer Controller.",
+    "lastChecked": "March 2026",
+    "published": true
+  },
+  {
+    "id": "foundationsGit",
+    "name": "Foundations: Git & GitHub Workflow",
+    "url": "/downloads/foundations-git.pdf",
+    "format": "NAEN PDF + Code",
+    "size": "Official PDF + Code",
+    "description": "Trunk-based development, signed commits, Gitleaks pre-commit hooks, and GitOps.",
+    "lastChecked": "March 2026",
+    "published": true
+  },
+  {
+    "id": "cloudAssociate",
+    "name": "Cloud Associate / SysAdmin Pack",
+    "url": "/downloads/cloudive-cloud-associate.pdf",
+    "format": "NAEN PDF + Code",
+    "size": "Official PDF + Code",
+    "description": "Core compute, storage, 3-tier multi-AZ VPC networking, and SSM bastionless ops.",
+    "lastChecked": "March 2026",
+    "published": true
+  },
+  {
+    "id": "seniorCloud",
+    "name": "Senior Cloud Engineer Pack",
+    "url": "/downloads/cloudive-senior-cloud.pdf",
+    "format": "NAEN PDF + Code",
+    "size": "Official PDF + Code",
+    "description": "Multi-AZ topologies, Transit Gateway, Route 53 multi-region failover, and chaos drills.",
+    "lastChecked": "March 2026",
+    "published": true
+  },
+  {
+    "id": "cloudArchitect",
+    "name": "Cloud Solutions Architect Pack",
+    "url": "/downloads/cloudive-cloud-architect.pdf",
+    "format": "NAEN PDF + Code",
+    "size": "Official PDF + Code",
+    "description": "Landing zones, AWS Organizations SCPs, cross-account governance, and disaster recovery.",
+    "lastChecked": "March 2026",
+    "published": true
+  },
+  {
+    "id": "devsecops",
+    "name": "DevSecOps & Platform Engineer Pack",
+    "url": "/downloads/cloudive-devsecops.pdf",
+    "format": "NAEN PDF + Code",
+    "size": "Official PDF + Code",
+    "description": "CI/CD security scanning, GitHub Actions AWS OIDC, Terraform guardrails, and Cosign.",
+    "lastChecked": "March 2026",
+    "published": true
+  },
+  {
+    "id": "cloudSecurity",
+    "name": "Cloud Security & Compliance Engineer Pack",
+    "url": "/downloads/cloudive-cloud-security.pdf",
+    "format": "NAEN PDF + Code",
+    "size": "Official PDF + Code",
+    "description": "CIS AWS Foundations v3.0, KMS envelope encryption, Athena forensics, and threat detection.",
+    "lastChecked": "March 2026",
+    "published": true
+  },
+  {
+    "id": "cloudData",
+    "name": "Cloud Data & Analytics Engineer Pack",
+    "url": "/downloads/cloudive-cloud-data.pdf",
+    "format": "NAEN PDF + Code",
+    "size": "Official PDF + Code",
+    "description": "Apache Iceberg lakehouses, AWS Glue Data Catalog, PySpark, and Lake Formation security.",
+    "lastChecked": "March 2026",
+    "published": true
+  },
+  {
+    "id": "toolkit",
+    "name": "Senior Leadership & Strategy Toolkit",
+    "url": "/downloads/cloudive-leadership-toolkit.pdf",
+    "format": "NAEN PDF",
+    "size": "Official PDF",
+    "description": "Board risk decks, 30-day FinOps cloud waste curtailment playbooks, and MIM war rooms.",
+    "lastChecked": "March 2026",
+    "published": true
+  },
+  {
+    "id": "fullBundle",
+    "name": "Complete Career Library Bundle",
+    "url": "/downloads/cloudive-complete-career-library.pdf",
+    "format": "NAEN PDF + Code",
+    "size": "Official PDF + Code",
+    "description": "Master dossier covering all 14 role packs, 45 hands-on labs, and leadership toolkits.",
+    "lastChecked": "March 2026",
+    "published": true
+  },
+  {
+    "id": "genai",
+    "name": "Generative AI Engineer Pack",
+    "url": "/downloads/cloudive-genai-engineer.pdf",
+    "format": "NAEN PDF + Code",
+    "size": "Official PDF + Code",
+    "description": "Amazon Bedrock Guardrails, RAG vector embeddings, prompt injection defense, and FinOps.",
+    "lastChecked": "March 2026",
+    "published": true
+  }
+]

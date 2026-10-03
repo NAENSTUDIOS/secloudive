@@ -1,0 +1,568 @@
+/* =========================================================================
+   SeCloudive Sentinel AI Assistant — Premium Cyber Security Styling
+   Vanilla CSS Design System: Glassmorphism, Micro-Animations, A11y, Telemetry
+   ========================================================================= */
+
+/* ── FAB Launcher ────────────────────────────────────────────────────────── */
+.sentinel-launcher {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.7rem 1.25rem;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, #064e3b 0%, #065f46 40%, #022c22 100%);
+  border: 1.5px solid rgba(16, 185, 129, 0.5);
+  box-shadow: 0 10px 30px -5px rgba(6, 78, 59, 0.6), 0 0 20px rgba(16, 185, 129, 0.3);
+  color: #f8fafc;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.sentinel-launcher:hover {
+  transform: translateY(-2px) scale(1.03);
+  border-color: #34d399;
+  box-shadow: 0 15px 35px -5px rgba(16, 185, 129, 0.7), 0 0 30px rgba(52, 211, 153, 0.45);
+}
+
+.sentinel-launcher-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sentinel-ping-dot {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #38bdf8;
+  box-shadow: 0 0 0 2px #040813;
+}
+
+.sentinel-ping-dot::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: #38bdf8;
+  animation: sentinelPulse 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@keyframes sentinelPulse {
+  75%, 100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+.sentinel-shortcut-pill {
+  font-size: 0.65rem;
+  padding: 0.15rem 0.4rem;
+  border-radius: 0.35rem;
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #cbd5e1;
+  font-family: 'DM Mono', monospace;
+  margin-left: 0.2rem;
+}
+
+/* ── Sentinel Chat Modal ─────────────────────────────────────────────────── */
+.sentinel-modal {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  width: 440px;
+  max-width: calc(100vw - 2rem);
+  height: 640px;
+  max-height: calc(100vh - 3rem);
+  z-index: 10000;
+  border-radius: 1.25rem;
+  background: #030712;
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.9), 0 0 40px rgba(16, 185, 129, 0.15);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: sentinelSlideUp 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.sentinel-modal.minimized {
+  height: 64px;
+}
+
+@keyframes sentinelSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ── Header ─────────────────────────────────────────────────────────────── */
+.sentinel-header {
+  padding: 0.85rem 1rem;
+  background: rgba(15, 23, 42, 0.9);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sentinel-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.sentinel-avatar {
+  height: 2.1rem;
+  width: 2.1rem;
+  border-radius: 0.6rem;
+  background: linear-gradient(135deg, #059669, #0d9488);
+  border: 1px solid rgba(52, 211, 153, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  box-shadow: 0 2px 10px rgba(16, 185, 129, 0.3);
+}
+
+.sentinel-title-box h3 {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #f8fafc;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.sentinel-role-tag {
+  font-size: 0.6rem;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(52, 211, 153, 0.4);
+  color: #34d399;
+  padding: 0.1rem 0.45rem;
+  border-radius: 9999px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-family: 'DM Mono', monospace;
+}
+
+.sentinel-disclosure-sub {
+  margin: 0.15rem 0 0;
+  font-size: 0.66rem;
+  color: #94a3b8;
+  line-height: 1.25;
+}
+
+.sentinel-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.sentinel-btn-icon {
+  background: transparent;
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  border-radius: 0.45rem;
+  color: #94a3b8;
+  padding: 0.35rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.sentinel-btn-icon:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #f8fafc;
+  border-color: rgba(148, 163, 184, 0.3);
+}
+
+.sentinel-btn-icon.active {
+  background: rgba(6, 182, 212, 0.15);
+  border-color: #06b6d4;
+  color: #22d3ee;
+}
+
+.sentinel-btn-icon.close:hover {
+  color: #f43f5e;
+  border-color: rgba(244, 63, 94, 0.4);
+  background: rgba(244, 63, 94, 0.1);
+}
+
+/* ── Context Bar ─────────────────────────────────────────────────────────── */
+.sentinel-context-bar {
+  padding: 0.4rem 1rem;
+  background: rgba(15, 23, 42, 0.5);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.7rem;
+  color: #94a3b8;
+}
+
+.sentinel-context-label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sentinel-context-route {
+  color: #38bdf8;
+  font-family: 'DM Mono', monospace;
+  font-weight: 500;
+}
+
+.sentinel-context-scenario {
+  color: #34d399;
+  font-family: 'DM Mono', monospace;
+  font-weight: 600;
+}
+
+/* ── Messages Container ──────────────────────────────────────────────────── */
+.sentinel-messages-area {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  scroll-behavior: smooth;
+}
+
+.sentinel-msg-row {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.sentinel-msg-row.user {
+  align-items: flex-end;
+}
+
+.sentinel-msg-row.assistant {
+  align-items: flex-start;
+}
+
+.sentinel-bubble {
+  max-width: 88%;
+  padding: 0.85rem 1rem;
+  border-radius: 1rem;
+  font-size: 0.84rem;
+  line-height: 1.6;
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
+.sentinel-bubble.user {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #022c22;
+  font-weight: 600;
+  border-bottom-right-radius: 0.2rem;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.25);
+}
+
+.sentinel-bubble.assistant {
+  background: #0f172a;
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  color: #e2e8f0;
+  border-bottom-left-radius: 0.2rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+.sentinel-bubble.assistant.outage {
+  background: rgba(88, 28, 28, 0.4);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #fca5a5;
+}
+
+.sentinel-bubble.assistant.rate-limited {
+  background: rgba(120, 53, 15, 0.35);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  color: #fde68a;
+}
+
+.sentinel-source-tag {
+  margin-top: 0.65rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.15);
+  font-size: 0.65rem;
+  font-family: 'DM Mono', monospace;
+  color: #38bdf8;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+/* ── Feedback Controls ───────────────────────────────────────────────────── */
+.sentinel-feedback-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.3rem;
+  padding: 0 0.35rem;
+  font-size: 0.7rem;
+  color: #64748b;
+}
+
+.sentinel-feedback-btn {
+  background: transparent;
+  border: 0;
+  color: #64748b;
+  cursor: pointer;
+  padding: 0.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.3rem;
+  transition: all 0.15s ease;
+}
+
+.sentinel-feedback-btn:hover {
+  color: #34d399;
+  background: rgba(52, 211, 153, 0.1);
+}
+
+.sentinel-feedback-btn.down:hover {
+  color: #f43f5e;
+  background: rgba(244, 63, 94, 0.1);
+}
+
+.sentinel-feedback-btn.selected-up {
+  color: #34d399;
+  font-weight: 700;
+}
+
+.sentinel-feedback-btn.selected-down {
+  color: #f43f5e;
+  font-weight: 700;
+}
+
+.sentinel-feedback-input {
+  font-size: 0.68rem;
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 0.35rem;
+  padding: 0.15rem 0.45rem;
+  color: #f8fafc;
+  outline: none;
+  width: 140px;
+}
+
+.sentinel-feedback-input:focus {
+  border-color: #38bdf8;
+}
+
+/* ── Typing Indicator ────────────────────────────────────────────────────── */
+.sentinel-typing-box {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.75rem;
+  color: #94a3b8;
+  font-size: 0.72rem;
+  font-family: 'DM Mono', monospace;
+}
+
+.sentinel-dots {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.sentinel-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #34d399;
+  animation: sentinelBounce 1.2s infinite ease-in-out;
+}
+
+.sentinel-dot:nth-child(2) {
+  animation-delay: 0.2s;
+  background: #38bdf8;
+}
+
+.sentinel-dot:nth-child(3) {
+  animation-delay: 0.4s;
+  background: #a78bfa;
+}
+
+@keyframes sentinelBounce {
+  0%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-5px); }
+}
+
+/* ── Chips ───────────────────────────────────────────────────────────────── */
+.sentinel-chips-bar {
+  padding: 0.5rem 0.85rem;
+  display: flex;
+  gap: 0.45rem;
+  overflow-x: auto;
+  border-top: 1px solid rgba(148, 163, 184, 0.08);
+  background: #020617;
+  scrollbar-width: none;
+}
+
+.sentinel-chips-bar::-webkit-scrollbar {
+  display: none;
+}
+
+.sentinel-chip-btn {
+  padding: 0.35rem 0.7rem;
+  border-radius: 9999px;
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  color: #cbd5e1;
+  font-size: 0.72rem;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  font-family: inherit;
+}
+
+.sentinel-chip-btn:hover {
+  color: #34d399;
+  border-color: rgba(52, 211, 153, 0.4);
+  background: rgba(6, 78, 59, 0.3);
+}
+
+/* ── Cooldown Alert ──────────────────────────────────────────────────────── */
+.sentinel-cooldown-bar {
+  padding: 0.5rem 1rem;
+  background: rgba(120, 53, 15, 0.25);
+  border-top: 1px solid rgba(245, 158, 11, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  color: #fde68a;
+  font-family: 'DM Mono', monospace;
+}
+
+/* ── Input Area ──────────────────────────────────────────────────────────── */
+.sentinel-input-area {
+  padding: 0.75rem 1rem;
+  background: rgba(15, 23, 42, 0.95);
+  border-top: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.sentinel-input-form {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+.sentinel-textarea {
+  flex: 1;
+  max-height: 120px;
+  min-height: 40px;
+  padding: 0.55rem 0.85rem;
+  font-size: 0.82rem;
+  background: #030712;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 0.75rem;
+  color: #f8fafc;
+  resize: none;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.15s ease;
+}
+
+.sentinel-textarea:focus {
+  border-color: #10b981;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+}
+
+.sentinel-textarea:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.sentinel-send-btn {
+  padding: 0.65rem;
+  border-radius: 0.75rem;
+  background: #10b981;
+  border: 0;
+  color: #022c22;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  font-weight: 700;
+}
+
+.sentinel-send-btn:hover:not(:disabled) {
+  background: #34d399;
+  transform: translateY(-1px);
+}
+
+.sentinel-send-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* ── Mandatory Footer Disclosure ─────────────────────────────────────────── */
+.sentinel-disclosure-foot {
+  margin-top: 0.45rem;
+  font-size: 0.64rem;
+  color: #64748b;
+  text-align: center;
+  line-height: 1.3;
+}
+
+/* ── Admin View ──────────────────────────────────────────────────────────── */
+.sentinel-admin-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  font-size: 0.78rem;
+  color: #cbd5e1;
+}
+
+.sentinel-admin-card {
+  padding: 0.85rem;
+  border-radius: 0.75rem;
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.sentinel-admin-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  font-family: 'DM Mono', monospace;
+  color: #94a3b8;
+  text-transform: uppercase;
+}

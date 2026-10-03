@@ -1,0 +1,353 @@
+/* =========================================================================
+   SeCloudive - Daily Learning Goal & Streak Tracker Widget Styles
+   ========================================================================= */
+
+.daily-streak-widget {
+  position: relative;
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(10, 15, 29, 0.95));
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: 14px;
+  padding: 20px 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.6), 0 0 20px -5px rgba(56, 189, 248, 0.1);
+  overflow: hidden;
+  backdrop-filter: blur(12px);
+}
+
+.streak-widget-glow {
+  position: absolute;
+  top: -50px;
+  right: -50px;
+  width: 150px;
+  height: 150px;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.streak-widget-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.streak-badge-box {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.streak-flame-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.25) 0%, rgba(239, 68, 68, 0.1) 100%);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  box-shadow: 0 0 15px rgba(245, 158, 11, 0.2);
+}
+
+.streak-flame-icon {
+  color: #f59e0b;
+  filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.6));
+}
+
+.streak-count-title {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.streak-number {
+  font-size: 1.8rem;
+  font-weight: 800;
+  font-family: 'DM Mono', monospace;
+  color: #f8fafc;
+  line-height: 1;
+}
+
+.streak-unit {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #f59e0b;
+  letter-spacing: 0.08em;
+}
+
+.streak-subtext {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  margin-top: 3px;
+}
+
+/* Weekly calendar dots */
+.streak-week-calendar {
+  display: flex;
+  gap: 8px;
+}
+
+.week-day-dot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.dot-label {
+  font-size: 0.72rem;
+  font-family: 'DM Mono', monospace;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.dot-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  color: #64748b;
+  transition: all 0.2s ease;
+}
+
+.week-day-dot.active .dot-indicator {
+  background: rgba(16, 185, 129, 0.2);
+  border-color: rgba(16, 185, 129, 0.5);
+  color: #10b981;
+}
+
+.week-day-dot.today .dot-indicator {
+  border-color: #38bdf8;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+}
+
+.empty-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #475569;
+}
+
+/* Goal body */
+.streak-goal-body {
+  padding: 16px 0;
+}
+
+.streak-goal-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.goal-status-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+}
+
+.goal-label {
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #94a3b8;
+  font-family: 'DM Mono', monospace;
+}
+
+.goal-fraction {
+  color: #f1f5f9;
+  font-weight: 600;
+}
+
+.goal-pct {
+  font-size: 0.95rem;
+  font-weight: 800;
+  font-family: 'DM Mono', monospace;
+  color: #38bdf8;
+}
+
+.streak-progress-track {
+  width: 100%;
+  height: 8px;
+  background: rgba(30, 41, 59, 0.8);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.streak-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+
+/* Daily tasks list */
+.daily-tasks-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 12px;
+}
+
+.daily-task-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.daily-task-item:hover {
+  background: rgba(30, 41, 59, 0.7);
+  border-color: rgba(56, 189, 248, 0.4);
+  transform: translateY(-1px);
+}
+
+.daily-task-item.is-done {
+  background: rgba(16, 185, 129, 0.08);
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.task-checkbox {
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.daily-task-item.is-done .task-checkbox {
+  color: #10b981;
+}
+
+.task-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.task-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #f1f5f9;
+}
+
+.daily-task-item.is-done .task-title {
+  text-decoration: line-through;
+  color: #94a3b8;
+}
+
+.task-desc {
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.task-action-link {
+  font-size: 0.75rem;
+  color: #38bdf8;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: rgba(56, 189, 248, 0.1);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  text-decoration: none;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.task-action-link:hover {
+  background: rgba(56, 189, 248, 0.2);
+  color: #e0f2fe;
+}
+
+/* Footer / Claim Bonus */
+.streak-widget-footer {
+  padding-top: 14px;
+  border-top: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.daily-tip-box {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 0.82rem;
+  color: #94a3b8;
+  line-height: 1.5;
+}
+
+.tip-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #f59e0b;
+  font-weight: 700;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.tip-content {
+  color: #cbd5e1;
+  font-style: italic;
+}
+
+.bonus-claim-area {
+  display: flex;
+  justify-content: center;
+}
+
+.btn-claim-streak-bonus {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #10b981, #06b6d4);
+  color: #041017;
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 10px 24px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+  transition: all 0.2s ease;
+}
+
+.btn-claim-streak-bonus:hover {
+  filter: brightness(1.1);
+  transform: translateY(-2px);
+}
+
+.bonus-claimed-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #10b981;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+@media (max-width: 768px) {
+  .streak-widget-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .streak-week-calendar {
+    width: 100%;
+    justify-content: space-between;
+  }
+}

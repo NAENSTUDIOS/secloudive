@@ -41,11 +41,13 @@ flowchart TD
 4. AWS Amplify connects to the GitHub repository and runs the repository build specification.
 5. Amplify publishes the generated `dist` directory at a public URL.
 
-## Coding Agent Usage
+## Coding Agent & Amazon Q Developer Usage
 
-### How the coding agent assisted development
+### How Amazon Q Developer & coding agents assisted development
 
-The coding agent was used as an implementation and review collaborator during the SeCloudive build. It inspected the existing codebase before edits, preserved the React/Vite architecture, and validated changes with production builds and browser checks.
+Amazon Q Developer and the coding agent were used as implementation, architectural review, and security verification collaborators during the SeCloudive build:
+1. **Amazon Q Developer in VS Code**: Utilized for real-time prompt-driven security reviews of IAM policies, CloudTrail forensic patterns, live AWS telemetry caching, and AWS Well-Architected Framework compliance.
+2. **Coding Agent**: Inspected the codebase before edits, authored modular React components, preserved the React/Vite architecture, and validated changes with production builds and automated test suites.
 
 ### React component generation
 
@@ -122,14 +124,23 @@ frontend:
 
 ## Required Screenshots Checklist
 
-The following screenshots should be captured for final hackathon evidence:
+The following screenshots provide evidence for the final hackathon submission:
 
-- [ ] **Screenshot 1:** Coding agent working on SeCloudive in VS Code.
-- [ ] **Screenshot 2:** AWS Toolkit or another AWS-connected workflow visible in VS Code.
+- [x] **Screenshot 1 & 2: Amazon Q Developer & AWS Toolkit in VS Code** (Verified below)
 - [ ] **Screenshot 3:** GitHub repository containing the SeCloudive source code.
 - [ ] **Screenshot 4:** AWS Amplify build and deployment screen showing a successful build.
 - [ ] **Screenshot 5:** Live AWS-hosted SeCloudive application at its public URL.
 - [ ] **Screenshot 6:** AWS Amplify application dashboard.
+
+### Verified Proof: Amazon Q Developer & AWS Toolkit Active in VS Code
+
+![Amazon Q Developer and AWS Toolkit in VS Code](screenshots/amazon-q-developer-proof.png)
+
+*The screenshot above demonstrates:*
+1. **Amazon Q Developer Extension Active**: Open in the left sidebar, reading and analyzing `dailyAwsSecuritySync.js`.
+2. **AWS Toolkit Integration**: AWS Toolkit Logs active in the bottom terminal (`awsCfnLsp`, `cloudformation-languageserver`, and telemetry authentication pipelines).
+3. **SeCloudive Security AI Assistant Design**: Workspace open to `secloudive-ai-assistant-design.md` detailing security training guardrails and framework lookup logic.
+4. **Architectural Review Prompt**: Active prompt evaluating `dailyAwsSecuritySync.js` for AWS Well-Architected Security and Reliability pillar compliance.
 
 Screenshots should show the relevant application, repository, or AWS context clearly. Avoid showing credentials, tokens, private repository secrets, or personal access keys.
 
@@ -148,7 +159,7 @@ The resulting workflow keeps cloud security judgment at the center: learners inv
 | Requirement                            | Status                            | Evidence                                   |
 | -------------------------------------- | --------------------------------- | ------------------------------------------ |
 | Public AWS URL requirement             | Ready after Amplify deployment    | `amplify.yml` and deployment steps         |
-| Coding-agent documentation requirement | Documented                        | This file, `Coding Agent Usage` section    |
+| Coding-agent documentation requirement | Documented & Verified             | `Coding Agent Usage` & `screenshots/amazon-q-developer-proof.png` |
 | Development process requirement        | Documented                        | Workflow diagram and development workflow  |
 | AWS Amplify compatibility              | Ready                             | Vite build and Amplify build specification |
 | GitHub integration                     | Ready after repository connection | GitHub-to-Amplify workflow                 |
@@ -166,7 +177,6 @@ The repository still needs evidence that exists outside the codebase:
 2. A successful AWS Amplify build screenshot.
 3. A live public Amplify URL and screenshot.
 4. An AWS Amplify application dashboard screenshot.
-5. A screenshot of coding-agent usage in VS Code.
-6. A screenshot showing an AWS-connected workflow in VS Code or AWS Toolkit.
 
-These are submission-evidence tasks, not application-code blockers.
+*(Note: Amazon Q Developer in VS Code and AWS Toolkit screenshots have been verified and embedded).*
+

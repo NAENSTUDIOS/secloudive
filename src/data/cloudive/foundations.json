@@ -1,0 +1,52 @@
+[
+  {
+    "id": "linux",
+    "title": "Foundations: Linux Shell & Cloud Scripting",
+    "slug": "linux",
+    "description": "Master Bash automation, file permissions, POSIX process management, systemd, and cloud-init bootstrapping for resilient EC2 workloads.",
+    "downloadKey": "foundationsLinux",
+    "downloadUrl": "/downloads/foundations-linux.zip",
+    "topics": ["Bash Scripting", "Systemd Services", "User Management & Sudoers", "Cloud-Init Bootstrapping", "Process Signals"],
+    "published": true
+  },
+  {
+    "id": "python",
+    "title": "Foundations: Python & AWS Boto3 SDK",
+    "slug": "python",
+    "description": "Programmatic cloud orchestration. Build custom CLI tools, write AWS Lambda event triggers, and handle API retries, pagination, and error handling with Boto3.",
+    "downloadKey": "foundationsPython",
+    "downloadUrl": "/downloads/foundations-python.zip",
+    "topics": ["Python 3.12 Primitives", "Boto3 Client vs Resource", "Lambda Context & Handlers", "Pagination & Backoff", "Testing with Moto"],
+    "published": true
+  },
+  {
+    "id": "docker",
+    "title": "Foundations: Docker Containers for Cloud",
+    "slug": "docker",
+    "description": "Production containerization. Multi-stage Dockerfiles, minimal base images, non-root execution, vulnerability scanning, and Amazon ECR integration.",
+    "downloadKey": "foundationsDocker",
+    "downloadUrl": "/downloads/foundations-docker.zip",
+    "topics": ["Multi-Stage Builds", "OCI Standards", "Non-Root Users", "Healthcheck Directives", "Amazon ECR Immutability"],
+    "published": true
+  },
+  {
+    "id": "kubernetes",
+    "title": "Foundations: Kubernetes & Amazon EKS",
+    "slug": "kubernetes",
+    "description": "Cloud-native workload management. Declarative manifests, Pods, Deployments, Services, ConfigMaps, Secrets, and AWS Load Balancer Controller.",
+    "downloadKey": "foundationsKubernetes",
+    "downloadUrl": "/downloads/foundations-kubernetes.zip",
+    "topics": ["K8s Control Plane", "Declarative YAML", "StatefulSets vs Deployments", "IRSA IAM Integration", "EKS Add-ons"],
+    "published": true
+  },
+  {
+    "id": "git",
+    "title": "Foundations: Git & GitHub Workflow",
+    "slug": "git",
+    "description": "Professional engineering collaboration. Trunk-based development, semantic commits, PR code reviews, merge conflicts, and automated GitHub Actions CI/CD.",
+    "downloadKey": "foundationsGit",
+    "downloadUrl": "/downloads/foundations-git.zip",
+    "topics": ["Branching Strategies", "Interactive Rebase", "PR Review Standards", "Merge Conflicts", "GitHub Actions CI/CD"],
+    "published": true
+  }
+]

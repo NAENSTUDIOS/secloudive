@@ -22,8 +22,16 @@ import {
 } from 'lucide-react'
 import { jobPlaybooks } from '../data/jobPlaybooks'
 import ForensicQueryStudio from '../components/ForensicQueryStudio'
+import DefenderQuoteCallout from '../components/DefenderQuoteCallout'
+import { useChallenges } from '../context/ChallengeContext'
 
 export default function JobPlaybookEngine() {
+  const {
+    executePlaybook,
+    playbooksExecuted,
+    completedPlaybooksCount
+  } = useChallenges()
+
   const [activePlaybook, setActivePlaybook] = useState(jobPlaybooks[0])
   const [activeTab, setActiveTab] = useState('workflow') // 'workflow' | 'forensics' | 'ciso'
   const [copiedCmd, setCopiedCmd] = useState(null)
@@ -78,6 +86,22 @@ Report Generated via SeCloudive Cloud Security Career Engine.`
         </div>
 
         <div className="playbooks-header-actions">
+          <span style={{
+            fontSize: '0.78rem',
+            fontFamily: "'DM Mono', monospace",
+            fontWeight: 700,
+            color: '#10b981',
+            background: 'rgba(16, 185, 129, 0.15)',
+            border: '1px solid rgba(16, 185, 129, 0.3)',
+            borderRadius: '6px',
+            padding: '6px 12px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px'
+          }}>
+            <CheckCircle2 size={14} />
+            {completedPlaybooksCount || 0}/4 Executed ({ (completedPlaybooksCount || 0) * 100 } XP)
+          </span>
           <Link to="/labs" className="button button-ghost">
             <Terminal size={15} /> Hands-on Labs (16)
           </Link>
@@ -86,6 +110,14 @@ Report Generated via SeCloudive Cloud Security Career Engine.`
           </Link>
         </div>
       </div>
+
+      {/* Motivational Security Defender Quote Callout */}
+      <DefenderQuoteCallout 
+        category="tactical" 
+        autoCycle={true} 
+        cycleIntervalMs={14000} 
+        className="playbooks-quote-callout"
+      />
 
       {/* Playbook Selector Strip */}
       <div className="playbook-selector-strip">
@@ -104,6 +136,11 @@ Report Generated via SeCloudive Cloud Security Career Engine.`
                 {pb.severity.split(' - ')[0]}
               </span>
               <span className="pnc-ticket">{pb.ticketId}</span>
+              {playbooksExecuted?.[pb.id] && (
+                <span style={{ marginLeft: 'auto', color: '#10b981', fontSize: '0.7rem', display: 'flex', alignItems: 'center', gap: '3px' }}>
+                  <CheckCircle2 size={12} /> EXECUTED
+                </span>
+              )}
             </div>
             <h4>{pb.title}</h4>
             <div className="pnc-footer">
@@ -118,9 +155,31 @@ Report Generated via SeCloudive Cloud Security Career Engine.`
       <div className="playbook-workspace-card">
         {/* Workspace Nav Header */}
         <div className="workspace-tabs-header">
-          <div className="wth-title">
+          <div className="wth-title" style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
             <span className="ticket-pill">{activePlaybook.ticketId}</span>
-            <h2>{activePlaybook.title}</h2>
+            <h2 style={{ margin: 0 }}>{activePlaybook.title}</h2>
+            <button
+              type="button"
+              onClick={() => executePlaybook && executePlaybook(activePlaybook.id)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '6px 14px',
+                fontSize: '0.78rem',
+                fontWeight: 700,
+                background: playbooksExecuted?.[activePlaybook.id] ? 'rgba(16, 185, 129, 0.2)' : 'linear-gradient(135deg, #0ea5e9, #0284c7)',
+                color: playbooksExecuted?.[activePlaybook.id] ? '#10b981' : '#ffffff',
+                border: playbooksExecuted?.[activePlaybook.id] ? '1px solid #10b981' : 'none',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                boxShadow: playbooksExecuted?.[activePlaybook.id] ? 'none' : '0 2px 10px rgba(14, 165, 233, 0.3)'
+              }}
+            >
+              <CheckCircle2 size={14} />
+              <span>{playbooksExecuted?.[activePlaybook.id] ? '✓ Playbook Executed & Evidence Recorded (+100 XP)' : 'Execute Containment & Record Evidence (+100 XP)'}</span>
+            </button>
           </div>
 
           <div className="wth-tabs">

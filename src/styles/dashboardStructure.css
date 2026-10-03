@@ -1,0 +1,461 @@
+/* =========================================================================
+   SeCloudive Dashboard Structure & Orientation Guide Styles
+   Pure Vanilla CSS: Hierarchical Section Dividers, Categorized Nav Hub,
+   Interactive 4-Step Orientation Guide & Persona Jump Filters
+   ========================================================================= */
+
+/* ── Categorized Quick Navigation Hub ────────────────────────────────────── */
+.structured-nav-hub {
+  margin-bottom: 1.75rem;
+  padding: 1rem 1.25rem;
+  background: rgba(10, 15, 29, 0.75);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  border-radius: 14px;
+  backdrop-filter: blur(12px);
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.nav-hub-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+  padding-bottom: 0.5rem;
+}
+
+.nav-hub-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  font-family: 'DM Mono', monospace;
+  font-weight: 700;
+  color: #94a3b8;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.nav-hub-groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 0.85rem;
+}
+
+.nav-hub-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(148, 163, 184, 0.1);
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.nav-hub-group:hover {
+  border-color: rgba(56, 189, 248, 0.35);
+  transform: translateY(-1px);
+}
+
+.nav-group-label {
+  font-size: 0.68rem;
+  font-weight: 800;
+  font-family: 'DM Mono', monospace;
+  color: #38bdf8;
+  letter-spacing: 0.04em;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  text-transform: uppercase;
+}
+
+.nav-group-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.nav-hub-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 600;
+  text-decoration: none;
+  background: rgba(30, 41, 59, 0.7);
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  color: #cbd5e1;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.nav-hub-pill:hover {
+  background: rgba(56, 189, 248, 0.15);
+  border-color: #38bdf8;
+  color: #f8fafc;
+  transform: translateY(-1px);
+}
+
+.nav-hub-pill.pill-amber {
+  border-color: rgba(245, 158, 11, 0.35);
+  color: #fbbf24;
+}
+.nav-hub-pill.pill-amber:hover {
+  background: rgba(245, 158, 11, 0.18);
+  border-color: #f59e0b;
+}
+
+.nav-hub-pill.pill-emerald {
+  border-color: rgba(16, 185, 129, 0.35);
+  color: #34d399;
+}
+.nav-hub-pill.pill-emerald:hover {
+  background: rgba(16, 185, 129, 0.18);
+  border-color: #10b981;
+}
+
+.nav-hub-pill.pill-cyan {
+  border-color: rgba(6, 182, 212, 0.35);
+  color: #22d3ee;
+}
+.nav-hub-pill.pill-cyan:hover {
+  background: rgba(6, 182, 212, 0.18);
+  border-color: #06b6d4;
+}
+
+.nav-hub-pill.pill-purple {
+  border-color: rgba(168, 85, 247, 0.35);
+  color: #c084fc;
+}
+.nav-hub-pill.pill-purple:hover {
+  background: rgba(168, 85, 247, 0.18);
+  border-color: #a855f7;
+}
+
+/* ── Interactive Platform Structural Guide / User Orientation Walkthrough ── */
+.platform-guide-banner {
+  margin-bottom: 2rem;
+  padding: 1.25rem 1.5rem;
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(6, 78, 59, 0.25) 50%, rgba(15, 23, 42, 0.95) 100%);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.guide-banner-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.guide-title-box {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.guide-icon-badge {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #059669, #0d9488);
+  border: 1px solid rgba(52, 211, 153, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+}
+
+.guide-heading-text h2 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #f8fafc;
+  letter-spacing: -0.01em;
+}
+
+.guide-heading-text p {
+  margin: 0.2rem 0 0;
+  font-size: 0.78rem;
+  color: #94a3b8;
+}
+
+.guide-toggle-btn {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  color: #cbd5e1;
+  padding: 0.4rem 0.85rem;
+  border-radius: 8px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  transition: all 0.2s ease;
+}
+
+.guide-toggle-btn:hover {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: #10b981;
+  color: #34d399;
+}
+
+/* 4-Step Structural Path Grid */
+.guide-steps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.guide-step-card {
+  padding: 1rem;
+  background: rgba(10, 15, 29, 0.85);
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.25s ease;
+}
+
+.guide-step-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #10b981, #38bdf8);
+  opacity: 0.8;
+}
+
+.guide-step-card:hover {
+  border-color: rgba(56, 189, 248, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+}
+
+.step-number-tag {
+  font-size: 0.65rem;
+  font-family: 'DM Mono', monospace;
+  font-weight: 800;
+  color: #34d399;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.guide-step-card h4 {
+  margin: 0;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #f1f5f9;
+}
+
+.guide-step-card p {
+  margin: 0;
+  font-size: 0.74rem;
+  color: #94a3b8;
+  line-height: 1.5;
+  flex: 1;
+}
+
+.guide-step-links {
+  margin-top: 0.35rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.guide-micro-link {
+  font-size: 0.68rem;
+  font-family: 'DM Mono', monospace;
+  color: #38bdf8;
+  text-decoration: none;
+  padding: 0.2rem 0.45rem;
+  border-radius: 4px;
+  background: rgba(56, 189, 248, 0.08);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  transition: all 0.15s ease;
+}
+
+.guide-micro-link:hover {
+  background: rgba(56, 189, 248, 0.2);
+  color: #f0f9ff;
+  border-color: #38bdf8;
+}
+
+/* Persona Intent Filter Row */
+.persona-intent-row {
+  margin-top: 1.1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.persona-intent-label {
+  font-size: 0.72rem;
+  font-family: 'DM Mono', monospace;
+  font-weight: 700;
+  color: #38bdf8;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  text-transform: uppercase;
+}
+
+.persona-pill-btn {
+  padding: 0.3rem 0.65rem;
+  border-radius: 9999px;
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  color: #cbd5e1;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  font-family: inherit;
+}
+
+.persona-pill-btn:hover,
+.persona-pill-btn.active {
+  background: rgba(16, 185, 129, 0.2);
+  border-color: #34d399;
+  color: #34d399;
+}
+
+/* ── Structural Stage Section Headers ────────────────────────────────────── */
+.stage-section-wrapper {
+  margin-top: 2.25rem;
+  margin-bottom: 1rem;
+  padding: 1rem 1.25rem;
+  background: rgba(15, 23, 42, 0.65);
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-left: 4px solid #10b981;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.stage-section-wrapper.stage-cyan {
+  border-left-color: #06b6d4;
+}
+
+.stage-section-wrapper.stage-purple {
+  border-left-color: #a855f7;
+}
+
+.stage-section-wrapper.stage-amber {
+  border-left-color: #f59e0b;
+}
+
+.stage-section-wrapper.stage-rose {
+  border-left-color: #f43f5e;
+}
+
+.stage-header-info {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.stage-badge {
+  font-size: 0.68rem;
+  font-family: 'DM Mono', monospace;
+  font-weight: 800;
+  padding: 0.25rem 0.55rem;
+  border-radius: 6px;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  color: #34d399;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.stage-badge.badge-cyan {
+  background: rgba(6, 182, 212, 0.15);
+  border-color: rgba(6, 182, 212, 0.3);
+  color: #22d3ee;
+}
+
+.stage-badge.badge-purple {
+  background: rgba(168, 85, 247, 0.15);
+  border-color: rgba(168, 85, 247, 0.3);
+  color: #c084fc;
+}
+
+.stage-badge.badge-amber {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: rgba(245, 158, 11, 0.3);
+  color: #fbbf24;
+}
+
+.stage-badge.badge-rose {
+  background: rgba(244, 63, 94, 0.15);
+  border-color: rgba(244, 63, 94, 0.3);
+  color: #fb7185;
+}
+
+.stage-text-block h3 {
+  margin: 0;
+  font-size: 0.98rem;
+  font-weight: 800;
+  color: #f8fafc;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.stage-text-block p {
+  margin: 0.15rem 0 0;
+  font-size: 0.74rem;
+  color: #94a3b8;
+}
+
+.stage-meta-pills {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.7rem;
+  font-family: 'DM Mono', monospace;
+  color: #64748b;
+}
+
+/* Responsive queries */
+@media (max-width: 768px) {
+  .nav-hub-groups {
+    grid-template-columns: 1fr;
+  }
+  .guide-steps-grid {
+    grid-template-columns: 1fr;
+  }
+  .stage-section-wrapper {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

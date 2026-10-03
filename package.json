@@ -5,8 +5,14 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:frontend": "vite",
+    "dev:backend": "python -m uvicorn server.agent_engine:app --host 0.0.0.0 --port 8000 --reload",
+    "start:backend": "python server/agent_engine.py",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "audit:jsx": "node scripts/audit_jsx_imports.js",
+    "diagnose:keys": "node scripts/diagnose_keys.mjs",
+    "test": "node scripts/test_simulated_identifiers.mjs && node scripts/test_sentinel_scope.mjs && node scripts/test_unique_user_id_system.mjs && node scripts/audit_jsx_imports.js"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^6.1.1",
@@ -14,7 +20,13 @@
     "vite": "^8.3.0"
   },
   "dependencies": {
+    "@react-oauth/google": "^0.13.5",
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.117.2",
+    "jszip": "^3.10.2",
+    "jwt-decode": "^4.0.0",
     "lucide-react": "^1.48.0",
+    "qrcode": "^1.5.4",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "react-router-dom": "^7.18.4"

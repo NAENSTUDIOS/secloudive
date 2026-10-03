@@ -1,0 +1,341 @@
+/* =========================================================================
+   SeCloudive Advanced Motion UI & Cyber Graphics Design System
+   Rich Aesthetics, Hardware-Accelerated Animations, & Glassmorphic Polish
+   ========================================================================= */
+
+/* ── 1. Cyber Mesh Ambient Glows & Background Grid ── */
+.cyber-ambient-grid {
+  position: relative;
+  background-image: 
+    linear-gradient(to right, rgba(14, 165, 233, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(14, 165, 233, 0.04) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+.cyber-ambient-grid::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 20%, rgba(14, 165, 233, 0.12), transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── 2. Glassmorphism 2.0 & Holographic Glow Cards ── */
+.cyber-glass-panel {
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(56, 189, 248, 0.18);
+  border-radius: 12px;
+  box-shadow: 
+    0 10px 30px -10px rgba(0, 0, 0, 0.6),
+    0 0 20px -5px rgba(14, 165, 233, 0.08);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.32s ease;
+}
+
+.cyber-glass-panel:hover {
+  border-color: rgba(56, 189, 248, 0.45);
+  box-shadow: 
+    0 16px 40px -10px rgba(0, 0, 0, 0.7),
+    0 0 35px -5px rgba(14, 165, 233, 0.22);
+}
+
+/* Subtle holographic top-light edge */
+.cyber-glass-panel::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.6), rgba(168, 85, 247, 0.4), transparent);
+  pointer-events: none;
+}
+
+/* ── 3. 3D Tilt & Micro-Motion Interactions ── */
+.motion-card {
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.25s ease;
+  will-change: transform;
+}
+
+.motion-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 14px 34px -10px rgba(0, 0, 0, 0.5), 0 0 22px rgba(14, 165, 233, 0.16);
+}
+
+.motion-button {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+
+.motion-button:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.08);
+}
+
+.motion-button:active {
+  transform: scale(0.97);
+}
+
+/* Light shimmer wave on interactive buttons */
+.button-cyber-shimmer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+  transform: skewX(-22deg);
+  transition: left 0.7s ease;
+}
+
+.button-cyber-shimmer:hover::before {
+  left: 150%;
+}
+
+/* ── 4. Live Pulsing Beacons & Radar Animations ── */
+@keyframes radarSweep {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes sonarPing {
+  0% {
+    transform: scale(0.85);
+    opacity: 1;
+  }
+  75% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+
+@keyframes neonBeacon {
+  0%, 100% {
+    box-shadow: 0 0 4px currentColor, 0 0 8px currentColor;
+    opacity: 0.9;
+  }
+  50% {
+    box-shadow: 0 0 12px currentColor, 0 0 24px currentColor;
+    opacity: 1;
+  }
+}
+
+.beacon-pulse-emerald {
+  color: #10b981;
+  position: relative;
+}
+
+.beacon-pulse-emerald::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 1.5px solid #10b981;
+  animation: sonarPing 2.2s infinite ease-out;
+}
+
+.beacon-pulse-rose {
+  color: #f43f5e;
+  position: relative;
+}
+
+.beacon-pulse-rose::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 1.5px solid #f43f5e;
+  animation: sonarPing 1.8s infinite ease-out;
+}
+
+/* ── 5. Staggered Entrance Animations ── */
+@keyframes cyberFadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stagger-in {
+  animation: cyberFadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.stagger-1 { animation-delay: 0.05s; }
+.stagger-2 { animation-delay: 0.12s; }
+.stagger-3 { animation-delay: 0.20s; }
+.stagger-4 { animation-delay: 0.28s; }
+.stagger-5 { animation-delay: 0.36s; }
+
+/* ── 6. Interactive Threat Radar Widget Styling ── */
+.threat-radar-container {
+  display: flex;
+  flex-direction: column;
+  background: rgba(11, 20, 38, 0.88);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: 14px;
+  padding: 20px;
+  backdrop-filter: blur(20px);
+  box-shadow: 
+    0 15px 40px rgba(0, 0, 0, 0.5),
+    0 0 30px rgba(14, 165, 233, 0.12);
+  position: relative;
+  overflow: hidden;
+}
+
+.threat-radar-scope {
+  position: relative;
+  width: 100%;
+  max-width: 320px;
+  aspect-ratio: 1;
+  margin: 0 auto;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(14, 165, 233, 0.1) 0%, rgba(2, 6, 23, 0.8) 75%);
+  border: 2px solid rgba(56, 189, 248, 0.35);
+  box-shadow: 
+    inset 0 0 30px rgba(14, 165, 233, 0.25),
+    0 0 20px rgba(14, 165, 233, 0.15);
+  display: grid;
+  place-items: center;
+}
+
+.threat-radar-beam {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, transparent 0deg, transparent 270deg, rgba(56, 189, 248, 0.05) 300deg, rgba(56, 189, 248, 0.45) 360deg);
+  animation: radarSweep 4s linear infinite;
+  pointer-events: none;
+}
+
+.threat-radar-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px dashed rgba(56, 189, 248, 0.22);
+}
+
+.radar-ring-1 { width: 33%; height: 33%; }
+.radar-ring-2 { width: 66%; height: 66%; }
+.radar-ring-3 { width: 100%; height: 100%; }
+
+.threat-radar-crosshair-x {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(56, 189, 248, 0.18);
+  pointer-events: none;
+}
+
+.threat-radar-crosshair-y {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: rgba(56, 189, 248, 0.18);
+  pointer-events: none;
+}
+
+/* Radar Threat Target Node */
+.radar-target-node {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  z-index: 10;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.radar-target-node:hover {
+  transform: translate(-50%, -50%) scale(1.35);
+}
+
+.radar-target-dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  box-shadow: 0 0 10px currentColor, 0 0 20px currentColor;
+}
+
+/* ── 7. Liquid Neon Progress Track ── */
+.liquid-progress-bar {
+  height: 7px;
+  background: rgba(30, 41, 59, 0.8);
+  border-radius: 99px;
+  overflow: hidden;
+  position: relative;
+  border: 1px solid rgba(148, 163, 184, 0.15);
+}
+
+.liquid-progress-fill {
+  height: 100%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, #0ea5e9, #38bdf8, #818cf8);
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.5);
+  position: relative;
+  transition: width 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.liquid-progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 14px;
+  height: 100%;
+  background: #ffffff;
+  filter: blur(2px);
+  opacity: 0.65;
+}
+
+/* ── 8. Sound Effects Toggle Widget ── */
+.audio-fx-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: rgba(30, 41, 59, 0.5);
+  color: #94a3b8;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.audio-fx-toggle:hover {
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+  border-color: rgba(56, 189, 248, 0.35);
+}
+
+.audio-fx-toggle.is-active {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border-color: rgba(16, 185, 129, 0.4);
+}

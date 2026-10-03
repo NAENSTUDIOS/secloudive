@@ -1,0 +1,409 @@
+/* =========================================================================
+   SeCloudive Dynamic SVG Topology Attack Graph & Real-Time SIEM Styles
+   ========================================================================= */
+
+.dynamic-topology-canvas {
+  border-radius: 1rem;
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  background: radial-gradient(circle at 80% 20%, rgba(14, 165, 233, 0.08), transparent 28rem), #070d19;
+  padding: 1.5rem;
+  box-shadow: 0 25px 50px -12px rgba(2, 6, 23, 0.7);
+  color: #e2e8f0;
+  margin-bottom: 2rem;
+  font-family: inherit;
+}
+
+.topology-header-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.topology-title-group {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.topology-icon-badge {
+  height: 2.5rem;
+  width: 2.5rem;
+  border-radius: 0.75rem;
+  background: rgba(14, 165, 233, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #38bdf8;
+  flex-shrink: 0;
+}
+
+.topology-eyebrow {
+  font-size: 0.7rem;
+  font-family: 'DM Mono', monospace;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #38bdf8;
+}
+
+.topology-heading {
+  margin: 0.15rem 0 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #f8fafc;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.severity-pill-critical {
+  padding: 0.15rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.65rem;
+  font-family: 'DM Mono', monospace;
+  font-weight: 700;
+  background: rgba(136, 19, 55, 0.6);
+  color: #fecdd3;
+  border: 1px solid rgba(225, 29, 72, 0.5);
+}
+
+.severity-pill-high {
+  padding: 0.15rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.65rem;
+  font-family: 'DM Mono', monospace;
+  font-weight: 700;
+  background: rgba(124, 45, 18, 0.6);
+  color: #fed7aa;
+  border: 1px solid rgba(234, 88, 12, 0.5);
+}
+
+.topology-scenario-pills {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.scenario-pill-btn {
+  padding: 0.4rem 0.8rem;
+  border-radius: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: #0f172a;
+  color: #cbd5e1;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.scenario-pill-btn:hover {
+  background: #1e293b;
+  border-color: rgba(56, 189, 248, 0.4);
+  color: #f8fafc;
+}
+
+.scenario-pill-btn.active {
+  background: #0ea5e9;
+  color: #020617;
+  font-weight: 700;
+  border-color: #38bdf8;
+  box-shadow: 0 4px 15px rgba(14, 165, 233, 0.35);
+}
+
+.topology-playback-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  margin: 1rem 0;
+  border-radius: 0.75rem;
+  background: rgba(15, 23, 42, 0.65);
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  font-size: 0.78rem;
+}
+
+.topology-playback-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.playback-step-counter {
+  font-weight: 600;
+  color: #cbd5e1;
+}
+
+.playback-log-preview {
+  color: #38bdf8;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.72rem;
+}
+
+.topology-playback-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-playback-toggle {
+  padding: 0.4rem 0.85rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.btn-playback-toggle.playing {
+  background: #d97706;
+  color: #ffffff;
+}
+
+.btn-playback-toggle.paused {
+  background: #0284c7;
+  color: #ffffff;
+}
+
+.btn-playback-toggle:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.btn-playback-action {
+  padding: 0.4rem 0.65rem;
+  border-radius: 0.5rem;
+  background: #1e293b;
+  color: #cbd5e1;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  cursor: pointer;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.btn-playback-action:hover:not(:disabled) {
+  background: #334155;
+  color: #ffffff;
+}
+
+.btn-playback-action:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.topology-main-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1.25rem;
+}
+
+@media (max-width: 980px) {
+  .topology-main-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.topology-svg-wrapper {
+  position: relative;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  background: #030712;
+  padding: 1rem;
+  overflow: hidden;
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.topology-watermark {
+  position: absolute;
+  top: 0.75rem;
+  left: 1rem;
+  font-size: 0.65rem;
+  font-family: 'DM Mono', monospace;
+  color: #475569;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+.topology-sidebar-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.topology-inspector-card {
+  padding: 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  background: rgba(15, 23, 42, 0.6);
+}
+
+.inspector-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.inspector-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.inspector-icon-box {
+  padding: 0.4rem;
+  border-radius: 0.5rem;
+  background: rgba(14, 165, 233, 0.15);
+  color: #38bdf8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.inspector-name {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.2;
+}
+
+.inspector-type {
+  font-size: 0.65rem;
+  color: #94a3b8;
+  font-family: 'DM Mono', monospace;
+}
+
+.inspector-status-badge {
+  padding: 0.15rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.65rem;
+  font-family: 'DM Mono', monospace;
+  font-weight: 700;
+}
+
+.status-badge-risk {
+  background: rgba(136, 19, 55, 0.75);
+  color: #fecdd3;
+  border: 1px solid rgba(225, 29, 72, 0.7);
+}
+
+.status-badge-safe {
+  background: rgba(6, 78, 59, 0.75);
+  color: #a7f3d0;
+  border: 1px solid rgba(16, 185, 129, 0.7);
+}
+
+.inspector-section-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: block;
+}
+
+.inspector-risk-text {
+  color: #cbd5e1;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  line-height: 1.5;
+}
+
+.inspector-remedy-text {
+  color: #34d399;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  line-height: 1.5;
+  font-family: 'DM Mono', monospace;
+}
+
+.topology-siem-pane {
+  padding: 0.85rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  background: #020617;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.72rem;
+}
+
+.siem-pane-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #94a3b8;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.siem-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #38bdf8;
+  font-weight: 700;
+}
+
+.siem-log-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  max-height: 12rem;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
+.siem-log-row {
+  padding: 0.4rem 0.5rem;
+  border-radius: 0.35rem;
+  line-height: 1.35;
+  font-size: 0.68rem;
+  transition: all 0.2s ease;
+}
+
+.siem-log-row.highlight {
+  background: rgba(136, 19, 55, 0.25);
+  color: #fecdd3;
+  border-left: 2px solid #f43f5e;
+}
+
+.siem-log-row.standard {
+  color: #94a3b8;
+  background: rgba(15, 23, 42, 0.4);
+}
+
+.siem-timestamp {
+  color: #64748b;
+  margin-right: 0.4rem;
+}
+
+/* SVG Pulse and Dash animations */
+@keyframes dash-pulse {
+  to {
+    stroke-dashoffset: -20;
+  }
+}
+
+.attack-path-active {
+  animation: dash-pulse 1.2s linear infinite;
+}

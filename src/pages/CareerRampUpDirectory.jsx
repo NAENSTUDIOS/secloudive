@@ -31,12 +31,20 @@ import {
   BookOpen,
   Flame,
   ShieldAlert,
-  ArrowUpRight
+  ArrowUpRight,
+  Cloud,
+  Shield,
+  Compass
 } from 'lucide-react'
 import { rampUpCategories, masterRampUpLabs, officialRampUpPdfs } from '../data/careerRampUpData'
 import CopyrightDisclaimer from '../components/CopyrightDisclaimer'
+import { useChallenges } from '../context/ChallengeContext'
 
 export default function CareerRampUpDirectory() {
+  const { rampupLabsCompleted, toggleRampupLab } = useChallenges()
+  const completedLabs = rampupLabsCompleted || {}
+  const toggleCompleted = toggleRampupLab
+
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedDifficulty, setSelectedDifficulty] = useState('all')
@@ -46,29 +54,6 @@ export default function CareerRampUpDirectory() {
   const [expandedLabId, setExpandedLabId] = useState(null)
   const [copiedCmdId, setCopiedCmdId] = useState(null)
   const [copiedPdfId, setCopiedPdfId] = useState(null)
-  
-  // Track completed labs in localStorage
-  const [completedLabs, setCompletedLabs] = useState(() => {
-    try {
-      const saved = localStorage.getItem('secloudive_rampup_completed')
-      return saved ? JSON.parse(saved) : {}
-    } catch {
-      return {}
-    }
-  })
-
-  // Save completion state
-  const toggleCompleted = (id) => {
-    setCompletedLabs(prev => {
-      const updated = { ...prev, [id]: !prev[id] }
-      try {
-        localStorage.setItem('secloudive_rampup_completed', JSON.stringify(updated))
-      } catch (err) {
-        console.error('Storage error', err)
-      }
-      return updated
-    })
-  }
 
   const handleCopy = (text, id) => {
     navigator.clipboard.writeText(text)
@@ -168,12 +153,24 @@ export default function CareerRampUpDirectory() {
     return { rank: 'Level 1: Recruit Analyst', color: 'amber', badgeClass: 'rank-recruit' }
   }, [completedCount])
 
+  // Dynamic live count for each category pill derived directly from masterRampUpLabs
+  const categoryCounts = useMemo(() => {
+    const counts = { all: masterRampUpLabs.length }
+    masterRampUpLabs.forEach(lab => {
+      counts[lab.category] = (counts[lab.category] || 0) + 1
+    })
+    return counts
+  }, [])
+
   // Helper for category icons
   const getCategoryIcon = (catId) => {
     switch (catId) {
       case 'cloud-roles': return <Briefcase size={13} />
+      case 'google-cloud': return <Cloud size={13} />
+      case 'azure-cloud': return <Shield size={13} />
       case 'tryhackme': return <Flame size={13} />
       case 'hackthebox': return <Cpu size={13} />
+      case 'roadmap-90': return <Compass size={13} />
       case 'linux': return <Terminal size={13} />
       case 'python': return <FileCode2 size={13} />
       case 'networking': return <Radio size={13} />
@@ -188,17 +185,22 @@ export default function CareerRampUpDirectory() {
       {/* 1. CYBER CAREER COMMAND DECK HERO */}
       <section className="rampup-hero-deck">
         <div className="rampup-hero-main">
+          <div style={{ marginBottom: '10px' }}>
+            <Link to="/#structured-path" style={{ color: '#38bdf8', display: 'inline-flex', alignItems: 'center', gap: '4px', textDecoration: 'none', background: 'rgba(56, 189, 248, 0.1)', padding: '3px 10px', borderRadius: '6px', border: '1px solid rgba(56, 189, 248, 0.3)', fontSize: '11px', fontFamily: 'monospace' }}>
+              🎯 Structured Path • Safe Labs Runbooks
+            </Link>
+          </div>
           <div className="eyebrow-cyber">
             <span className="pulse-dot-cyan" />
-            <span>OFFICIAL CLOUD CAREER COMMAND DECK • MASTER LAB DIRECTORY</span>
+            <span>OFFICIAL MULTI-CLOUD CAREER COMMAND DECK • MASTER LAB DIRECTORY</span>
           </div>
           <h1 className="rampup-headline">
             Cloud Roles, Official Ramp-Up PDFs &amp; <em>Master Labs.</em>
           </h1>
           <p className="rampup-subhead">
-            Zero fluff, 100% authentic: authoritative AWS Ramp-Up Guide PDFs, step-by-step CLI execution blueprints, 
+            Zero fluff, 100% authentic: authoritative AWS, Google Cloud, Microsoft Azure &amp; TryHackMe Ramp-Up Guide PDFs, step-by-step CLI execution blueprints, 
             and career interview defense across every Cloud Role, TryHackMe room, HackTheBox machine, 
-            and Core Foundations (Linux, Python, Networking, Docker, IaC).
+            90-Day Cloud Roadmap, and Core Foundations (Linux, Python, Networking, Docker, IaC).
           </p>
 
           <div className="hero-quick-actions">
@@ -211,7 +213,7 @@ export default function CareerRampUpDirectory() {
               }}
             >
               <FileText size={14} />
-              <span>Explore Official AWS PDFs ({officialRampUpPdfs.length})</span>
+              <span>Explore Official PDFs ({officialRampUpPdfs.length})</span>
             </button>
 
             <button 
@@ -379,7 +381,7 @@ export default function CareerRampUpDirectory() {
               >
                 <span className="cat-chip-icon">{getCategoryIcon(cat.id)}</span>
                 <span>{cat.label}</span>
-                <span className="chip-count-pill">{cat.count}</span>
+                <span className="chip-count-pill">{categoryCounts[cat.id] ?? 0}</span>
               </button>
             )
           })}

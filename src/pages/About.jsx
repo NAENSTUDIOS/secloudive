@@ -19,9 +19,12 @@ import {
   ChevronDown,
   ChevronRight,
   Flame,
-  Layers
+  Layers,
+  Send,
+  Mail
 } from 'lucide-react'
 import CopyrightDisclaimer from '../components/CopyrightDisclaimer'
+import { NaenStudiosLogoBadge, CloudArchitectureGraphic } from '../components/CloudGraphics'
 
 const careerRoles = [
   {
@@ -77,7 +80,7 @@ const careerRoles = [
       'Query Athena over terabytes of VPC Flow Logs and CloudTrail to trace lateral movement.',
       'Author formal Root Cause Analysis (RCA) and Post-Incident Reviews (PIR) for executive leadership.'
     ],
-    topTools: ['AWS CloudTrail', 'VPC Flow Logs', 'AWS Systems Manager', 'Volatilitiy / LiME', 'Athena'],
+    topTools: ['AWS CloudTrail', 'VPC Flow Logs', 'AWS Systems Manager', 'Volatility / LiME', 'Athena'],
     certifications: ['GIAC Cloud Forensics (GCFA)', 'GIAC Incident Handler (GCIH)']
   },
   {
@@ -360,6 +363,14 @@ export default function About() {
               </div>
             </div>
 
+            {/* Visual Multi-Tier Cloud Architecture Graphic */}
+            <div style={{ marginTop: '32px', marginBottom: '28px' }}>
+              <div style={{ fontSize: '0.72rem', fontWeight: 800, color: '#38bdf8', letterSpacing: '0.08em', marginBottom: '8px' }}>
+                ARCHITECTURE REFERENCE TOPOLOGY
+              </div>
+              <CloudArchitectureGraphic width="100%" height={240} />
+            </div>
+
             <div className="manifesto-cta">
               <Link to="/playbooks" className="button button-primary">
                 Launch Job Playbook Engine <ArrowRight size={16} />
@@ -371,6 +382,75 @@ export default function About() {
           </div>
         </section>
       )}
+
+      {/* NAEN Studios & Official Support Card */}
+      <section style={{
+        marginTop: '36px',
+        padding: '28px 32px',
+        background: 'linear-gradient(135deg, rgba(14, 165, 233, 0.08) 0%, rgba(15, 23, 42, 0.75) 100%)',
+        border: '1px solid rgba(56, 189, 248, 0.25)',
+        borderRadius: '12px',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        flexWrap: 'wrap',
+        gap: '20px'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <NaenStudiosLogoBadge size={44} />
+          <div>
+            <div style={{ fontSize: '0.72rem', fontWeight: 800, color: '#38bdf8', letterSpacing: '0.08em', marginBottom: '4px' }}>
+              ENGINEERED BY NAEN STUDIOS
+            </div>
+            <h3 style={{ margin: '0 0 6px', fontSize: '1.25rem', fontWeight: 800, color: '#f8fafc' }}>
+              NAEN Studios & Platform Inquiries
+            </h3>
+            <p style={{ margin: 0, fontSize: '0.85rem', color: '#94a3b8', maxWidth: '540px', lineHeight: 1.6 }}>
+              SeCloudive and NAEN AI are built by NAEN Studios. For educational partnerships, feedback, bug reports, or technical queries, reach out directly to our engineering team.
+            </p>
+          </div>
+        </div>
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+          <button
+            type="button"
+            onClick={() => window.dispatchEvent(new CustomEvent('open-script-dispatch'))}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              background: 'rgba(56, 189, 248, 0.12)',
+              border: '1px solid rgba(56, 189, 248, 0.35)',
+              color: '#38bdf8',
+              padding: '12px 18px',
+              borderRadius: '8px',
+              fontWeight: 700,
+              fontSize: '0.88rem',
+              cursor: 'pointer',
+              transition: 'all 0.15s'
+            }}
+          >
+            <Send size={15} /> Auto Script to NAEN Studios
+          </button>
+          <a
+            href="mailto:naenstudios@gmail.com"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              background: 'linear-gradient(135deg, #0284c7 0%, #2563eb 100%)',
+              color: '#ffffff',
+              padding: '12px 22px',
+              borderRadius: '8px',
+              fontWeight: 700,
+              fontSize: '0.88rem',
+              textDecoration: 'none',
+              boxShadow: '0 4px 16px rgba(14, 165, 233, 0.3)'
+            }}
+          >
+            <Mail size={15} /> Contact: naenstudios@gmail.com <ArrowRight size={15} />
+          </a>
+        </div>
+      </section>
 
       {/* Legal & Trademark Attribution */}
       <div style={{ marginTop: '40px' }}>
