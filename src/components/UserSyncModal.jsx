@@ -1,35 +1,32 @@
 import { useState, useEffect, useRef } from 'react'
 import { GoogleLogin } from '@react-oauth/google'
 import {
-  Users,
-  UserPlus,
-  RefreshCw,
-  Download,
-  Upload,
-  Key,
-  Check,
-  Copy,
-  Trash2,
-  Edit2,
-  X,
+  Fingerprint,
   ShieldCheck,
+  Zap,
   Cloud,
-  Clock,
-  Sparkles,
-  ArrowRight,
-  Database,
+  RefreshCw,
+  Copy,
+  Check,
   CheckCircle2,
   AlertCircle,
   LogIn,
   LogOut,
-  UserCheck,
-  Zap,
   Globe,
-  Mail,
   Lock,
-  Send,
-  AtSign,
-  Fingerprint
+  Key,
+  Download,
+  Upload,
+  X,
+  ChevronDown,
+  ChevronUp,
+  Sparkles,
+  ArrowRight,
+  Laptop,
+  Smartphone,
+  Shield,
+  UserCheck,
+  UserPlus
 } from 'lucide-react'
 import { useChallenges } from '../context/ChallengeContext'
 import { useAuth } from '../context/AuthContext'
@@ -43,7 +40,13 @@ import {
   parseGoogleCredential,
   deterministicGoogleUserId
 } from '../services/userSyncManager'
-import { GOOGLE_CLIENT_ID } from '../config/googleAuthConfig'
+import {
+  isPasskeySupported,
+  registerPasskey,
+  authenticatePasskey,
+  hasPasskeyForUser,
+  getEnrolledPasskeys
+} from '../services/passkeyAuthService'
 import { checkSupabaseHealth, isSupabaseConfigured } from '../lib/supabase'
 
 function GoogleIcon({ size = 18 }) {
@@ -59,93 +62,38 @@ function GoogleIcon({ size = 18 }) {
 
 export default function UserSyncModal() {
   const [isOpen, setIsOpen] = useState(false)
-  const [activeTab, setActiveTab] = useState('profiles') // 'profiles' | 'backup' | 'token' | 'cloud'
+  const [activeAuthTab, setActiveAuthTab] = useState('passkey') // 'passkey' | 'google' | 'studentid'
   
-  // Login method selector in Profiles tab: 'google' | 'userid' | 'email'
-  const [loginMethod, setLoginMethod] = useState('google')
-
-  // Registration form
-  const [showRegisterForm, setShowRegisterForm] = useState(false)
-  const [newUserId, setNewUserId] = useState('')
-  const [newUserName, setNewUserName] = useState('')
-  const [newUserRole, setNewUserRole] = useState('Cloud Security Engineer')
-  const [newUserColor, setNewUserColor] = useState('#38bdf8')
-  const [migrateGuestData, setMigrateGuestData] = useState(true)
-  const [idAvailability, setIdAvailability] = useState(null) // null | { available: boolean, message: string }
-
-  // Quick User ID Login form
-  const [loginInputId, setLoginInputId] = useState('')
-  const [loginError, setLoginError] = useState(null)
-  const [suggestRegisterId, setSuggestRegisterId] = useState(null)
+  // Status feedback
   const [actionSuccess, setActionSuccess] = useState(null)
+  const [authError, setAuthError] = useState(null)
+  const [isProcessing, setIsProcessing] = useState(false)
+  const [lastSyncTimestamp, setLastSyncTimestamp] = useState(null)
+  const [ambientSyncStatus, setAmbientSyncStatus] = useState(null)
 
-  // Google Authentication State
-  const [googleAuthError, setGoogleAuthError] = useState(null)
-  const [isGoogleProcessing, setIsGoogleProcessing] = useState(false)
-  const [showCustomGoogle, setShowCustomGoogle] = useState(false)
-  const [customGoogleEmail, setCustomGoogleEmail] = useState('')
-  const [customGoogleName, setCustomGoogleName] = useState('')
+  // Passkey enrollment state
+  const [hasPasskeyEnrolled, setHasPasskeyEnrolled] = useState(false)
+  const [isPasskeyEnrolling, setIsPasskeyEnrolling] = useState(false)
 
-  // Email & Password state
-  const [emailInput, setEmailInput] = useState('')
-  const [passwordInput, setPasswordInput] = useState('')
-  const [displayNameInput, setDisplayNameInput] = useState('')
-  const [isEmailSignUp, setIsEmailSignUp] = useState(false)
-  const [emailError, setEmailError] = useState(null)
-  const [isEmailLoading, setIsEmailLoading] = useState(false)
+  // Student ID Input
+  const [studentIdInput, setStudentIdInput] = useState('')
+  const [suggestClaimId, setSuggestClaimId] = useState(null)
+  const [copiedIdNotice, setCopiedIdNotice] = useState(false)
 
-  // Edit form
-  const [editingProfileId, setEditingProfileId] = useState(null)
-  const [editName, setEditName] = useState('')
+  // Direct Google Account Fallback
+  const [showDirectGoogle, setShowDirectGoogle] = useState(false)
+  const [directGoogleEmail, setDirectGoogleEmail] = useState('')
 
-  // Sync token state
+  // Vault Tools (Collapsible Drawer for power users)
+  const [showVaultDrawer, setShowVaultDrawer] = useState(false)
   const [generatedToken, setGeneratedToken] = useState('')
   const [inputToken, setInputToken] = useState('')
   const [tokenCopied, setTokenCopied] = useState(false)
   const [tokenStatusMessage, setTokenStatusMessage] = useState(null)
-
-  // File import state
-  const fileInputRef = useRef(null)
   const [importStatus, setImportStatus] = useState(null)
-
-  // Cloud Synchronization state
-  const [cloudSyncStatus, setCloudSyncStatus] = useState(null)
-  const [isManualSyncing, setIsManualSyncing] = useState(false)
-  const [lastManualSyncTime, setLastManualSyncTime] = useState(null)
-  const [copiedIdNotice, setCopiedIdNotice] = useState(false)
+  const fileInputRef = useRef(null)
 
   const auth = useAuth()
-
-  const handleTriggerManualSync = async () => {
-    setIsManualSyncing(true)
-    try {
-      if (autoSaveState?.triggerSave) {
-        await autoSaveState.triggerSave()
-      }
-      const res = await checkSupabaseHealth()
-      setCloudSyncStatus(res)
-      setLastManualSyncTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }))
-      setActionSuccess('All challenges, lab notes, and XP synchronized successfully!')
-      setTimeout(() => setActionSuccess(null), 4000)
-    } catch {
-      setLastManualSyncTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }))
-      setActionSuccess('Progress safely secured in local client sandbox.')
-      setTimeout(() => setActionSuccess(null), 4000)
-    } finally {
-      setTimeout(() => setIsManualSyncing(false), 500)
-    }
-  }
-
-  const handleCheckSyncStatus = async () => {
-    if (cloudSyncStatus) return
-    try {
-      const res = await checkSupabaseHealth()
-      setCloudSyncStatus(res)
-    } catch {
-      setCloudSyncStatus({ ok: false, status: 'offline', message: 'Local safe mode active.' })
-    }
-  }
-
   const {
     activeProfile = {},
     allProfiles = [],
@@ -154,16 +102,16 @@ export default function UserSyncModal() {
     loginWithUserId,
     switchToGuestMode,
     deleteUserProfile,
-    updateUserProfile,
     exportUserData,
     importUserData,
     loginWithGoogle,
-    linkGoogleAccount,
     autoSaveState = {},
     completedMasterActivities = 0,
     totalMasterActivities = 100,
     masterTotalXP = 0
   } = useChallenges() || {}
+
+  const isCurrentGuest = Boolean(activeProfile?.isGuest || activeProfile?.id === 'guest')
 
   // Listen for open event
   useEffect(() => {
@@ -172,286 +120,311 @@ export default function UserSyncModal() {
     return () => window.removeEventListener('open-user-sync-modal', handleOpen)
   }, [])
 
-  // Check ID availability in real-time as user types
+  // Check passkey enrollment whenever active profile changes
   useEffect(() => {
-    if (!newUserId.trim()) {
-      setIdAvailability(null)
-      return
-    }
-    const validation = validateUserIdFormat(newUserId)
-    if (!validation.valid) {
-      setIdAvailability({ available: false, message: validation.error })
-      return
-    }
-    const available = isUserIdAvailable(validation.cleanId)
-    if (available) {
-      setIdAvailability({ available: true, message: `User ID "${validation.cleanId}" is available!` })
+    if (activeProfile?.id && !isCurrentGuest) {
+      setHasPasskeyEnrolled(hasPasskeyForUser(activeProfile.id))
     } else {
-      setIdAvailability({
-        available: false,
-        message: `User ID "${validation.cleanId}" is already claimed. Each user must have their own unique ID.`
-      })
+      const keys = getEnrolledPasskeys()
+      setHasPasskeyEnrolled(keys.length > 0)
     }
-  }, [newUserId])
+  }, [activeProfile, isCurrentGuest])
 
-  // Generate unique User ID helper
-  const handleAutoGenerateId = () => {
-    const generated = generateUniqueUserId()
-    setNewUserId(generated)
-  }
-
-  // Register unique profile handler
-  const handleRegisterProfile = (e) => {
-    e.preventDefault()
-    if (!newUserId.trim()) return
-
-    const res = registerUniqueProfile({
-      userId: newUserId.trim(),
-      name: newUserName.trim() || newUserId.trim(),
-      role: newUserRole,
-      avatarColor: newUserColor,
-      migrateGuestData
-    })
-
-    if (res.success) {
-      setActionSuccess(`Successfully registered unique User ID: ${res.profile.id}`)
-      setNewUserId('')
-      setNewUserName('')
-      setShowRegisterForm(false)
-      setSuggestRegisterId(null)
-      setTimeout(() => setActionSuccess(null), 4000)
-    } else {
-      setIdAvailability({ available: false, message: res.error || 'Failed to register User ID.' })
+  // Ambient automatic sync helper: automatically called upon ANY authentication
+  const triggerAmbientSync = async (profileId) => {
+    try {
+      if (autoSaveState?.triggerSave) {
+        await autoSaveState.triggerSave()
+      }
+      const health = await checkSupabaseHealth()
+      setAmbientSyncStatus(health)
+      setLastSyncTimestamp(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }))
+    } catch {
+      setLastSyncTimestamp(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }))
     }
   }
 
-  // Login with existing User ID handler
-  const handleLoginSubmit = async (e) => {
-    e.preventDefault()
-    if (!loginInputId.trim()) return
-    setLoginError(null)
-    setSuggestRegisterId(null)
+  // ── 2036 AUTH METHOD 1: Biometric Passkey / WebAuthn ─────────────────────────
+  const handlePasskeyAuthenticate = async () => {
+    setIsProcessing(true)
+    setAuthError(null)
 
     try {
-      const res = await loginWithUserId(loginInputId.trim())
+      const res = await authenticatePasskey(isCurrentGuest ? null : activeProfile?.id)
       if (res.success) {
-        setActionSuccess(`Switched to Student ID: ${res.profile.id}${res.fromCloud ? ' (Cloud Synced)' : ''}`)
-        setLoginInputId('')
-        setLoginError(null)
-        setTimeout(() => setActionSuccess(null), 4000)
-      } else {
-        setLoginError(res.error || 'Failed to sign in with this Student ID.')
-        if (res.notFound) {
-          setSuggestRegisterId(loginInputId.trim())
+        const switchRes = await loginWithUserId(res.userId)
+        if (switchRes.success) {
+          setActionSuccess(`Passkey Verified! Synced to ${switchRes.profile.name || res.userId}`)
+          await triggerAmbientSync(res.userId)
+          setTimeout(() => setActionSuccess(null), 4000)
+        } else {
+          setAuthError('Passkey verified, but profile could not be activated.')
         }
+      } else if (!res.cancelled) {
+        setAuthError(res.error || 'Biometric authentication could not be completed.')
       }
     } catch {
-      setLoginError('Could not verify Student ID. Please try again or create a new profile.')
+      setAuthError('Biometric prompt was cancelled or unavailable on this device.')
+    } finally {
+      setIsProcessing(false)
     }
   }
 
-  // 1-Click activate unrecognised ID as new registration
-  const handleClaimSuggestedId = () => {
-    if (!suggestRegisterId) return
-    setNewUserId(suggestRegisterId)
-    setNewUserName(suggestRegisterId)
-    setShowRegisterForm(true)
-    setLoginError(null)
-    setSuggestRegisterId(null)
-  }
+  // 1-Click Enroll Hardware Passkey for currently active profile
+  const handleEnrollPasskey = async () => {
+    if (isCurrentGuest) {
+      setAuthError('Please sign in or claim a Student ID before enrolling a biometric passkey.')
+      return
+    }
 
-  // Google Authentication Handlers: Strict 1-to-1 Mapping to Single User ID
-  const handleGoogleSignInFlow = (googleData, options = {}) => {
-    setIsGoogleProcessing(true)
-    setGoogleAuthError(null)
+    setIsPasskeyEnrolling(true)
+    setAuthError(null)
 
     try {
-      const email = googleData.email?.trim() || 'operator@gmail.com'
-      const name = googleData.name?.trim() || email.split('@')[0]
-      const sub = googleData.sub || `google-sub-${email.replace(/[^a-z0-9]/gi, '')}`
-
-      const res = loginWithGoogle({ sub, email, name, picture: googleData.picture }, options)
-      if (auth?.signInWithDirectGoogleData) {
-        try {
-          auth.signInWithDirectGoogleData({ sub, email, name, picture: googleData.picture }, options)
-        } catch {}
-      }
+      const res = await registerPasskey({
+        userId: activeProfile.id,
+        userName: activeProfile.name || activeProfile.id,
+        displayName: `${activeProfile.name || activeProfile.id} (${activeProfile.id})`
+      })
 
       if (res.success) {
-        setActionSuccess(res.message || `Synced to single User ID: ${res.profile.id}`)
-        setShowCustomGoogle(false)
-        setCustomGoogleEmail('')
-        setCustomGoogleName('')
+        setHasPasskeyEnrolled(true)
+        setActionSuccess('Hardware Passkey enrolled! You can now unlock with Windows Hello / Touch ID.')
+        await triggerAmbientSync(activeProfile.id)
         setTimeout(() => setActionSuccess(null), 4500)
-      } else {
-        setGoogleAuthError(res.error || 'Failed to authenticate with Google.')
+      } else if (!res.cancelled) {
+        setAuthError(res.error || 'Failed to enroll passkey.')
       }
+    } catch {
+      setAuthError('Passkey enrollment was cancelled.')
     } finally {
-      setIsGoogleProcessing(false)
+      setIsPasskeyEnrolling(false)
     }
   }
 
-  const handleGoogleOAuthSuccess = async (credentialResponse) => {
-    setIsGoogleProcessing(true)
-    setGoogleAuthError(null)
+  // ── 2036 AUTH METHOD 2: Google Sovereign Cloud Identity ──────────────────────
+  const handleGoogleSuccess = async (credentialResponse) => {
+    setIsProcessing(true)
+    setAuthError(null)
+
     try {
       if (auth?.signInWithGoogle) {
         await auth.signInWithGoogle(credentialResponse.credential)
       }
       const parsed = parseGoogleCredential(credentialResponse.credential)
       if (parsed) {
-        handleGoogleSignInFlow(parsed)
-      } else {
-        setActionSuccess('Signed in with Google successfully!')
-        setTimeout(() => setActionSuccess(null), 4000)
-      }
-    } catch (err) {
-      setGoogleAuthError(err?.message || 'Google sign-in could not be completed.')
-    } finally {
-      setIsGoogleProcessing(false)
-    }
-  }
+        const email = parsed.email?.trim() || 'student@gmail.com'
+        const name = parsed.name?.trim() || email.split('@')[0]
+        const sub = parsed.sub || `google-sub-${email.replace(/[^a-z0-9]/gi, '')}`
 
-  // Direct Google Account Sign-In (no-popup fallback for private browsing or origin restrictions)
-  const handleDirectCustomGoogleSignIn = (e) => {
-    e.preventDefault()
-    if (!customGoogleEmail.trim()) return
-    const cleanEmail = customGoogleEmail.trim().toLowerCase()
-    handleGoogleSignInFlow({
-      sub: `google-sub-${cleanEmail.replace(/[^a-z0-9]/gi, '')}`,
-      email: cleanEmail,
-      name: customGoogleName.trim() || cleanEmail.split('@')[0],
-      picture: null
-    })
-  }
-
-  // Supabase Email & Password Handlers
-  const handleEmailSubmit = async (e) => {
-    e.preventDefault()
-    if (!emailInput.trim()) return
-    setIsEmailLoading(true)
-    setEmailError(null)
-
-    try {
-      if (isEmailSignUp) {
-        if (!auth?.signUpWithEmail) throw new Error('Email registration engine not ready.')
-        const res = await auth.signUpWithEmail(emailInput, passwordInput, {
-          name: displayNameInput || emailInput.split('@')[0],
-          role: newUserRole
-        })
+        const res = loginWithGoogle({ sub, email, name, picture: parsed.picture })
         if (res.success) {
-          setActionSuccess(res.message || 'Account registered successfully!')
-          setEmailInput('')
-          setPasswordInput('')
-          setDisplayNameInput('')
-          setTimeout(() => setActionSuccess(null), 4500)
-        } else {
-          setEmailError(res.error || 'Failed to create account.')
-        }
-      } else {
-        if (!auth?.signInWithEmail) throw new Error('Email sign-in engine not ready.')
-        const res = await auth.signInWithEmail(emailInput, passwordInput)
-        if (res.success) {
-          setActionSuccess('Signed in with Email successfully!')
-          setEmailInput('')
-          setPasswordInput('')
+          setActionSuccess(`Sovereign Google ID Synced: ${res.profile.id}`)
+          await triggerAmbientSync(res.profile.id)
           setTimeout(() => setActionSuccess(null), 4000)
         } else {
-          setEmailError(res.error || 'Invalid credentials or account not found.')
+          setAuthError(res.error || 'Failed to bind Google Identity.')
         }
       }
-    } catch (err) {
-      setEmailError(err.message || 'Email authentication error.')
+    } catch {
+      setAuthError('Google sign-in could not be completed. You can use Direct Email or Student ID.')
     } finally {
-      setIsEmailLoading(false)
+      setIsProcessing(false)
     }
   }
 
-  const handleMagicLinkSubmit = async () => {
-    if (!emailInput.trim()) {
-      setEmailError('Please enter your email address to receive a magic sign-in link.')
-      return
-    }
-    setIsEmailLoading(true)
-    setEmailError(null)
+  const handleDirectGoogleSubmit = async (e) => {
+    e.preventDefault()
+    if (!directGoogleEmail.trim()) return
+    const cleanEmail = directGoogleEmail.trim().toLowerCase()
+    setIsProcessing(true)
+    setAuthError(null)
+
     try {
-      if (!auth?.signInWithMagicLink) throw new Error('Magic link service not available.')
-      const res = await auth.signInWithMagicLink(emailInput)
+      const res = loginWithGoogle({
+        sub: `google-sub-${cleanEmail.replace(/[^a-z0-9]/gi, '')}`,
+        email: cleanEmail,
+        name: cleanEmail.split('@')[0],
+        picture: null
+      })
       if (res.success) {
-        setActionSuccess(res.message)
-        setTimeout(() => setActionSuccess(null), 5000)
-      } else {
-        setEmailError(res.error || 'Failed to send magic link.')
+        setActionSuccess(`Signed in with Google Account: ${res.profile.id}`)
+        setDirectGoogleEmail('')
+        setShowDirectGoogle(false)
+        await triggerAmbientSync(res.profile.id)
+        setTimeout(() => setActionSuccess(null), 4000)
       }
-    } catch (err) {
-      setEmailError(err.message || 'Magic link error.')
+    } catch {
+      setAuthError('Direct Google sign-in failed. Please verify your email format.')
     } finally {
-      setIsEmailLoading(false)
+      setIsProcessing(false)
     }
   }
 
-  // Switch to Guest Mode handler
+  // ── 2036 AUTH METHOD 3: Sovereign Student ID / Instant Claim ────────────────
+  const handleStudentIdLogin = async (e) => {
+    e?.preventDefault()
+    if (!studentIdInput.trim()) return
+    setIsProcessing(true)
+    setAuthError(null)
+    setSuggestClaimId(null)
+
+    try {
+      const res = await loginWithUserId(studentIdInput.trim())
+      if (res.success) {
+        setActionSuccess(`Switched to Student ID: ${res.profile.id}`)
+        setStudentIdInput('')
+        await triggerAmbientSync(res.profile.id)
+        setTimeout(() => setActionSuccess(null), 4000)
+      } else {
+        setAuthError(res.error || `Student ID "${studentIdInput.trim()}" not found.`)
+        if (res.notFound) {
+          setSuggestClaimId(studentIdInput.trim())
+        }
+      }
+    } catch {
+      setAuthError('Could not verify Student ID.')
+    } finally {
+      setIsProcessing(false)
+    }
+  }
+
+  // Instant 1-Tap Generate & Claim Sovereign ID (Zero tedious forms!)
+  const handleInstantGenerateId = async () => {
+    setIsProcessing(true)
+    setAuthError(null)
+
+    try {
+      const newId = generateUniqueUserId('SEC-STUDENT')
+      const res = registerUniqueProfile({
+        userId: newId,
+        name: 'Cyber Security Analyst',
+        role: 'Cloud Security Engineer',
+        color: '#38bdf8',
+        migrateGuestData: isCurrentGuest
+      })
+
+      if (res.success) {
+        setActionSuccess(`New Sovereign ID Activated: ${res.profile.id}`)
+        await triggerAmbientSync(res.profile.id)
+        setTimeout(() => setActionSuccess(null), 4000)
+      } else {
+        setAuthError(res.error || 'Failed to generate sovereign ID.')
+      }
+    } catch {
+      setAuthError('Error activating sovereign ID.')
+    } finally {
+      setIsProcessing(false)
+    }
+  }
+
+  // 1-Click Claim Suggested ID
+  const handleClaimSuggested = () => {
+    if (!suggestClaimId) return
+    const res = registerUniqueProfile({
+      userId: suggestClaimId,
+      name: suggestClaimId,
+      role: 'Cloud Security Engineer',
+      color: '#38bdf8',
+      migrateGuestData: isCurrentGuest
+    })
+    if (res.success) {
+      setActionSuccess(`Claimed & Activated Student ID: ${res.profile.id}`)
+      setSuggestClaimId(null)
+      setStudentIdInput('')
+      setAuthError(null)
+      triggerAmbientSync(res.profile.id)
+      setTimeout(() => setActionSuccess(null), 4000)
+    }
+  }
+
+  // 1-Click Copy Active ID
+  const handleCopyId = () => {
+    if (activeProfile?.id) {
+      navigator.clipboard.writeText(activeProfile.id)
+      setCopiedIdNotice(true)
+      setTimeout(() => setCopiedIdNotice(false), 2000)
+    }
+  }
+
+  // Switch to Guest Mode
   const handleSwitchToGuest = () => {
     switchToGuestMode()
-    setActionSuccess('Switched to Guest Mode. Progress will run in temporary local sandbox.')
-    setTimeout(() => setActionSuccess(null), 4000)
+    setActionSuccess('Switched to Guest Sandbox. Progress is isolated locally.')
+    setTimeout(() => setActionSuccess(null), 3500)
   }
 
-  // Generate Token handler
+  // Vault Tools: Generate Offline Token
   const handleGenerateToken = () => {
-    const token = generateSyncToken(activeProfile.id)
-    if (token) {
+    try {
+      const token = generateSyncToken(activeProfile.id)
       setGeneratedToken(token)
-      setTokenCopied(false)
+    } catch {
+      setTokenStatusMessage({ type: 'error', text: 'Failed to generate sync token.' })
     }
   }
 
   const handleCopyToken = () => {
-    if (!generatedToken) return
-    navigator.clipboard.writeText(generatedToken)
-    setTokenCopied(true)
-    setTimeout(() => setTokenCopied(false), 2000)
+    if (generatedToken) {
+      navigator.clipboard.writeText(generatedToken)
+      setTokenCopied(true)
+      setTimeout(() => setTokenCopied(false), 2000)
+    }
   }
 
-  const handleRestoreToken = () => {
+  const handleRestoreToken = async () => {
     if (!inputToken.trim()) return
     const res = restoreFromSyncToken(inputToken.trim())
     if (res.success) {
-      setTokenStatusMessage({ type: 'success', text: `Successfully restored profile: ${res.profile.name}` })
+      setTokenStatusMessage({ type: 'success', text: `Restored progress for ${res.profile.id}!` })
       setInputToken('')
-      setTimeout(() => setTokenStatusMessage(null), 3500)
+      await triggerAmbientSync(res.profile.id)
+      setTimeout(() => setTokenStatusMessage(null), 4000)
     } else {
-      setTokenStatusMessage({ type: 'error', text: res.message || 'Invalid sync token.' })
+      setTokenStatusMessage({ type: 'error', text: res.error || 'Invalid sync token string.' })
     }
   }
 
-  // File import handler
-  const handleFileUpload = (e) => {
+  // Vault Tools: Export JSON
+  const handleDownloadBackup = () => {
+    try {
+      const dataStr = exportUserData(activeProfile.id)
+      const blob = new Blob([dataStr], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `secloudive-vault-${activeProfile.id}-${Date.now()}.json`
+      a.click()
+      URL.revokeObjectURL(url)
+      setActionSuccess('Encrypted vault backup downloaded!')
+      setTimeout(() => setActionSuccess(null), 3000)
+    } catch {
+      setAuthError('Failed to generate vault backup.')
+    }
+  }
+
+  // Vault Tools: Import JSON
+  const handleImportFile = (e) => {
     const file = e.target.files?.[0]
     if (!file) return
-
     const reader = new FileReader()
-    reader.onload = (event) => {
-      try {
-        const parsed = JSON.parse(event.target.result)
-        const res = importUserData(parsed)
+    reader.onload = async (event) => {
+      const content = event.target?.result
+      if (typeof content === 'string') {
+        const res = importUserData(content)
         if (res.success) {
-          setImportStatus({ type: 'success', text: `Restored profile: ${res.profile.name}` })
+          setImportStatus({ type: 'success', text: `Vault restored for User ${res.profile.id}!` })
+          await triggerAmbientSync(res.profile.id)
+          setTimeout(() => setImportStatus(null), 4000)
         } else {
-          setImportStatus({ type: 'error', text: res.message || 'Import failed.' })
+          setImportStatus({ type: 'error', text: res.error || 'Import failed.' })
         }
-      } catch (err) {
-        setImportStatus({ type: 'error', text: 'Invalid JSON backup file.' })
       }
-      setTimeout(() => setImportStatus(null), 4000)
     }
     reader.readAsText(file)
-    e.target.value = ''
   }
 
   if (!isOpen) return null
-
-  const isCurrentGuest = Boolean(activeProfile?.isGuest || activeProfile?.id === 'guest')
 
   return (
     <div className="user-sync-backdrop" onClick={() => setIsOpen(false)}>
@@ -460,23 +433,59 @@ export default function UserSyncModal() {
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
-        aria-label="User Identity & Auto-Sync Engine"
-        style={{ maxWidth: '780px' }}
+        aria-label="Cyber Identity & Ambient Sync Nexus"
+        style={{
+          maxWidth: '720px',
+          width: '95%',
+          background: 'linear-gradient(180deg, rgba(11, 20, 38, 0.98) 0%, rgba(3, 7, 18, 0.98) 100%)',
+          border: '1px solid rgba(56, 189, 248, 0.3)',
+          borderRadius: '16px',
+          boxShadow: '0 25px 80px rgba(0, 0, 0, 0.8), 0 0 40px rgba(56, 189, 248, 0.12)',
+          overflow: 'hidden'
+        }}
       >
-        {/* Header */}
-        <div className="user-sync-header">
-          <div className="user-sync-title-box">
-            <Cloud size={20} className="text-cyan animate-pulse" />
+        {/* Top Accent Bar */}
+        <div style={{
+          height: '3px',
+          background: 'linear-gradient(90deg, #38bdf8 0%, #3b82f6 50%, #10b981 100%)',
+          boxShadow: '0 0 10px rgba(56, 189, 248, 0.6)'
+        }} />
+
+        {/* Unified Header */}
+        <div style={{
+          padding: '18px 24px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          borderBottom: '1px solid rgba(148, 163, 184, 0.12)',
+          background: 'rgba(15, 23, 42, 0.6)'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{
+              width: '36px',
+              height: '36px',
+              borderRadius: '10px',
+              background: 'rgba(56, 189, 248, 0.15)',
+              border: '1px solid rgba(56, 189, 248, 0.35)',
+              display: 'grid',
+              placeItems: 'center',
+              color: '#38bdf8'
+            }}>
+              <Fingerprint size={20} className="animate-pulse" />
+            </div>
             <div>
-              <div className="user-sync-title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <SeCloudiveLogo size={15} variant="two-tone" glow={false} />
-                <span>Identity & Sync Center</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <SeCloudiveLogo size={14} variant="two-tone" glow={false} />
+                <span style={{ fontSize: '15px', fontWeight: 800, color: '#f8fafc', letterSpacing: '-0.2px' }}>
+                  Identity & Ambient Sync Nexus
+                </span>
               </div>
-              <div className="user-sync-subtitle">
-                Google OAuth • Unique Student ID • Cloud Synchronization • Zero-Trust Data Isolation
+              <div style={{ fontSize: '11px', color: '#94a3b8', marginTop: '2px' }}>
+                Passkeys • Biometric FIDO2 • Google Sovereign ID • Ambient Real-Time Sync
               </div>
             </div>
           </div>
+
           <button 
             className="btn-user-sync-close"
             onClick={() => setIsOpen(false)}
@@ -486,79 +495,48 @@ export default function UserSyncModal() {
           </button>
         </div>
 
-        {/* Live Auto-Save Telemetry Bar */}
-        <div className="user-sync-telemetry-bar">
-          <div className="sync-telemetry-left">
-            <span className={`sync-telemetry-dot ${autoSaveState.isSaving ? 'is-saving' : 'is-saved'}`} />
-            <span className="sync-telemetry-status">
-              {autoSaveState.isSaving
-                ? 'Auto-saving data to browser…'
-                : isCurrentGuest
-                ? 'Guest sandbox active (not auto-synced to permanent User ID)'
-                : `Auto-saved at ${autoSaveState.lastSaved || 'Just now'}`}
+        {/* Ambient Sync Telemetry Ribbon */}
+        <div style={{
+          padding: '8px 24px',
+          background: 'rgba(2, 6, 23, 0.7)',
+          borderBottom: '1px solid rgba(148, 163, 184, 0.08)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          fontSize: '11.5px',
+          color: '#94a3b8',
+          flexWrap: 'wrap',
+          gap: '8px'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{
+              width: '8px',
+              height: '8px',
+              borderRadius: '50%',
+              background: '#10b981',
+              boxShadow: '0 0 8px #10b981'
+            }} />
+            <span style={{ color: '#cbd5e1' }}>
+              <strong>Ambient Sync Active:</strong> All labs, notes & XP continuously secured
             </span>
           </div>
-          <div className="sync-telemetry-right">
-            <span>
-              <strong>Mode:</strong> {isCurrentGuest ? 'Guest Learner' : `User ${activeProfile.id}`}
-            </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span>Synced: <strong style={{ color: '#38bdf8' }}>{lastSyncTimestamp || autoSaveState.lastSaved || 'Real-time'}</strong></span>
             <span>•</span>
-            <span><strong>Master XP:</strong> {masterTotalXP.toLocaleString()}</span>
+            <span>Master XP: <strong style={{ color: '#f59e0b' }}>{masterTotalXP.toLocaleString()}</strong></span>
           </div>
         </div>
 
-        {/* Banner Alert if in Guest Mode */}
-        {isCurrentGuest && (
+        {/* Status Alerts */}
+        {actionSuccess && (
           <div style={{
-            background: 'rgba(245, 158, 11, 0.1)',
-            borderBottom: '1px solid rgba(245, 158, 11, 0.25)',
+            background: 'rgba(16, 185, 129, 0.15)',
+            borderBottom: '1px solid rgba(16, 185, 129, 0.3)',
             padding: '10px 24px',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: '12px',
-            fontSize: '0.78rem',
-            color: '#fde68a'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <AlertCircle size={15} style={{ color: '#f59e0b', flexShrink: 0 }} />
-              <span>
-                <strong>Guest Mode Active:</strong> Sign in with Google, Email, or Claim a Unique User ID to preserve all your labs, notes, and XP permanently!
-              </span>
-            </div>
-            <button
-              type="button"
-              onClick={() => {
-                setLoginMethod('google')
-                setShowRegisterForm(true)
-              }}
-              style={{
-                background: '#f59e0b',
-                color: '#020617',
-                border: 'none',
-                borderRadius: '6px',
-                padding: '4px 10px',
-                fontWeight: 700,
-                fontSize: '0.74rem',
-                cursor: 'pointer',
-                whiteSpace: 'nowrap'
-              }}
-            >
-              Sign In / Claim ID
-            </button>
-          </div>
-        )}
-
-        {/* Success Action Notification */}
-        {actionSuccess && (
-          <div style={{
-            background: 'rgba(16, 185, 129, 0.12)',
-            borderBottom: '1px solid rgba(16, 185, 129, 0.3)',
-            padding: '9px 24px',
-            display: 'flex',
-            alignItems: 'center',
             gap: '8px',
-            fontSize: '0.8rem',
+            fontSize: '12px',
             color: '#6ee7b7'
           }}>
             <CheckCircle2 size={15} />
@@ -566,1374 +544,856 @@ export default function UserSyncModal() {
           </div>
         )}
 
-        {/* Tabs */}
-        <div className="user-sync-tabs">
-          <button 
-            className={`user-sync-tab ${activeTab === 'profiles' ? 'active' : ''}`}
-            onClick={() => setActiveTab('profiles')}
-          >
-            <Users size={15} />
-            <span>Sign In & Identity ({allProfiles.length})</span>
-          </button>
-          <button 
-            className={`user-sync-tab ${activeTab === 'backup' ? 'active' : ''}`}
-            onClick={() => setActiveTab('backup')}
-          >
-            <Database size={15} />
-            <span>Export & Backup</span>
-          </button>
-          <button 
-            className={`user-sync-tab ${activeTab === 'token' ? 'active' : ''}`}
-            onClick={() => setActiveTab('token')}
-          >
-            <Key size={15} />
-            <span>Sync Token</span>
-          </button>
-          <button 
-            className={`user-sync-tab ${activeTab === 'cloud' ? 'active' : ''}`}
-            onClick={() => {
-              setActiveTab('cloud')
-              handleCheckSyncStatus()
-            }}
-          >
-            <Cloud size={15} />
-            <span>Cloud Sync & Devices</span>
-          </button>
-        </div>
+        {authError && (
+          <div style={{
+            background: 'rgba(239, 68, 68, 0.15)',
+            borderBottom: '1px solid rgba(239, 68, 68, 0.3)',
+            padding: '10px 24px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            fontSize: '12px',
+            color: '#fca5a5'
+          }}>
+            <AlertCircle size={15} />
+            <span>{authError}</span>
+          </div>
+        )}
 
-        {/* Body Content */}
-        <div className="user-sync-body">
-          {/* TAB 1: SIGN IN & USER IDENTITY */}
-          {activeTab === 'profiles' && (
-            <div className="user-sync-section">
-              {/* Active Profile Status Spotlight */}
-              <div style={{
-                background: isCurrentGuest ? 'rgba(15, 23, 42, 0.6)' : 'linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(15, 23, 42, 0.8) 100%)',
-                border: isCurrentGuest ? '1px solid rgba(148, 163, 184, 0.2)' : '1px solid rgba(16, 185, 129, 0.35)',
-                borderRadius: '12px',
-                padding: '14px 18px',
-                marginBottom: '18px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: '14px',
-                flexWrap: 'wrap'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <div style={{
-                    width: '42px',
-                    height: '42px',
-                    borderRadius: '10px',
-                    background: isCurrentGuest ? 'rgba(148, 163, 184, 0.15)' : 'rgba(16, 185, 129, 0.15)',
-                    border: isCurrentGuest ? '1px solid rgba(148, 163, 184, 0.3)' : '1px solid rgba(16, 185, 129, 0.4)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: isCurrentGuest ? '#94a3b8' : '#10b981',
-                    fontWeight: 800,
-                    fontSize: '1.1rem',
-                    overflow: 'hidden'
-                  }}>
-                    {activeProfile?.avatarUrl ? (
-                      <img src={activeProfile.avatarUrl} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    ) : (
-                      isCurrentGuest ? '?' : activeProfile.name?.charAt(0)?.toUpperCase() || 'U'
-                    )}
-                  </div>
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span style={{
-                        fontSize: '0.68rem',
-                        fontWeight: 800,
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.05em',
-                        color: isCurrentGuest ? '#f59e0b' : '#10b981'
-                      }}>
-                        {isCurrentGuest ? 'CURRENT MODE: GUEST (TEMPORARY)' : 'CURRENT USER ID: ' + activeProfile.id}
-                      </span>
-                      {!isCurrentGuest && (
-                        <span style={{ fontSize: '0.65rem', background: 'rgba(16, 185, 129, 0.15)', color: '#10b981', padding: '1px 6px', borderRadius: '4px', fontWeight: 700 }}>
-                          Auto-Sync Active
-                        </span>
-                      )}
-                    </div>
-                    <div style={{ fontSize: '1rem', fontWeight: 800, color: '#f8fafc', marginTop: '2px' }}>
-                      {activeProfile.name || 'Guest Learner'}
-                    </div>
-                    <div style={{ fontSize: '0.76rem', color: '#94a3b8' }}>
-                      {activeProfile.role || 'Cloud Security Engineer'} • {completedMasterActivities} Tasks Verified
-                    </div>
-                  </div>
-                </div>
-
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  {!isCurrentGuest ? (
-                    <button
-                      type="button"
-                      onClick={handleSwitchToGuest}
-                      style={{
-                        background: 'transparent',
-                        border: '1px solid rgba(148, 163, 184, 0.25)',
-                        color: '#cbd5e1',
-                        borderRadius: '6px',
-                        padding: '6px 12px',
-                        fontSize: '0.78rem',
-                        fontWeight: 600,
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px'
-                      }}
-                      title="Switch to temporary guest sandbox"
-                    >
-                      <LogOut size={13} />
-                      <span>Switch to Guest</span>
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => setShowRegisterForm(true)}
-                      style={{
-                        background: '#38bdf8',
-                        color: '#020617',
-                        border: 'none',
-                        borderRadius: '6px',
-                        padding: '7px 14px',
-                        fontSize: '0.8rem',
-                        fontWeight: 700,
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px'
-                      }}
-                    >
-                      <UserPlus size={14} />
-                      <span>Claim Unique User ID</span>
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              {/* ── MULTI-METHOD AUTHENTICATION SELECTOR ── */}
-              <div style={{
-                background: 'rgba(15, 23, 42, 0.75)',
-                border: '1px solid rgba(56, 189, 248, 0.25)',
-                borderRadius: '14px',
-                padding: '16px',
-                marginBottom: '20px'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px', flexWrap: 'wrap', gap: '8px' }}>
-                  <div style={{ fontSize: '0.78rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#94a3b8' }}>
-                    CHOOSE YOUR SIGN-IN METHOD
-                  </div>
-                  {/* Method Navigation Pills */}
-                  <div style={{ display: 'flex', gap: '6px', background: 'rgba(2, 6, 23, 0.6)', padding: '3px', borderRadius: '8px', border: '1px solid rgba(148, 163, 184, 0.15)' }}>
-                    <button
-                      type="button"
-                      onClick={() => { setLoginMethod('google'); setGoogleAuthError(null); }}
-                      style={{
-                        background: loginMethod === 'google' ? '#38bdf8' : 'transparent',
-                        color: loginMethod === 'google' ? '#020617' : '#94a3b8',
-                        border: 'none',
-                        borderRadius: '6px',
-                        padding: '4px 10px',
-                        fontSize: '0.74rem',
-                        fontWeight: 700,
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '5px'
-                      }}
-                    >
-                      <GoogleIcon size={13} />
-                      <span>Google OAuth</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => { setLoginMethod('userid'); setLoginError(null); }}
-                      style={{
-                        background: loginMethod === 'userid' ? '#38bdf8' : 'transparent',
-                        color: loginMethod === 'userid' ? '#020617' : '#94a3b8',
-                        border: 'none',
-                        borderRadius: '6px',
-                        padding: '4px 10px',
-                        fontSize: '0.74rem',
-                        fontWeight: 700,
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '5px'
-                      }}
-                    >
-                      <Fingerprint size={13} />
-                      <span>Unique User ID</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => { setLoginMethod('email'); setEmailError(null); }}
-                      style={{
-                        background: loginMethod === 'email' ? '#38bdf8' : 'transparent',
-                        color: loginMethod === 'email' ? '#020617' : '#94a3b8',
-                        border: 'none',
-                        borderRadius: '6px',
-                        padding: '4px 10px',
-                        fontSize: '0.74rem',
-                        fontWeight: 700,
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '5px'
-                      }}
-                    >
-                      <Mail size={13} />
-                      <span>Email / Password</span>
-                    </button>
-                  </div>
-                </div>
-
-                {/* ── SUB-METHOD 1: GOOGLE AUTHENTICATION ── */}
-                {loginMethod === 'google' && (
-                  <div style={{
-                    background: 'rgba(2, 6, 23, 0.65)',
-                    border: '1px solid rgba(66, 133, 244, 0.25)',
-                    borderRadius: '10px',
-                    padding: '16px'
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '14px', flexWrap: 'wrap' }}>
-                      <div style={{ flex: 1, minWidth: '240px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#60a5fa' }}>Google Identity Services</span>
-                          <span style={{ fontSize: '0.66rem', background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', padding: '1px 6px', borderRadius: '4px', fontWeight: 700 }}>
-                            1-to-1 Deterministic ID
-                          </span>
-                        </div>
-                        <p style={{ fontSize: '0.76rem', color: '#94a3b8', margin: '4px 0 0' }}>
-                          Signs in using your Google account and automatically maps to your permanent single User ID.
-                        </p>
-                      </div>
-
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'flex-start' }}>
-                        {/* Official Google OAuth popup */}
-                        <GoogleLogin
-                          onSuccess={handleGoogleOAuthSuccess}
-                          onError={() => {
-                            setGoogleAuthError('Google sign-in popup closed or blocked. You can use Quick Google Sign-In below!')
-                          }}
-                          useOneTap={false}
-                          theme="filled_black"
-                          shape="rectangular"
-                          size="large"
-                          text="signin_with"
-                          logo_alignment="left"
-                        />
-
-                        {/* Quick Direct Google Sign-In (no-popup fallback) */}
-                        <button
-                          type="button"
-                          onClick={() => setShowCustomGoogle(prev => !prev)}
-                          style={{
-                            background: 'rgba(56, 189, 248, 0.08)',
-                            border: '1px dashed rgba(56, 189, 248, 0.35)',
-                            color: '#38bdf8',
-                            borderRadius: '6px',
-                            padding: '5px 10px',
-                            fontSize: '0.72rem',
-                            fontWeight: 600,
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '5px'
-                          }}
-                        >
-                          <Zap size={12} />
-                          <span>{showCustomGoogle ? 'Hide Direct Account Sign-In' : '⚡ Direct Google Sign-In (Instant / No Popups)'}</span>
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Direct Custom Google Sign-In Form */}
-                    {showCustomGoogle && (
-                      <form onSubmit={handleDirectCustomGoogleSignIn} style={{ marginTop: '14px', paddingTop: '14px', borderTop: '1px solid rgba(148, 163, 184, 0.12)' }}>
-                        <div style={{ fontSize: '0.74rem', color: '#cbd5e1', marginBottom: '8px', fontWeight: 600 }}>
-                          Enter any Google email address to sign in instantly without third-party popups:
-                        </div>
-                        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                          <input
-                            type="email"
-                            placeholder="your.email@gmail.com"
-                            value={customGoogleEmail}
-                            onChange={(e) => setCustomGoogleEmail(e.target.value)}
-                            required
-                            style={{
-                              flex: 1,
-                              minWidth: '200px',
-                              background: 'rgba(15, 23, 42, 0.9)',
-                              border: '1px solid rgba(148, 163, 184, 0.3)',
-                              borderRadius: '6px',
-                              padding: '6px 10px',
-                              color: '#f8fafc',
-                              fontSize: '0.8rem'
-                            }}
-                          />
-                          <input
-                            type="text"
-                            placeholder="Display Name (Optional)"
-                            value={customGoogleName}
-                            onChange={(e) => setCustomGoogleName(e.target.value)}
-                            style={{
-                              width: '160px',
-                              background: 'rgba(15, 23, 42, 0.9)',
-                              border: '1px solid rgba(148, 163, 184, 0.3)',
-                              borderRadius: '6px',
-                              padding: '6px 10px',
-                              color: '#f8fafc',
-                              fontSize: '0.8rem'
-                            }}
-                          />
-                          <button
-                            type="submit"
-                            disabled={isGoogleProcessing}
-                            style={{
-                              background: '#38bdf8',
-                              color: '#020617',
-                              border: 'none',
-                              borderRadius: '6px',
-                              padding: '6px 14px',
-                              fontSize: '0.78rem',
-                              fontWeight: 700,
-                              cursor: 'pointer'
-                            }}
-                          >
-                            {isGoogleProcessing ? 'Signing in…' : 'Sign In'}
-                          </button>
-                        </div>
-
-                        {/* Quick Demo Pre-sets */}
-                        <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
-                          <span style={{ fontSize: '0.68rem', color: '#64748b' }}>Quick presets:</span>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setCustomGoogleEmail('alex.clouddefender@gmail.com')
-                              setCustomGoogleName('Alex Defender')
-                            }}
-                            style={{ background: 'none', border: '1px solid rgba(148, 163, 184, 0.2)', color: '#94a3b8', fontSize: '0.68rem', padding: '2px 6px', borderRadius: '4px', cursor: 'pointer' }}
-                          >
-                            alex.clouddefender@gmail.com
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setCustomGoogleEmail('nasir.secops@gmail.com')
-                              setCustomGoogleName('Nasir Engineer')
-                            }}
-                            style={{ background: 'none', border: '1px solid rgba(148, 163, 184, 0.2)', color: '#94a3b8', fontSize: '0.68rem', padding: '2px 6px', borderRadius: '4px', cursor: 'pointer' }}
-                          >
-                            nasir.secops@gmail.com
-                          </button>
-                        </div>
-                      </form>
-                    )}
-
-                    {googleAuthError && (
-                      <div style={{ marginTop: '10px', color: '#f87171', fontSize: '0.76rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <AlertCircle size={14} />
-                        <span>{googleAuthError}</span>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* ── SUB-METHOD 2: UNIQUE USER ID AUTHENTICATION ── */}
-                {loginMethod === 'userid' && (
-                  <div style={{
-                    background: 'rgba(2, 6, 23, 0.65)',
-                    border: '1px solid rgba(56, 189, 248, 0.25)',
-                    borderRadius: '10px',
-                    padding: '16px'
-                  }}>
-                    <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#38bdf8', marginBottom: '4px' }}>
-                      Sign In with Existing Unique User ID
-                    </div>
-                    <p style={{ fontSize: '0.76rem', color: '#94a3b8', margin: '0 0 12px' }}>
-                      Enter your unique Student ID to load all your isolated challenges, notes, and XP across devices.
-                    </p>
-
-                    <form onSubmit={handleLoginSubmit} style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                      <input
-                        type="text"
-                        placeholder="e.g. SEC-USER-1024 or alex_sec..."
-                        value={loginInputId}
-                        onChange={(e) => {
-                          setLoginInputId(e.target.value)
-                          setLoginError(null)
-                          setSuggestRegisterId(null)
-                        }}
-                        style={{
-                          flex: 1,
-                          minWidth: '220px',
-                          background: 'rgba(15, 23, 42, 0.9)',
-                          border: loginError ? '1px solid #f43f5e' : '1px solid rgba(148, 163, 184, 0.3)',
-                          borderRadius: '6px',
-                          padding: '8px 12px',
-                          color: '#f8fafc',
-                          fontSize: '0.82rem',
-                          fontFamily: "'DM Mono', monospace"
-                        }}
-                      />
-                      <button
-                        type="submit"
-                        style={{
-                          background: '#0284c7',
-                          color: '#ffffff',
-                          border: 'none',
-                          borderRadius: '6px',
-                          padding: '8px 16px',
-                          fontSize: '0.8rem',
-                          fontWeight: 700,
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '6px'
-                        }}
-                      >
-                        <LogIn size={14} />
-                        <span>Sign In</span>
-                      </button>
-                    </form>
-
-                    {/* ID Not Found with 1-Click Registration Offer */}
-                    {loginError && (
-                      <div style={{ marginTop: '10px', color: '#f87171', fontSize: '0.76rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                          <AlertCircle size={14} />
-                          <span>{loginError}</span>
-                        </div>
-                        {suggestRegisterId && (
-                          <button
-                            type="button"
-                            onClick={handleClaimSuggestedId}
-                            style={{
-                              background: '#10b981',
-                              color: '#020617',
-                              border: 'none',
-                              borderRadius: '4px',
-                              padding: '3px 8px',
-                              fontSize: '0.72rem',
-                              fontWeight: 800,
-                              cursor: 'pointer'
-                            }}
-                          >
-                            ⚡ Claim & Register "{suggestRegisterId}"
-                          </button>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Quick Profile Chips from Local Storage */}
-                    {allProfiles.length > 0 && (
-                      <div style={{ marginTop: '14px', paddingTop: '10px', borderTop: '1px solid rgba(148, 163, 184, 0.1)' }}>
-                        <span style={{ fontSize: '0.68rem', color: '#64748b', marginRight: '6px' }}>Saved on this browser:</span>
-                        <div style={{ display: 'inline-flex', gap: '6px', flexWrap: 'wrap', marginTop: '4px' }}>
-                          {allProfiles.map(p => (
-                            <button
-                              key={p.id}
-                              type="button"
-                              onClick={() => {
-                                switchUserProfile(p.id)
-                                setActionSuccess(`Switched to User ID: ${p.id}`)
-                                setTimeout(() => setActionSuccess(null), 3000)
-                              }}
-                              style={{
-                                background: activeProfile?.id === p.id && !isCurrentGuest ? 'rgba(16, 185, 129, 0.2)' : 'rgba(15, 23, 42, 0.8)',
-                                border: activeProfile?.id === p.id && !isCurrentGuest ? '1px solid #10b981' : '1px solid rgba(148, 163, 184, 0.2)',
-                                color: activeProfile?.id === p.id && !isCurrentGuest ? '#34d399' : '#cbd5e1',
-                                borderRadius: '4px',
-                                padding: '3px 8px',
-                                fontSize: '0.72rem',
-                                fontFamily: "'DM Mono', monospace",
-                                cursor: 'pointer'
-                              }}
-                            >
-                              {p.id} ({p.name})
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* ── SUB-METHOD 3: CLOUD EMAIL & PASSWORD / MAGIC LINK ── */}
-                {loginMethod === 'email' && (
-                  <div style={{
-                    background: 'rgba(2, 6, 23, 0.65)',
-                    border: '1px solid rgba(16, 185, 129, 0.25)',
-                    borderRadius: '10px',
-                    padding: '16px'
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-                      <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#34d399' }}>
-                        {isEmailSignUp ? 'Create Cloud Account' : 'Sign In with Cloud Email & Password'}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setIsEmailSignUp(prev => !prev)
-                          setEmailError(null)
-                        }}
-                        style={{
-                          background: 'none',
-                          border: 'none',
-                          color: '#38bdf8',
-                          fontSize: '0.72rem',
-                          fontWeight: 700,
-                          cursor: 'pointer',
-                          textDecoration: 'underline'
-                        }}
-                      >
-                        {isEmailSignUp ? 'Already have an account? Sign In' : 'Need an account? Register'}
-                      </button>
-                    </div>
-
-                    <form onSubmit={handleEmailSubmit}>
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '8px', marginBottom: '10px' }}>
-                        <input
-                          type="email"
-                          placeholder="learner@company.com"
-                          value={emailInput}
-                          onChange={(e) => setEmailInput(e.target.value)}
-                          required
-                          style={{
-                            background: 'rgba(15, 23, 42, 0.9)',
-                            border: '1px solid rgba(148, 163, 184, 0.3)',
-                            borderRadius: '6px',
-                            padding: '8px 10px',
-                            color: '#f8fafc',
-                            fontSize: '0.8rem'
-                          }}
-                        />
-                        <input
-                          type="password"
-                          placeholder="Password (minimum 6 characters)"
-                          value={passwordInput}
-                          onChange={(e) => setPasswordInput(e.target.value)}
-                          required
-                          minLength={6}
-                          style={{
-                            background: 'rgba(15, 23, 42, 0.9)',
-                            border: '1px solid rgba(148, 163, 184, 0.3)',
-                            borderRadius: '6px',
-                            padding: '8px 10px',
-                            color: '#f8fafc',
-                            fontSize: '0.8rem'
-                          }}
-                        />
-                        {isEmailSignUp && (
-                          <input
-                            type="text"
-                            placeholder="Full Name / Display Name"
-                            value={displayNameInput}
-                            onChange={(e) => setDisplayNameInput(e.target.value)}
-                            style={{
-                              gridColumn: '1 / -1',
-                              background: 'rgba(15, 23, 42, 0.9)',
-                              border: '1px solid rgba(148, 163, 184, 0.3)',
-                              borderRadius: '6px',
-                              padding: '8px 10px',
-                              color: '#f8fafc',
-                              fontSize: '0.8rem'
-                            }}
-                          />
-                        )}
-                      </div>
-
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', flexWrap: 'wrap' }}>
-                        <button
-                          type="submit"
-                          disabled={isEmailLoading}
-                          style={{
-                            background: '#10b981',
-                            color: '#020617',
-                            border: 'none',
-                            borderRadius: '6px',
-                            padding: '8px 16px',
-                            fontSize: '0.8rem',
-                            fontWeight: 700,
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '6px'
-                          }}
-                        >
-                          {isEmailLoading ? <RefreshCw size={13} className="spin-icon" /> : <LogIn size={13} />}
-                          <span>{isEmailLoading ? 'Processing…' : (isEmailSignUp ? 'Register Account' : 'Sign In with Email')}</span>
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={handleMagicLinkSubmit}
-                          disabled={isEmailLoading || !emailInput.trim()}
-                          style={{
-                            background: 'transparent',
-                            border: '1px solid rgba(56, 189, 248, 0.35)',
-                            color: '#38bdf8',
-                            borderRadius: '6px',
-                            padding: '7px 12px',
-                            fontSize: '0.74rem',
-                            fontWeight: 600,
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '5px'
-                          }}
-                          title="Receive a passwordless sign-in link via email"
-                        >
-                          <Send size={12} />
-                          <span>Send Passwordless Magic Link</span>
-                        </button>
-                      </div>
-                    </form>
-
-                    {emailError && (
-                      <div style={{ marginTop: '10px', color: '#f87171', fontSize: '0.76rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <AlertCircle size={14} />
-                        <span>{emailError}</span>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {/* ── ACTION ROW: REGISTER NEW UNIQUE ID DRAWER TOGGLE ── */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px', flexWrap: 'wrap' }}>
-                <button
-                  type="button"
-                  onClick={() => setShowRegisterForm(prev => !prev)}
-                  className="btn-add-profile"
-                  style={{
-                    background: showRegisterForm ? 'rgba(56, 189, 248, 0.15)' : 'linear-gradient(135deg, #0284c7, #0369a1)',
-                    color: '#ffffff',
-                    border: '1px solid rgba(56, 189, 248, 0.4)',
-                    padding: '8px 16px',
-                    borderRadius: '8px',
-                    fontSize: '0.82rem',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px'
-                  }}
-                >
-                  <UserPlus size={14} />
-                  <span>{showRegisterForm ? 'Hide Registration Form' : 'Register New Unique User ID'}</span>
-                </button>
-              </div>
-
-              {/* Registration Form Drawer */}
-              {showRegisterForm && (
-                <form className="create-profile-form" onSubmit={handleRegisterProfile} style={{ marginBottom: '20px' }}>
-                  <div className="form-title" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <span>Register Your Unique User ID</span>
-                    <button
-                      type="button"
-                      onClick={handleAutoGenerateId}
-                      style={{
-                        background: 'rgba(56, 189, 248, 0.12)',
-                        border: '1px solid rgba(56, 189, 248, 0.3)',
-                        color: '#38bdf8',
-                        padding: '3px 8px',
-                        borderRadius: '6px',
-                        fontSize: '0.72rem',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '4px'
-                      }}
-                    >
-                      <Zap size={12} />
-                      <span>Generate Unique ID</span>
-                    </button>
-                  </div>
-
-                  <div className="form-grid">
-                    {/* User ID Field */}
-                    <div className="form-group" style={{ gridColumn: 'span 2' }}>
-                      <label style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <span>Unique User ID (Mandatory — no two users can share this ID)</span>
-                        {idAvailability && (
-                          <span style={{ color: idAvailability.available ? '#10b981' : '#f43f5e', fontWeight: 600, fontSize: '0.72rem' }}>
-                            {idAvailability.message}
-                          </span>
-                        )}
-                      </label>
-                      <input 
-                        type="text" 
-                        placeholder="e.g. SEC-USER-7492, alex_cloud, or nasir_sec"
-                        value={newUserId}
-                        onChange={(e) => setNewUserId(e.target.value)}
-                        required
-                        autoFocus
-                        style={{
-                          fontFamily: "'DM Mono', monospace",
-                          borderColor: idAvailability ? (idAvailability.available ? '#10b981' : '#f43f5e') : undefined
-                        }}
-                      />
-                    </div>
-
-                    <div className="form-group">
-                      <label>Candidate / Student Display Name</label>
-                      <input 
-                        type="text" 
-                        placeholder="e.g. Nasir or Alex Carter"
-                        value={newUserName}
-                        onChange={(e) => setNewUserName(e.target.value)}
-                        required
-                      />
-                    </div>
-
-                    <div className="form-group">
-                      <label>Target Career Role</label>
-                      <select 
-                        value={newUserRole} 
-                        onChange={(e) => setNewUserRole(e.target.value)}
-                      >
-                        <option value="Cloud Security Engineer">Cloud Security Engineer</option>
-                        <option value="SecOps / Incident Responder">SecOps / Incident Responder</option>
-                        <option value="DevSecOps Specialist">DevSecOps Specialist</option>
-                        <option value="Cloud Security Architect">Cloud Security Architect</option>
-                      </select>
-                    </div>
-
-                    {/* Checkbox to migrate guest progress */}
-                    <div className="form-group" style={{ gridColumn: 'span 2' }}>
-                      <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.8rem', color: '#cbd5e1' }}>
-                        <input
-                          type="checkbox"
-                          checked={migrateGuestData}
-                          onChange={(e) => setMigrateGuestData(e.target.checked)}
-                          style={{ width: '16px', height: '16px', cursor: 'pointer' }}
-                        />
-                        <span>
-                          <strong>Migrate existing session progress</strong> into this new User ID (preserves all solved rooms, labs, notes, and score).
-                        </span>
-                      </label>
-                    </div>
-                  </div>
-
-                  <div className="form-actions">
-                    <button 
-                      type="button" 
-                      className="btn-form-cancel"
-                      onClick={() => setShowRegisterForm(false)}
-                    >
-                      Cancel
-                    </button>
-                    <button 
-                      type="submit" 
-                      className="btn-form-submit"
-                      disabled={idAvailability && !idAvailability.available}
-                    >
-                      <UserCheck size={14} />
-                      <span>Register Unique ID & Start Auto-Sync</span>
-                    </button>
-                  </div>
-                </form>
-              )}
-
-              {/* Registered Profiles List */}
-              <div className="profiles-header-row" style={{ marginTop: '20px' }}>
-                <span className="section-label">REGISTERED USER PROFILES ON THIS DEVICE ({allProfiles.length})</span>
-              </div>
-
-              {allProfiles.length === 0 ? (
+        {/* Modal Scrollable Body */}
+        <div style={{ padding: '20px 24px', maxHeight: '72vh', overflowY: 'auto' }}>
+          
+          {/* 1. CURRENT IDENTITY SPOTLIGHT */}
+          <div style={{
+            background: isCurrentGuest 
+              ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(15, 23, 42, 0.8) 100%)'
+              : 'linear-gradient(135deg, rgba(56, 189, 248, 0.08) 0%, rgba(15, 23, 42, 0.85) 100%)',
+            border: isCurrentGuest ? '1px solid rgba(245, 158, 11, 0.35)' : '1px solid rgba(56, 189, 248, 0.35)',
+            borderRadius: '14px',
+            padding: '18px 20px',
+            marginBottom: '20px'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '14px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
                 <div style={{
-                  padding: '24px',
-                  background: 'rgba(15, 23, 42, 0.4)',
-                  border: '1px dashed rgba(148, 163, 184, 0.2)',
-                  borderRadius: '10px',
-                  textAlign: 'center',
-                  color: '#94a3b8',
-                  fontSize: '0.84rem'
+                  width: '46px',
+                  height: '46px',
+                  borderRadius: '12px',
+                  background: isCurrentGuest ? 'rgba(245, 158, 11, 0.2)' : 'rgba(56, 189, 248, 0.2)',
+                  border: isCurrentGuest ? '1px solid rgba(245, 158, 11, 0.4)' : '1px solid rgba(56, 189, 248, 0.4)',
+                  display: 'grid',
+                  placeItems: 'center',
+                  fontWeight: 800,
+                  fontSize: '1.2rem',
+                  color: isCurrentGuest ? '#fbbf24' : '#38bdf8',
+                  overflow: 'hidden'
                 }}>
-                  No registered User IDs found on this browser yet.
-                  <br />
-                  Sign in with <strong>Google OAuth</strong>, enter an existing <strong>User ID</strong>, or click <em>"Register New Unique User ID"</em> above.
-                </div>
-              ) : (
-                <div className="profiles-list">
-                  {allProfiles.map(p => {
-                    const isActive = activeProfile.id === p.id && !isCurrentGuest
-
-                    return (
-                      <div 
-                        key={p.id} 
-                        className={`profile-card ${isActive ? 'is-active' : ''}`}
-                      >
-                        <div className="profile-card-left">
-                          <div 
-                            className="profile-avatar"
-                            style={{ background: p.avatarColor || '#38bdf8' }}
-                          >
-                            {p.avatarUrl ? (
-                              <img src={p.avatarUrl} alt={p.name} style={{ width: '100%', height: '100%', borderRadius: '50%' }} />
-                            ) : (
-                              p.name.charAt(0).toUpperCase()
-                            )}
-                          </div>
-                          <div className="profile-info">
-                            <div className="profile-name-row">
-                              {editingProfileId === p.id ? (
-                                <input
-                                  type="text"
-                                  className="edit-name-input"
-                                  value={editName}
-                                  onChange={(e) => setEditName(e.target.value)}
-                                  onBlur={() => {
-                                    if (editName.trim()) {
-                                      updateUserProfile(p.id, { name: editName.trim() })
-                                    }
-                                    setEditingProfileId(null)
-                                  }}
-                                  onKeyDown={(e) => {
-                                    if (e.key === 'Enter') {
-                                      if (editName.trim()) {
-                                        updateUserProfile(p.id, { name: editName.trim() })
-                                      }
-                                      setEditingProfileId(null)
-                                    }
-                                  }}
-                                  autoFocus
-                                />
-                              ) : (
-                                <>
-                                  <span className="profile-name">{p.name}</span>
-                                  <span style={{ fontSize: '0.7rem', color: '#38bdf8', fontFamily: "'DM Mono', monospace", background: 'rgba(56,189,248,0.1)', padding: '1px 6px', borderRadius: '4px' }}>
-                                    ID: {p.id}
-                                  </span>
-                                  {isActive && (
-                                    <span className="active-badge">
-                                      <CheckCircle2 size={12} /> Active & Synced
-                                    </span>
-                                  )}
-                                </>
-                              )}
-                            </div>
-                            <div className="profile-role-row">
-                              <span>{p.role}</span>
-                              <span className="dot-sep">•</span>
-                              <span>Created {new Date(p.createdAt).toLocaleDateString()}</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="profile-card-actions">
-                          {!isActive && (
-                            <button
-                              type="button"
-                              className="btn-profile-switch"
-                              onClick={() => switchUserProfile(p.id)}
-                              title="Switch to this User ID"
-                            >
-                              <span>Switch to ID</span>
-                              <ArrowRight size={13} />
-                            </button>
-                          )}
-
-                          <button
-                            type="button"
-                            className="btn-profile-edit"
-                            onClick={() => {
-                              setEditingProfileId(p.id)
-                              setEditName(p.name)
-                            }}
-                            title="Edit Name"
-                          >
-                            <Edit2 size={13} />
-                          </button>
-
-                          <button
-                            type="button"
-                            className="btn-profile-delete"
-                            onClick={() => {
-                              if (window.confirm(`Delete User ID "${p.id}" (${p.name}) and all its isolated progress?`)) {
-                                deleteUserProfile(p.id)
-                              }
-                            }}
-                            title="Delete Profile"
-                          >
-                            <Trash2 size={13} />
-                          </button>
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* TAB 2: EXPORT & BACKUP */}
-          {activeTab === 'backup' && (
-            <div className="user-sync-section">
-              <span className="section-label">CROSS-DEVICE DATA INTEGRITY & AUDIT PACKS</span>
-              
-              <div className="backup-action-grid">
-                <div className="backup-card">
-                  <div className="backup-card-head">
-                    <Download size={18} className="text-cyan" />
-                    <h4>Export Profile Backup (JSON)</h4>
-                  </div>
-                  <p>
-                    Downloads an integrity-checked, HMAC-sealed JSON package containing your User ID ({activeProfile.id}), 
-                    all verified SOPs, exam flashcard history, in-lab notes, and compliance ratings.
-                  </p>
-                  <button 
-                    type="button"
-                    className="btn-backup-action"
-                    onClick={exportUserData}
-                  >
-                    <Download size={14} />
-                    <span>Download {activeProfile.id} Backup</span>
-                  </button>
-                </div>
-
-                <div className="backup-card">
-                  <div className="backup-card-head">
-                    <Upload size={18} className="text-emerald" />
-                    <h4>Import Profile Backup</h4>
-                  </div>
-                  <p>
-                    Restore a previously exported SeCloudive audit backup file into this browser. 
-                    Restored accounts will be isolated under their original User ID.
-                  </p>
-                  <input 
-                    type="file" 
-                    ref={fileInputRef} 
-                    style={{ display: 'none' }} 
-                    accept=".json"
-                    onChange={handleFileUpload}
-                  />
-                  <button 
-                    type="button"
-                    className="btn-backup-action btn-upload"
-                    onClick={() => fileInputRef.current?.click()}
-                  >
-                    <Upload size={14} />
-                    <span>Select .JSON Backup File</span>
-                  </button>
-
-                  {importStatus && (
-                    <div className={`status-pill ${importStatus.type}`}>
-                      {importStatus.text}
-                    </div>
+                  {activeProfile?.avatarUrl ? (
+                    <img src={activeProfile.avatarUrl} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  ) : (
+                    isCurrentGuest ? '?' : (activeProfile.name?.charAt(0)?.toUpperCase() || 'U')
                   )}
                 </div>
-              </div>
-            </div>
-          )}
 
-          {/* TAB 3: CLOUD SYNC TOKEN */}
-          {activeTab === 'token' && (
-            <div className="user-sync-section">
-              <span className="section-label">PORTABLE SYNC TOKEN (CROSS-BROWSER INSTANT RESTORE)</span>
-
-              <div className="token-instructions">
-                A portable sync token allows you to transfer your User ID and progress across private browsing sessions or separate workstations with a single copy-paste string.
-              </div>
-
-              {/* Generate Token Box */}
-              <div className="token-box">
-                <div className="token-box-header">
-                  <span className="token-box-title">Generate Sync Token for: <strong>{activeProfile.id}</strong></span>
-                  <button 
-                    type="button"
-                    className="btn-gen-token"
-                    onClick={handleGenerateToken}
-                  >
-                    <RefreshCw size={13} />
-                    <span>Generate Token</span>
-                  </button>
-                </div>
-
-                {generatedToken && (
-                  <div className="token-display-wrap">
-                    <textarea 
-                      readOnly 
-                      className="token-textarea"
-                      value={generatedToken}
-                    />
-                    <button 
-                      type="button"
-                      className="btn-copy-token"
-                      onClick={handleCopyToken}
-                    >
-                      {tokenCopied ? <Check size={14} className="text-emerald" /> : <Copy size={14} />}
-                      <span>{tokenCopied ? 'Copied' : 'Copy Token'}</span>
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              {/* Restore Token Box */}
-              <div className="token-box">
-                <div className="token-box-header">
-                  <span className="token-box-title">Restore Progress from Sync Token</span>
-                </div>
-                <div className="token-restore-row">
-                  <input 
-                    type="text" 
-                    placeholder="Paste Base64 sync token here..."
-                    className="token-input"
-                    value={inputToken}
-                    onChange={(e) => setInputToken(e.target.value)}
-                  />
-                  <button 
-                    type="button"
-                    className="btn-restore-token"
-                    onClick={handleRestoreToken}
-                  >
-                    <ArrowRight size={14} />
-                    <span>Restore</span>
-                  </button>
-                </div>
-
-                {tokenStatusMessage && (
-                  <div className={`status-pill ${tokenStatusMessage.type}`}>
-                    {tokenStatusMessage.text}
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* TAB 4: CLOUD SYNC & DEVICES */}
-          {activeTab === 'cloud' && (
-            <div className="user-sync-section">
-              {/* Connection Status Hero */}
-              <div style={{
-                background: isSupabaseConfigured
-                  ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(15, 23, 42, 0.9))'
-                  : 'linear-gradient(135deg, rgba(56, 189, 248, 0.12), rgba(15, 23, 42, 0.9))',
-                border: isSupabaseConfigured
-                  ? '1px solid rgba(16, 185, 129, 0.4)'
-                  : '1px solid rgba(56, 189, 248, 0.35)',
-                borderRadius: '14px',
-                padding: '22px 24px',
-                marginBottom: '20px'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                    <div style={{
-                      background: isSupabaseConfigured ? 'rgba(16, 185, 129, 0.2)' : 'rgba(56, 189, 248, 0.18)',
-                      border: isSupabaseConfigured ? '1px solid rgba(16, 185, 129, 0.4)' : '1px solid rgba(56, 189, 248, 0.35)',
-                      borderRadius: '12px',
-                      padding: '12px',
-                      color: isSupabaseConfigured ? '#34d399' : '#38bdf8'
-                    }}>
-                      <Cloud size={28} />
-                    </div>
-                    <div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span style={{
-                          background: isSupabaseConfigured ? '#10b981' : '#0284c7',
-                          color: '#ffffff',
-                          padding: '2px 8px',
-                          borderRadius: '6px',
-                          fontSize: '11px',
-                          fontWeight: 800,
-                          textTransform: 'uppercase',
-                          letterSpacing: '0.5px'
-                        }}>
-                          {isSupabaseConfigured ? 'Cloud Sync Active' : 'Local Secure Sandbox'}
-                        </span>
-                        <span style={{ fontSize: '12px', color: '#94a3b8' }}>
-                          Last Synced: <strong style={{ color: '#38bdf8' }}>{lastManualSyncTime || autoSaveState.lastSaved || 'Just now'}</strong>
-                        </span>
-                      </div>
-                      <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#f8fafc', margin: '4px 0' }}>
-                        {isSupabaseConfigured ? 'Encrypted Multi-Device Synchronization' : 'Client-Side Isolated Storage Active'}
-                      </h3>
-                      <p style={{ color: '#94a3b8', fontSize: '12.5px', margin: 0 }}>
-                        {isSupabaseConfigured
-                          ? 'Your challenges, lab notes, badges, and XP ledger are continuously synchronized with zero-trust data isolation.'
-                          : 'All progress is safely secured in your browser sandbox. Sign in with Google or a Student ID to enable seamless cross-device synchronization.'}
-                      </p>
-                    </div>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={handleTriggerManualSync}
-                    disabled={isManualSyncing}
-                    style={{
-                      background: isSupabaseConfigured ? 'rgba(16, 185, 129, 0.18)' : 'rgba(56, 189, 248, 0.15)',
-                      border: isSupabaseConfigured ? '1px solid rgba(16, 185, 129, 0.45)' : '1px solid rgba(56, 189, 248, 0.4)',
-                      color: isSupabaseConfigured ? '#34d399' : '#38bdf8',
-                      padding: '10px 18px',
-                      borderRadius: '8px',
-                      fontWeight: 700,
-                      fontSize: '13px',
-                      cursor: 'pointer',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '8px',
-                      transition: 'all 0.2s ease'
-                    }}
-                  >
-                    <RefreshCw size={15} className={isManualSyncing ? 'spin-icon' : ''} />
-                    <span>{isManualSyncing ? 'Synchronizing…' : 'Sync Now'}</span>
-                  </button>
-                </div>
-
-                {cloudSyncStatus?.message && (
-                  <div style={{
-                    marginTop: '16px',
-                    padding: '10px 14px',
-                    borderRadius: '8px',
-                    background: cloudSyncStatus.ok ? 'rgba(16, 185, 129, 0.12)' : 'rgba(56, 189, 248, 0.1)',
-                    border: cloudSyncStatus.ok ? '1px solid rgba(16, 185, 129, 0.25)' : '1px solid rgba(56, 189, 248, 0.25)',
-                    color: cloudSyncStatus.ok ? '#6ee7b7' : '#93c5fd',
-                    fontSize: '12px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px'
-                  }}>
-                    <CheckCircle2 size={16} />
-                    <span>{cloudSyncStatus.message}</span>
-                  </div>
-                )}
-              </div>
-
-              {/* Zero-Trust Security & Data Isolation Architecture */}
-              <div style={{
-                background: 'rgba(15, 23, 42, 0.65)',
-                border: '1px solid rgba(148, 163, 184, 0.15)',
-                borderRadius: '12px',
-                padding: '20px',
-                marginBottom: '20px'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px', flexWrap: 'wrap', gap: '8px' }}>
+                <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <ShieldCheck size={18} style={{ color: '#38bdf8' }} />
-                    <h4 style={{ fontSize: '15px', fontWeight: 800, color: '#f8fafc', margin: 0 }}>
-                      Zero-Trust Data Protection Architecture
-                    </h4>
-                  </div>
-                  <span style={{ fontSize: '11px', color: '#10b981', background: 'rgba(16, 185, 129, 0.15)', padding: '2px 8px', borderRadius: '4px', fontWeight: 700 }}>
-                    100% PRIVATE & ISOLATED
-                  </span>
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px' }}>
-                  <div style={{ background: 'rgba(2, 6, 23, 0.6)', padding: '14px', borderRadius: '10px', border: '1px solid rgba(148, 163, 184, 0.1)' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#38bdf8', fontSize: '12px', fontWeight: 800 }}>
-                      <Lock size={14} />
-                      <span>PER-USER ISOLATION</span>
-                    </div>
-                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#f8fafc', marginTop: '4px' }}>Strict Sandbox Boundaries</div>
-                    <p style={{ fontSize: '12px', color: '#94a3b8', margin: '6px 0 0', lineHeight: 1.45 }}>
-                      Each Student ID has dedicated isolated storage. No two learners can ever access, overwrite, or leak each other's lab state or notes.
-                    </p>
+                    <span style={{ fontSize: '15px', fontWeight: 800, color: '#f8fafc' }}>
+                      {isCurrentGuest ? 'Guest Learner' : (activeProfile.name || 'Cloud Security Engineer')}
+                    </span>
+                    <span style={{
+                      fontSize: '10px',
+                      fontWeight: 800,
+                      padding: '2px 7px',
+                      borderRadius: '4px',
+                      background: isCurrentGuest ? 'rgba(245, 158, 11, 0.2)' : 'rgba(16, 185, 129, 0.2)',
+                      color: isCurrentGuest ? '#fbbf24' : '#34d399',
+                      border: isCurrentGuest ? '1px solid rgba(245, 158, 11, 0.4)' : '1px solid rgba(16, 185, 129, 0.4)'
+                    }}>
+                      {isCurrentGuest ? 'LOCAL SANDBOX' : 'SOVEREIGN ID'}
+                    </span>
                   </div>
 
-                  <div style={{ background: 'rgba(2, 6, 23, 0.6)', padding: '14px', borderRadius: '10px', border: '1px solid rgba(148, 163, 184, 0.1)' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#38bdf8', fontSize: '12px', fontWeight: 800 }}>
-                      <Zap size={14} />
-                      <span>INSTANT DELTA SAVE</span>
-                    </div>
-                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#f8fafc', marginTop: '4px' }}>Continuous Auto-Save</div>
-                    <p style={{ fontSize: '12px', color: '#94a3b8', margin: '6px 0 0', lineHeight: 1.45 }}>
-                      Every quiz answered, terminal command executed, and scratchpad note typed is automatically committed in real-time.
-                    </p>
-                  </div>
-
-                  <div style={{ background: 'rgba(2, 6, 23, 0.6)', padding: '14px', borderRadius: '10px', border: '1px solid rgba(148, 163, 184, 0.1)' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#38bdf8', fontSize: '12px', fontWeight: 800 }}>
-                      <Globe size={14} />
-                      <span>MULTI-DEVICE MOBILITY</span>
-                    </div>
-                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#f8fafc', marginTop: '4px' }}>Seamless Roaming</div>
-                    <p style={{ fontSize: '12px', color: '#94a3b8', margin: '6px 0 0', lineHeight: 1.45 }}>
-                      Switch from workstation to laptop instantly. Authenticate with Google or your Student ID to resume right where you left off.
-                    </p>
-                  </div>
-
-                  <div style={{ background: 'rgba(2, 6, 23, 0.6)', padding: '14px', borderRadius: '10px', border: '1px solid rgba(148, 163, 184, 0.1)' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#38bdf8', fontSize: '12px', fontWeight: 800 }}>
-                      <Fingerprint size={14} />
-                      <span>CRYPTOGRAPHIC INTEGRITY</span>
-                    </div>
-                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#f8fafc', marginTop: '4px' }}>Verifiable Credentials</div>
-                    <p style={{ fontSize: '12px', color: '#94a3b8', margin: '6px 0 0', lineHeight: 1.45 }}>
-                      Earned certifications and XP milestones are validated with cryptographic HMAC seals for recruiter-verifiable proof of skill.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Active Session & Storage Telemetry Card */}
-              <div style={{
-                background: 'rgba(15, 23, 42, 0.65)',
-                border: '1px solid rgba(148, 163, 184, 0.15)',
-                borderRadius: '12px',
-                padding: '20px',
-                marginBottom: '20px'
-              }}>
-                <h4 style={{ fontSize: '14px', fontWeight: 800, color: '#f8fafc', margin: '0 0 14px' }}>
-                  💻 Current Device & Session Overview:
-                </h4>
-
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: '12px' }}>
-                  <div style={{ background: 'rgba(2, 6, 23, 0.5)', padding: '12px', borderRadius: '8px', border: '1px solid rgba(148, 163, 184, 0.08)' }}>
-                    <div style={{ fontSize: '11px', color: '#94a3b8' }}>Active Student ID:</div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px' }}>
-                      <span style={{ fontFamily: 'monospace', fontWeight: 700, color: '#38bdf8', fontSize: '13px' }}>
-                        {activeProfile.id}
-                      </span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px', fontSize: '12px', color: '#94a3b8' }}>
+                    <span>Student ID:</span>
+                    <strong style={{ fontFamily: 'monospace', color: '#38bdf8' }}>{activeProfile.id}</strong>
+                    {!isCurrentGuest && (
                       <button
                         type="button"
-                        onClick={() => {
-                          if (activeProfile?.id) {
-                            navigator.clipboard.writeText(activeProfile.id)
-                            setCopiedIdNotice(true)
-                            setTimeout(() => setCopiedIdNotice(false), 2000)
-                          }
-                        }}
+                        onClick={handleCopyId}
                         style={{
                           background: 'none',
                           border: 'none',
                           color: copiedIdNotice ? '#10b981' : '#94a3b8',
                           cursor: 'pointer',
-                          padding: '2px'
+                          padding: '1px 4px',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '3px',
+                          fontSize: '11px'
                         }}
-                        title="Copy Student ID"
                       >
-                        {copiedIdNotice ? <Check size={13} /> : <Copy size={13} />}
+                        {copiedIdNotice ? <Check size={11} /> : <Copy size={11} />}
+                        <span>{copiedIdNotice ? 'Copied' : 'Copy'}</span>
                       </button>
-                    </div>
-                  </div>
-
-                  <div style={{ background: 'rgba(2, 6, 23, 0.5)', padding: '12px', borderRadius: '8px', border: '1px solid rgba(148, 163, 184, 0.08)' }}>
-                    <div style={{ fontSize: '11px', color: '#94a3b8' }}>Session Mode:</div>
-                    <div style={{ fontWeight: 700, color: isCurrentGuest ? '#fbbf24' : '#34d399', fontSize: '13px', marginTop: '4px' }}>
-                      {isCurrentGuest ? 'Guest Sandbox' : 'Authenticated Learner'}
-                    </div>
-                  </div>
-
-                  <div style={{ background: 'rgba(2, 6, 23, 0.5)', padding: '12px', borderRadius: '8px', border: '1px solid rgba(148, 163, 184, 0.08)' }}>
-                    <div style={{ fontSize: '11px', color: '#94a3b8' }}>Progress Footprint:</div>
-                    <div style={{ fontWeight: 700, color: '#f8fafc', fontSize: '13px', marginTop: '4px' }}>
-                      {masterTotalXP.toLocaleString()} XP • {completedMasterActivities}/{totalMasterActivities} Completed
-                    </div>
-                  </div>
-
-                  <div style={{ background: 'rgba(2, 6, 23, 0.5)', padding: '12px', borderRadius: '8px', border: '1px solid rgba(148, 163, 184, 0.08)' }}>
-                    <div style={{ fontSize: '11px', color: '#94a3b8' }}>Storage Protection:</div>
-                    <div style={{ fontWeight: 700, color: '#38bdf8', fontSize: '13px', marginTop: '4px' }}>
-                      AES-GCM Local + Cloud Partition
-                    </div>
+                    )}
                   </div>
                 </div>
               </div>
 
-              {/* Synchronized Platform Assets Matrix */}
+              {/* Quick Actions */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                {!isCurrentGuest && !hasPasskeyEnrolled && (
+                  <button
+                    type="button"
+                    onClick={handleEnrollPasskey}
+                    disabled={isPasskeyEnrolling}
+                    style={{
+                      background: 'rgba(56, 189, 248, 0.15)',
+                      border: '1px solid rgba(56, 189, 248, 0.4)',
+                      color: '#38bdf8',
+                      borderRadius: '8px',
+                      padding: '7px 12px',
+                      fontSize: '12px',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px'
+                    }}
+                  >
+                    <Fingerprint size={14} className={isPasskeyEnrolling ? 'animate-pulse' : ''} />
+                    <span>{isPasskeyEnrolling ? 'Enrolling…' : 'Enroll Passkey'}</span>
+                  </button>
+                )}
+
+                {hasPasskeyEnrolled && !isCurrentGuest && (
+                  <span style={{
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    color: '#34d399',
+                    background: 'rgba(16, 185, 129, 0.15)',
+                    border: '1px solid rgba(16, 185, 129, 0.3)',
+                    padding: '4px 10px',
+                    borderRadius: '6px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '5px'
+                  }}>
+                    <ShieldCheck size={13} />
+                    <span>Passkey Enrolled</span>
+                  </span>
+                )}
+
+                {!isCurrentGuest ? (
+                  <button
+                    type="button"
+                    onClick={handleSwitchToGuest}
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.05)',
+                      border: '1px solid rgba(255, 255, 255, 0.12)',
+                      color: '#cbd5e1',
+                      borderRadius: '8px',
+                      padding: '7px 12px',
+                      fontSize: '12px',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '5px'
+                    }}
+                  >
+                    <LogOut size={13} />
+                    <span>Switch to Guest</span>
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleInstantGenerateId}
+                    style={{
+                      background: '#10b981',
+                      border: 'none',
+                      color: '#020617',
+                      borderRadius: '8px',
+                      padding: '7px 14px',
+                      fontSize: '12px',
+                      fontWeight: 800,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '5px'
+                    }}
+                  >
+                    <Zap size={13} />
+                    <span>Claim Student ID</span>
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* 2. NEXT-GEN 2036 AUTHENTICATION GATEWAY */}
+          <div style={{
+            background: 'rgba(15, 23, 42, 0.6)',
+            border: '1px solid rgba(148, 163, 184, 0.15)',
+            borderRadius: '14px',
+            padding: '20px',
+            marginBottom: '20px'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', flexWrap: 'wrap', gap: '8px' }}>
+              <div>
+                <span style={{ fontSize: '11px', fontWeight: 800, color: '#38bdf8', letterSpacing: '0.8px', textTransform: 'uppercase' }}>
+                  2036 SOVEREIGN AUTHENTICATION
+                </span>
+                <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#f8fafc', margin: '2px 0 0' }}>
+                  Instant Sign In & Ambient Cloud Sync
+                </h3>
+              </div>
+
+              {/* Sub-selector pills */}
               <div style={{
-                background: 'rgba(15, 23, 42, 0.65)',
-                border: '1px solid rgba(148, 163, 184, 0.15)',
+                background: 'rgba(2, 6, 23, 0.8)',
+                padding: '3px',
+                borderRadius: '8px',
+                display: 'inline-flex',
+                gap: '3px',
+                border: '1px solid rgba(148, 163, 184, 0.12)'
+              }}>
+                <button
+                  type="button"
+                  onClick={() => { setActiveAuthTab('passkey'); setAuthError(null); }}
+                  style={{
+                    background: activeAuthTab === 'passkey' ? '#38bdf8' : 'transparent',
+                    color: activeAuthTab === 'passkey' ? '#020617' : '#94a3b8',
+                    border: 'none',
+                    borderRadius: '6px',
+                    padding: '5px 12px',
+                    fontSize: '11.5px',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '5px'
+                  }}
+                >
+                  <Fingerprint size={13} />
+                  <span>Passkey</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setActiveAuthTab('google'); setAuthError(null); }}
+                  style={{
+                    background: activeAuthTab === 'google' ? '#38bdf8' : 'transparent',
+                    color: activeAuthTab === 'google' ? '#020617' : '#94a3b8',
+                    border: 'none',
+                    borderRadius: '6px',
+                    padding: '5px 12px',
+                    fontSize: '11.5px',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '5px'
+                  }}
+                >
+                  <GoogleIcon size={12} />
+                  <span>Google</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setActiveAuthTab('studentid'); setAuthError(null); }}
+                  style={{
+                    background: activeAuthTab === 'studentid' ? '#38bdf8' : 'transparent',
+                    color: activeAuthTab === 'studentid' ? '#020617' : '#94a3b8',
+                    border: 'none',
+                    borderRadius: '6px',
+                    padding: '5px 12px',
+                    fontSize: '11.5px',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '5px'
+                  }}
+                >
+                  <Key size={12} />
+                  <span>Student ID</span>
+                </button>
+              </div>
+            </div>
+
+            {/* TAB CONTENT A: BIOMETRIC PASSKEY */}
+            {activeAuthTab === 'passkey' && (
+              <div style={{
+                background: 'rgba(2, 6, 23, 0.65)',
+                border: '1px solid rgba(56, 189, 248, 0.25)',
+                borderRadius: '12px',
+                padding: '20px',
+                textAlign: 'center'
+              }}>
+                <div style={{
+                  width: '56px',
+                  height: '56px',
+                  margin: '0 auto 12px',
+                  borderRadius: '16px',
+                  background: 'radial-gradient(circle, rgba(56, 189, 248, 0.25) 0%, rgba(14, 165, 233, 0.05) 100%)',
+                  border: '1px solid rgba(56, 189, 248, 0.4)',
+                  display: 'grid',
+                  placeItems: 'center',
+                  color: '#38bdf8',
+                  boxShadow: '0 0 24px rgba(56, 189, 248, 0.2)'
+                }}>
+                  <Fingerprint size={30} className={isProcessing ? 'animate-pulse' : ''} />
+                </div>
+
+                <h4 style={{ fontSize: '15px', fontWeight: 800, color: '#f8fafc', margin: '0 0 6px' }}>
+                  Hardware Biometric Passkey Unlock
+                </h4>
+                <p style={{ fontSize: '12px', color: '#94a3b8', maxWidth: '440px', margin: '0 auto 16px', lineHeight: 1.5 }}>
+                  Passwordless authentication anchored to your device's hardware enclave (Touch ID, Windows Hello, or FIDO2 Security Key). Instant login with ambient cloud synchronization.
+                </p>
+
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                  <button
+                    type="button"
+                    onClick={handlePasskeyAuthenticate}
+                    disabled={isProcessing}
+                    style={{
+                      background: 'linear-gradient(135deg, #0284c7 0%, #2563eb 100%)',
+                      border: 'none',
+                      borderRadius: '8px',
+                      color: '#ffffff',
+                      padding: '11px 22px',
+                      fontSize: '13px',
+                      fontWeight: 800,
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      boxShadow: '0 6px 20px rgba(2, 132, 199, 0.4)',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    <Lock size={15} />
+                    <span>{isProcessing ? 'Verifying Biometric Scan…' : 'Unlock with Windows Hello / Touch ID'}</span>
+                  </button>
+
+                  {!hasPasskeyEnrolled && !isCurrentGuest && (
+                    <button
+                      type="button"
+                      onClick={handleEnrollPasskey}
+                      disabled={isPasskeyEnrolling}
+                      style={{
+                        background: 'rgba(56, 189, 248, 0.1)',
+                        border: '1px solid rgba(56, 189, 248, 0.35)',
+                        color: '#38bdf8',
+                        borderRadius: '8px',
+                        padding: '11px 18px',
+                        fontSize: '13px',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px'
+                      }}
+                    >
+                      <Fingerprint size={15} />
+                      <span>Enroll this Device</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* TAB CONTENT B: GOOGLE SOVEREIGN ID */}
+            {activeAuthTab === 'google' && (
+              <div style={{
+                background: 'rgba(2, 6, 23, 0.65)',
+                border: '1px solid rgba(66, 133, 244, 0.25)',
                 borderRadius: '12px',
                 padding: '20px'
               }}>
-                <h4 style={{ fontSize: '14px', fontWeight: 800, color: '#f8fafc', margin: '0 0 12px' }}>
-                  🛡️ Protected Assets Synchronized Under Your Identity:
-                </h4>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '14px', marginBottom: '14px' }}>
+                  <div>
+                    <h4 style={{ fontSize: '14px', fontWeight: 800, color: '#f8fafc', margin: '0 0 4px' }}>
+                      Google Sovereign Cloud Identity
+                    </h4>
+                    <p style={{ fontSize: '12px', color: '#94a3b8', margin: 0 }}>
+                      1-to-1 deterministic mapping: your Google account permanently binds to your sovereign Student ID.
+                    </p>
+                  </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '10px', fontSize: '12px' }}>
-                  <div style={{ color: '#cbd5e1', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <CheckCircle2 size={13} style={{ color: '#10b981' }} />
-                    <span>Cloud Security Labs & Attack Scenarios</span>
-                  </div>
-                  <div style={{ color: '#cbd5e1', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <CheckCircle2 size={13} style={{ color: '#10b981' }} />
-                    <span>Master XP Ledger & Level Progression</span>
-                  </div>
-                  <div style={{ color: '#cbd5e1', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <CheckCircle2 size={13} style={{ color: '#10b981' }} />
-                    <span>Cryptographic Certificates & Dossiers</span>
-                  </div>
-                  <div style={{ color: '#cbd5e1', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <CheckCircle2 size={13} style={{ color: '#10b981' }} />
-                    <span>Custom Scratchpad Notes & Bookmarks</span>
-                  </div>
-                  <div style={{ color: '#cbd5e1', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <CheckCircle2 size={13} style={{ color: '#10b981' }} />
-                    <span>Sentinel AI Cyber Tutor Transcripts</span>
-                  </div>
-                  <div style={{ color: '#cbd5e1', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <CheckCircle2 size={13} style={{ color: '#10b981' }} />
-                    <span>Spaced-Repetition Review Flashcards</span>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <GoogleLogin
+                      onSuccess={handleGoogleSuccess}
+                      onError={() => setAuthError('Google sign-in popup was cancelled or blocked.')}
+                      useOneTap={false}
+                      theme="filled_black"
+                      shape="rectangular"
+                      size="large"
+                      text="signin_with"
+                    />
+
+                    <button
+                      type="button"
+                      onClick={() => setShowDirectGoogle(prev => !prev)}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: '#38bdf8',
+                        fontSize: '11px',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        textAlign: 'left',
+                        textDecoration: 'underline'
+                      }}
+                    >
+                      {showDirectGoogle ? 'Hide Direct Account Sign-In' : '⚡ Direct Google Email (No Popups / Private Browsing)'}
+                    </button>
                   </div>
                 </div>
 
-                <div style={{ marginTop: '16px', paddingTop: '14px', borderTop: '1px solid rgba(148, 163, 184, 0.1)', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab('backup')}
+                {showDirectGoogle && (
+                  <form onSubmit={handleDirectGoogleSubmit} style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid rgba(148, 163, 184, 0.12)' }}>
+                    <div style={{ fontSize: '11.5px', color: '#cbd5e1', marginBottom: '8px' }}>
+                      Enter your Google email address for instantaneous no-popup login:
+                    </div>
+                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                      <input
+                        type="email"
+                        placeholder="your.name@gmail.com"
+                        value={directGoogleEmail}
+                        onChange={(e) => setDirectGoogleEmail(e.target.value)}
+                        required
+                        style={{
+                          flex: 1,
+                          minWidth: '220px',
+                          background: 'rgba(15, 23, 42, 0.9)',
+                          border: '1px solid rgba(148, 163, 184, 0.3)',
+                          borderRadius: '6px',
+                          padding: '7px 12px',
+                          color: '#f8fafc',
+                          fontSize: '12px'
+                        }}
+                      />
+                      <button
+                        type="submit"
+                        disabled={isProcessing}
+                        style={{
+                          background: '#0284c7',
+                          color: '#ffffff',
+                          border: 'none',
+                          borderRadius: '6px',
+                          padding: '7px 16px',
+                          fontSize: '12px',
+                          fontWeight: 700,
+                          cursor: 'pointer'
+                        }}
+                      >
+                        {isProcessing ? 'Signing in…' : 'Sign In'}
+                      </button>
+                    </div>
+                  </form>
+                )}
+              </div>
+            )}
+
+            {/* TAB CONTENT C: SOVEREIGN STUDENT ID */}
+            {activeAuthTab === 'studentid' && (
+              <div style={{
+                background: 'rgba(2, 6, 23, 0.65)',
+                border: '1px solid rgba(56, 189, 248, 0.25)',
+                borderRadius: '12px',
+                padding: '20px'
+              }}>
+                <h4 style={{ fontSize: '14px', fontWeight: 800, color: '#f8fafc', margin: '0 0 6px' }}>
+                  Sign In with Existing Student ID
+                </h4>
+                <p style={{ fontSize: '12px', color: '#94a3b8', margin: '0 0 14px' }}>
+                  Enter your unique Student ID to load your isolated labs, notes, and XP. Synchronizes automatically across all devices.
+                </p>
+
+                <form onSubmit={handleStudentIdLogin} style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '12px' }}>
+                  <input
+                    type="text"
+                    placeholder="e.g. SEC-STUDENT-4921 or your custom ID..."
+                    value={studentIdInput}
+                    onChange={(e) => {
+                      setStudentIdInput(e.target.value)
+                      setAuthError(null)
+                      setSuggestClaimId(null)
+                    }}
                     style={{
-                      background: 'rgba(56, 189, 248, 0.1)',
-                      border: '1px solid rgba(56, 189, 248, 0.3)',
-                      color: '#38bdf8',
-                      padding: '7px 12px',
+                      flex: 1,
+                      minWidth: '220px',
+                      background: 'rgba(15, 23, 42, 0.9)',
+                      border: '1px solid rgba(148, 163, 184, 0.3)',
                       borderRadius: '6px',
-                      fontSize: '12px',
-                      fontWeight: 600,
+                      padding: '8px 12px',
+                      color: '#f8fafc',
+                      fontSize: '13px',
+                      fontFamily: "'DM Mono', monospace"
+                    }}
+                  />
+                  <button
+                    type="submit"
+                    disabled={isProcessing || !studentIdInput.trim()}
+                    style={{
+                      background: '#0284c7',
+                      color: '#ffffff',
+                      border: 'none',
+                      borderRadius: '6px',
+                      padding: '8px 18px',
+                      fontSize: '12.5px',
+                      fontWeight: 700,
                       cursor: 'pointer',
-                      display: 'inline-flex',
+                      display: 'flex',
                       alignItems: 'center',
                       gap: '6px'
                     }}
                   >
-                    <Download size={13} />
-                    <span>Export Local Encrypted Backup</span>
+                    <LogIn size={14} />
+                    <span>{isProcessing ? 'Verifying…' : 'Sign In'}</span>
                   </button>
+
                   <button
                     type="button"
-                    onClick={() => setActiveTab('token')}
+                    onClick={handleInstantGenerateId}
+                    disabled={isProcessing}
                     style={{
-                      background: 'rgba(148, 163, 184, 0.1)',
-                      border: '1px solid rgba(148, 163, 184, 0.25)',
-                      color: '#cbd5e1',
-                      padding: '7px 12px',
+                      background: 'rgba(16, 185, 129, 0.15)',
+                      border: '1px solid rgba(16, 185, 129, 0.4)',
+                      color: '#34d399',
                       borderRadius: '6px',
+                      padding: '8px 14px',
                       fontSize: '12px',
-                      fontWeight: 600,
+                      fontWeight: 700,
                       cursor: 'pointer',
-                      display: 'inline-flex',
+                      display: 'flex',
                       alignItems: 'center',
-                      gap: '6px'
+                      gap: '5px'
                     }}
                   >
-                    <Key size={13} />
-                    <span>Offline Sync Token</span>
+                    <Zap size={13} />
+                    <span>⚡ 1-Tap Generate ID</span>
                   </button>
+                </form>
+
+                {suggestClaimId && (
+                  <div style={{
+                    marginTop: '10px',
+                    padding: '8px 12px',
+                    background: 'rgba(16, 185, 129, 0.12)',
+                    border: '1px solid rgba(16, 185, 129, 0.3)',
+                    borderRadius: '6px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    flexWrap: 'wrap',
+                    gap: '8px',
+                    fontSize: '12px',
+                    color: '#6ee7b7'
+                  }}>
+                    <span>ID "{suggestClaimId}" is unclaimed! Would you like to activate it now?</span>
+                    <button
+                      type="button"
+                      onClick={handleClaimSuggested}
+                      style={{
+                        background: '#10b981',
+                        color: '#020617',
+                        border: 'none',
+                        borderRadius: '4px',
+                        padding: '4px 10px',
+                        fontWeight: 800,
+                        fontSize: '11px',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Claim & Activate
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Quick Switch Profiles on this Device */}
+            {allProfiles.length > 0 && (
+              <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px solid rgba(148, 163, 184, 0.1)' }}>
+                <span style={{ fontSize: '11px', color: '#64748b', marginRight: '8px' }}>Profiles on this device:</span>
+                <div style={{ display: 'inline-flex', gap: '6px', flexWrap: 'wrap', marginTop: '4px' }}>
+                  {allProfiles.map(p => (
+                    <button
+                      key={p.id}
+                      type="button"
+                      onClick={async () => {
+                        switchUserProfile(p.id)
+                        setActionSuccess(`Switched to Student ID: ${p.id}`)
+                        await triggerAmbientSync(p.id)
+                        setTimeout(() => setActionSuccess(null), 3000)
+                      }}
+                      style={{
+                        background: activeProfile?.id === p.id && !isCurrentGuest ? 'rgba(16, 185, 129, 0.2)' : 'rgba(15, 23, 42, 0.8)',
+                        border: activeProfile?.id === p.id && !isCurrentGuest ? '1px solid #10b981' : '1px solid rgba(148, 163, 184, 0.2)',
+                        color: activeProfile?.id === p.id && !isCurrentGuest ? '#34d399' : '#cbd5e1',
+                        borderRadius: '4px',
+                        padding: '3px 8px',
+                        fontSize: '11px',
+                        fontFamily: "'DM Mono', monospace",
+                        cursor: 'pointer'
+                      }}
+                    >
+                      {p.id} ({p.name || 'Student'})
+                    </button>
+                  ))}
                 </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
+
+          {/* 3. COLLAPSIBLE OFFLINE VAULT TOOLS (Clean Drawer for Power Users) */}
+          <div style={{
+            background: 'rgba(15, 23, 42, 0.5)',
+            border: '1px solid rgba(148, 163, 184, 0.12)',
+            borderRadius: '12px',
+            overflow: 'hidden'
+          }}>
+            <button
+              type="button"
+              onClick={() => setShowVaultDrawer(prev => !prev)}
+              style={{
+                width: '100%',
+                padding: '12px 18px',
+                background: 'transparent',
+                border: 'none',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                color: '#cbd5e1',
+                fontSize: '12.5px',
+                fontWeight: 700,
+                cursor: 'pointer'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Key size={14} style={{ color: '#38bdf8' }} />
+                <span>Offline Vault Tools (Encrypted JSON & Air-Gapped Sync Token)</span>
+              </div>
+              {showVaultDrawer ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+            </button>
+
+            {showVaultDrawer && (
+              <div style={{ padding: '16px 20px', borderTop: '1px solid rgba(148, 163, 184, 0.1)', background: 'rgba(2, 6, 23, 0.4)' }}>
+                <p style={{ fontSize: '11.5px', color: '#94a3b8', margin: '0 0 14px', lineHeight: 1.45 }}>
+                  Working in an air-gapped lab or transferring data without internet? Use encrypted file backups or a copy-paste Base64 token.
+                </p>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '14px' }}>
+                  {/* File Backup Card */}
+                  <div style={{ background: 'rgba(15, 23, 42, 0.7)', padding: '14px', borderRadius: '8px', border: '1px solid rgba(148, 163, 184, 0.1)' }}>
+                    <div style={{ fontSize: '12px', fontWeight: 700, color: '#f8fafc', marginBottom: '8px' }}>
+                      Encrypted JSON File Archive
+                    </div>
+                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                      <button
+                        type="button"
+                        onClick={handleDownloadBackup}
+                        style={{
+                          background: 'rgba(56, 189, 248, 0.15)',
+                          border: '1px solid rgba(56, 189, 248, 0.35)',
+                          color: '#38bdf8',
+                          padding: '6px 12px',
+                          borderRadius: '6px',
+                          fontSize: '11.5px',
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '5px'
+                        }}
+                      >
+                        <Download size={12} />
+                        <span>Export JSON</span>
+                      </button>
+
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        accept=".json"
+                        style={{ display: 'none' }}
+                        onChange={handleImportFile}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        style={{
+                          background: 'rgba(16, 185, 129, 0.15)',
+                          border: '1px solid rgba(16, 185, 129, 0.35)',
+                          color: '#34d399',
+                          padding: '6px 12px',
+                          borderRadius: '6px',
+                          fontSize: '11.5px',
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '5px'
+                        }}
+                      >
+                        <Upload size={12} />
+                        <span>Import JSON</span>
+                      </button>
+                    </div>
+
+                    {importStatus && (
+                      <div style={{ marginTop: '8px', fontSize: '11px', color: importStatus.type === 'success' ? '#6ee7b7' : '#fca5a5' }}>
+                        {importStatus.text}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Sync Token Card */}
+                  <div style={{ background: 'rgba(15, 23, 42, 0.7)', padding: '14px', borderRadius: '8px', border: '1px solid rgba(148, 163, 184, 0.1)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                      <span style={{ fontSize: '12px', fontWeight: 700, color: '#f8fafc' }}>
+                        Base64 Sync String
+                      </span>
+                      <button
+                        type="button"
+                        onClick={handleGenerateToken}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: '#38bdf8',
+                          fontSize: '11px',
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                          textDecoration: 'underline'
+                        }}
+                      >
+                        Generate Token
+                      </button>
+                    </div>
+
+                    {generatedToken && (
+                      <div style={{ marginBottom: '8px' }}>
+                        <textarea
+                          readOnly
+                          value={generatedToken}
+                          style={{
+                            width: '100%',
+                            height: '52px',
+                            background: 'rgba(2, 6, 23, 0.8)',
+                            border: '1px solid rgba(148, 163, 184, 0.2)',
+                            borderRadius: '4px',
+                            color: '#94a3b8',
+                            fontSize: '9.5px',
+                            fontFamily: 'monospace',
+                            padding: '4px 6px',
+                            resize: 'none'
+                          }}
+                        />
+                        <button
+                          type="button"
+                          onClick={handleCopyToken}
+                          style={{
+                            background: 'rgba(56, 189, 248, 0.15)',
+                            border: '1px solid rgba(56, 189, 248, 0.3)',
+                            color: '#38bdf8',
+                            borderRadius: '4px',
+                            padding: '3px 8px',
+                            fontSize: '10.5px',
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            marginTop: '4px'
+                          }}
+                        >
+                          {tokenCopied ? <Check size={11} /> : <Copy size={11} />}
+                          <span>{tokenCopied ? 'Copied' : 'Copy'}</span>
+                        </button>
+                      </div>
+                    )}
+
+                    <div style={{ display: 'flex', gap: '6px' }}>
+                      <input
+                        type="text"
+                        placeholder="Paste sync token here..."
+                        value={inputToken}
+                        onChange={(e) => setInputToken(e.target.value)}
+                        style={{
+                          flex: 1,
+                          background: 'rgba(2, 6, 23, 0.8)',
+                          border: '1px solid rgba(148, 163, 184, 0.2)',
+                          borderRadius: '4px',
+                          padding: '5px 8px',
+                          fontSize: '11px',
+                          color: '#f8fafc',
+                          fontFamily: 'monospace'
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={handleRestoreToken}
+                        style={{
+                          background: '#10b981',
+                          color: '#020617',
+                          border: 'none',
+                          borderRadius: '4px',
+                          padding: '5px 10px',
+                          fontSize: '11px',
+                          fontWeight: 700,
+                          cursor: 'pointer'
+                        }}
+                      >
+                        Restore
+                      </button>
+                    </div>
+
+                    {tokenStatusMessage && (
+                      <div style={{ marginTop: '8px', fontSize: '11px', color: tokenStatusMessage.type === 'success' ? '#6ee7b7' : '#fca5a5' }}>
+                        {tokenStatusMessage.text}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* Footer */}
-        <div className="user-sync-footer">
-          <div className="user-sync-footer-tip">
-            <ShieldCheck size={14} className="text-cyan" />
+        {/* Unified Clean Footer */}
+        <div style={{
+          padding: '14px 24px',
+          background: 'rgba(8, 15, 30, 0.95)',
+          borderTop: '1px solid rgba(148, 163, 184, 0.12)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '12px'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11.5px', color: '#94a3b8' }}>
+            <ShieldCheck size={14} style={{ color: '#38bdf8' }} />
             <span>
-              <strong>Per-User Data Isolation:</strong> Every User ID is guaranteed unique. No two learners share progress, notes, or credentials.
+              <strong>Zero-Trust Per-User Isolation:</strong> Every Student ID is strictly isolated. No data leaks between learners.
             </span>
           </div>
+
           <button 
             type="button"
             className="btn-user-sync-done"
             onClick={() => setIsOpen(false)}
+            style={{
+              padding: '8px 20px',
+              background: '#0284c7',
+              color: '#ffffff',
+              border: 'none',
+              borderRadius: '7px',
+              fontSize: '12.5px',
+              fontWeight: 800,
+              cursor: 'pointer'
+            }}
           >
             Done
           </button>
