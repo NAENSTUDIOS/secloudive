@@ -419,7 +419,7 @@ export default function Navbar() {
           My Dashboard
         </NavLink>
         <NavLink to="/profile" onClick={closeMenu} className="clean-nav-link" style={{ fontWeight: 700 }}>
-          Profile
+          Student Portal
         </NavLink>
 
         {/* 5. Admin Portal (Visible to NAEN Studios Administration) */}

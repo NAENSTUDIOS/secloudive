@@ -146,6 +146,8 @@ export default function AppRoutes() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/user-profile" element={<Profile />} />
         <Route path="/student-profile" element={<Profile />} />
+        <Route path="/student-portal" element={<Profile />} />
+        <Route path="/portal" element={<Profile />} />
 
         {/* Live Internships & Threat Radar - Open to all, prominently accessible */}
         <Route path="/live-internships" element={<LiveInternshipsPage />} />
