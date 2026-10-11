@@ -323,6 +323,27 @@ Would you like to see the competencies required to elevate your readiness score 
       }
     }
 
+    // ── 5.5. SAFETY RULE: OFF-TOPIC NON-SECURITY/CAREER REDIRECT ──────────────
+    const offTopicPatterns = [
+      /\bwrite(\s+me)?\s+(a\s+)?poem(\s+about)?\b/i,
+      /\b(recipe\s+for|how\s+to\s+cook|baking\s+a)\b/i,
+      /\b(horoscope|astrology|sports\s+scores?)\b/i
+    ]
+    if (offTopicPatterns.some(p => p.test(tLower)) && !tLower.includes('cloud') && !tLower.includes('security') && !tLower.includes('aws') && !tLower.includes('career')) {
+      this.logSafetyDecline('off-topic-redirected', text)
+      const offTopicResponse = `As **${ASSISTANT_NAME}**, I am strictly scoped to cloud security, careers, and hands-on studies on SeCloudive. 
+
+I cannot fulfill requests outside this domain, such as creative writing, poetry, or general trivia. 
+
+How can I help you with AWS architectures, least privilege policies, incident investigations, or your cloud engineering career path today?`
+      return {
+        status: 'DECLINE_OFF_TOPIC',
+        reply: offTopicResponse,
+        category: 'off-topic-redirected',
+        sourceTag: `[${ASSISTANT_NAME} Scope Guardrail]`
+      }
+    }
+
     // ── 6. HAND-OFF: GEMINI MULTI-PERSONA MENTOR ENGINE ─────────────────────
     const mentorGradingPatterns = [
       /\b(grade|evaluate|score)\s+(my\s+)?(work|submission|answer|plan|response|remediation)\b/i,
