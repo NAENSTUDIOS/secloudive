@@ -561,7 +561,7 @@ export default function PlatformExplorationRoadmap({ compact = false }) {
           <div className="roadmap-title-area">
             <div className="roadmap-eyebrow-chip">
               <Sparkles size={13} />
-              <span>SECLOUDIVE MASTER FLIGHT PLAN /// 13 OPERATIONAL WORKSPACES</span>
+              <span>Master Flight Plan • 13 Operational Workspaces</span>
             </div>
             <h2>
               <Compass size={26} style={{ color: '#38bdf8' }} />

@@ -35,6 +35,7 @@ const SafeLabCostCalculator = lazy(() => import('../components/SafeLabCostCalcul
 const VerifyAuditPackPage = lazy(() => import('../pages/VerifyAuditPackPage'))
 const LiveInternshipsPage = lazy(() => import('../pages/LiveInternshipsPage'))
 const LiveThreatIntelPage = lazy(() => import('../pages/LiveThreatIntelPage'))
+const Profile = lazy(() => import('../pages/Profile'))
 
 import ClearanceGateCheckpoint from '../components/ClearanceGateCheckpoint'
 
@@ -42,7 +43,7 @@ function RouteLoadingFallback() {
   return (
     <div style={{ minHeight: '60vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '14px', color: '#94a3b8', font: "12px 'DM Mono', monospace" }}>
       <div className="pulse-dot" style={{ width: '8px', height: '8px' }} />
-      <span>INITIALIZING SOC FIELD ENVIRONMENT /// SECURE DISPATCH...</span>
+      <span>INITIALIZING SOC FIELD ENVIRONMENT • SECURE DISPATCH...</span>
     </div>
   )
 }
@@ -140,6 +141,11 @@ export default function AppRoutes() {
         <Route path="/downloads" element={<DownloadsPage />} />
         <Route path="/cost-calculator" element={<SafeLabCostCalculator />} />
         <Route path="/zero-cost-labs" element={<SafeLabCostCalculator />} />
+
+        {/* Dedicated Student & Engineer Profile Section */}
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/user-profile" element={<Profile />} />
+        <Route path="/student-profile" element={<Profile />} />
 
         {/* Live Internships & Threat Radar - Open to all, prominently accessible */}
         <Route path="/live-internships" element={<LiveInternshipsPage />} />

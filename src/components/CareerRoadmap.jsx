@@ -98,7 +98,7 @@ export default function CareerRoadmap({ readiness = 0, compact = false }) {
       <div className="career-roadmap-heading" style={{ flexWrap: 'wrap', gap: '16px' }}>
         <div>
           <div className="report-section-label">
-            <Rocket size={13} /> CAREER ROADMAP OS /// 11 SPECIALIZED ROLES
+            <Rocket size={13} /> Career Roadmap • 11 Specialized Roles
           </div>
           <h2 id="career-roadmap-title" style={{ margin: '4px 0' }}>
             Role-Specific Mastery & Career Roadmaps.

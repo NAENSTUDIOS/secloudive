@@ -60,7 +60,7 @@ Verified by SeCloudive Cloud Security Career Operating System.`
         <div>
           <div className="eyebrow">
             <span className="pulse-dot" style={{ backgroundColor: '#38bdf8' }} />
-            <span>PORTFOLIO TRACKER /// VERIFIED EVIDENCE DOSSIER</span>
+            <span>Portfolio Tracker • Verified Evidence Dossier</span>
           </div>
           <h2>
             Technical Evidence & Hiring Manager Dossier

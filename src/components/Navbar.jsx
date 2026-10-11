@@ -37,7 +37,8 @@ import {
   CheckCircle2,
   LogIn,
   FileText,
-  Maximize
+  Maximize,
+  User
 } from 'lucide-react'
 import { isAudioFXEnabled, setAudioFXEnabled, playTactileClick } from '../utils/cyberMotionAudio'
 import { masterRampUpLabs } from '../data/careerRampUpData'
@@ -413,9 +414,12 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* 4. Direct Link: Dashboard */}
+        {/* 4. Direct Links: Dashboard & Profile */}
         <NavLink to="/dashboard" onClick={closeMenu} className="clean-nav-link" style={{ fontWeight: 700 }}>
           My Dashboard
+        </NavLink>
+        <NavLink to="/profile" onClick={closeMenu} className="clean-nav-link" style={{ fontWeight: 700 }}>
+          Profile
         </NavLink>
 
         {/* 5. Admin Portal (Only visible to NAEN Studios) */}
@@ -545,15 +549,13 @@ export default function Navbar() {
           )}
         </Link>
 
-        {/* User Avatar */}
-        <button 
-          type="button"
+        {/* User Avatar linking to Profile page */}
+        <Link 
+          to="/profile"
           className="avatar-badge" 
-          onClick={() => window.dispatchEvent(new CustomEvent('open-user-sync-modal'))}
-          title={activeProfile?.authProvider === 'google' 
-            ? `Google ID Synced: ${activeProfile?.email || activeProfile?.name}\nUser ID: ${activeProfile?.id}\nClick to manage.`
-            : `Active Profile: ${activeProfile?.name || 'Guest'}\nClick to sign in with Google or switch User ID.`}
-          style={{ cursor: 'pointer', border: 'none', background: 'transparent', padding: 0, position: 'relative' }}
+          onClick={() => playTactileClick()}
+          title={`Profile: ${activeProfile?.name || 'Guest'}\nID: ${activeProfile?.id || 'guest'}\nClick to open Profile & Dossier.`}
+          style={{ cursor: 'pointer', border: 'none', background: 'transparent', padding: 0, position: 'relative', display: 'inline-flex', alignItems: 'center', textDecoration: 'none' }}
         >
           {activeProfile?.avatarUrl ? (
             <img 
@@ -573,7 +575,7 @@ export default function Navbar() {
               boxShadow: activeProfile?.authProvider === 'google' ? '0 0 6px #34a853' : '0 0 6px #38bdf8'
             }} 
           />
-        </button>
+        </Link>
 
         {/* Mobile Hamburger Toggle */}
         <button 

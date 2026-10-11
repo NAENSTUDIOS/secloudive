@@ -45,7 +45,7 @@ export default function RecommendationOrchestratorView() {
         <div className="orchestrator-title-block">
           <div className="orchestrator-eyebrow">
             <Sparkles size={13} className="text-cyan" />
-            <span>CAREER INTELLIGENCE LAYER /// RECOMMENDATION ORCHESTRATOR</span>
+            <span>Career Intelligence Layer • Recommendation Orchestrator</span>
           </div>
           <h2>
             End-to-End Career Pathway: <span className="text-cyan">{domainName}</span>

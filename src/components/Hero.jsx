@@ -68,10 +68,7 @@ export default function Hero() {
           <span style={{ display: 'inline-flex', alignItems: 'center', background: 'rgba(56, 189, 248, 0.1)', padding: '3px 8px', borderRadius: '4px', border: '1px solid rgba(56, 189, 248, 0.3)' }}>
             <SeCloudiveLogo size={12} variant="cyan" glow={false} />
           </span>
-          <span className="pulse-dot" /> OFFICIAL AWS CLOUD SECURITY & INTERNSHIP PATHWAY /// ZERO TO HIRE
-          <span style={{ background: '#ff990022', border: '1px solid #ff990066', color: '#ffb347', fontSize: '10px', padding: '2px 8px', borderRadius: '4px', fontWeight: 800, fontFamily: "'DM Mono', monospace" }}>
-            100% AWS SPECIALIZED
-          </span>
+          <span className="pulse-dot" /> AWS Security Engineering &amp; Internship Academy
         </div>
         <h1>
           Master AWS Cloud Security. <em>From Zero to Hire.</em>

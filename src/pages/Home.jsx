@@ -403,7 +403,7 @@ export default function Home() {
       <section className="section" style={{ borderTop: '1px solid rgba(255,255,255,0.06)', background: 'rgba(6,10,20,0.7)' }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-            <div className="section-kicker">PLATFORM IMPACT <span>///</span> REAL OUTCOMES</div>
+            <div className="section-kicker">Platform Impact &amp; Verified Outcomes</div>
             <h2 style={{ margin: '8px 0', fontSize: 'clamp(22px, 3vw, 32px)', fontWeight: 800, color: '#f8fafc', letterSpacing: '-0.5px' }}>
               The Platform That Reshapes Careers
             </h2>
@@ -431,7 +431,7 @@ export default function Home() {
       <section className="section" style={{ borderTop: '1px solid rgba(255,255,255,0.06)', background: 'rgba(6, 10, 20, 0.5)' }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
           <div className="section-kicker" style={{ textAlign: 'center', marginBottom: '8px' }}>
-            PEDAGOGICAL ARCHITECTURE <span>///</span> THE 3-PILLAR LOOP
+            Learning Methodology &amp; Engineering Pillars
           </div>
           <h2 style={{ textAlign: 'center', fontSize: 'clamp(24px, 3.5vw, 36px)', fontWeight: 800, color: '#f8fafc', margin: '0 0 14px', letterSpacing: '-0.6px' }}>
             How Real Cloud Security Judgment Is Built
@@ -486,7 +486,7 @@ export default function Home() {
       {/* ── 08: Zero-Cost Safety Strip ── */}
       <section className="section" id="zero-cost" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
         <div style={{ maxWidth: '840px', margin: '0 auto', textAlign: 'center' }}>
-          <div className="section-kicker">FINANCIAL PROTECTION HARNESS</div>
+          <div className="section-kicker">Zero-Cost Learning Guarantee</div>
           <h2 style={{ fontSize: 'clamp(22px, 3.5vw, 32px)', fontWeight: 800, color: '#f8fafc', margin: '0 0 12px' }}>
             Learn Cloud Security for <span style={{ color: '#10b981' }}>$0.00</span> with Zero Billing Fear
           </h2>
@@ -525,7 +525,7 @@ export default function Home() {
       {/* ── 09: Industry Benchmarks ── */}
       <section className="section" style={{ borderTop: '1px solid rgba(255,255,255,0.06)', background: 'rgba(9, 14, 26, 0.4)' }}>
         <div style={{ maxWidth: '1000px', margin: '0 auto', textAlign: 'center' }}>
-          <div className="section-kicker">INDUSTRY BENCHMARKS &amp; CERTIFICATIONS</div>
+          <div className="section-kicker">Industry Benchmarks &amp; Certifications</div>
           <h3 style={{ fontSize: '18px', color: '#cbd5e1', fontWeight: 700, margin: '0 0 20px' }}>
             Directly aligned with real cloud security hiring standards:
           </h3>
@@ -561,7 +561,7 @@ export default function Home() {
       <section className="landing-cta" style={{ margin: '40px 24px', borderRadius: '16px' }}>
         <div className="cta-grid">
           <div>
-            <div className="section-kicker">ZERO FLUFF /// 100% HANDS-ON CLOUD SECURITY</div>
+            <div className="section-kicker">Start Your Journey</div>
             <h2>Ready to start Tier 1?<br /><span>Begin your structured journey now.</span></h2>
           </div>
           <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center' }}>

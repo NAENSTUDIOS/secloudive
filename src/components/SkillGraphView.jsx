@@ -38,7 +38,7 @@ export default function SkillGraphView() {
         <div>
           <div className="eyebrow">
             <span className="pulse-dot" style={{ backgroundColor: '#10b981' }} />
-            <span>ENTERPRISE SKILL GRAPH /// 10 CYBERSECURITY DOMAINS</span>
+            <span>Enterprise Skill Graph • 10 Cybersecurity Domains</span>
           </div>
           <h2>
             Skills Map & Mastery Benchmark

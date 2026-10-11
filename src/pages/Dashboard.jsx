@@ -32,7 +32,8 @@ import {
   ChevronDown,
   ChevronUp,
   Compass,
-  Zap
+  Zap,
+  MessageSquare
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import ScoreCard from '../components/ScoreCard'
@@ -58,6 +59,7 @@ import DailyLearningStreakWidget from '../components/DailyLearningStreakWidget'
 import PlatformExplorationRoadmap from '../components/PlatformExplorationRoadmap'
 import DefenderQuoteCallout from '../components/DefenderQuoteCallout'
 import MultiCloudProviderFilter from '../components/MultiCloudProviderFilter'
+import GlobalSecurityCommsDeck from '../components/GlobalSecurityCommsDeck'
 import { playTabWhoosh, playTactileClick } from '../utils/cyberMotionAudio'
 import { 
   generateRemediationAuditPack, 
@@ -264,6 +266,18 @@ export default function Dashboard() {
           >
             <FileDown size={15} /> Export Audit Pack
           </button>
+          <a 
+            href="#comms-deck"
+            className="button button-primary"
+            style={{ 
+              background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.25) 0%, rgba(37, 99, 235, 0.45) 100%)',
+              border: '1px solid rgba(56, 189, 248, 0.55)',
+              color: '#38bdf8',
+              fontWeight: 800
+            }}
+          >
+            <MessageSquare size={15} /> Free Text Comms Deck
+          </a>
           <Link className="button button-primary" to={nextInvestigation ? `/investigations/${nextInvestigation.id}` : '/investigations'}>
             <ShieldCheck size={16} /> Quick Launch Incident ({investigations.length - investigationCompletedCount} Open)
           </Link>
@@ -550,7 +564,7 @@ export default function Dashboard() {
         <div className="nav-hub-header">
           <div className="nav-hub-title">
             <Radio size={14} className="text-cyan animate-pulse" />
-            <span>SECLOUDIVE ECOSYSTEM DIRECTORY /// 13 OPERATIONAL WORKSPACES</span>
+            <span>Ecosystem Directory • 13 Operational Workspaces</span>
           </div>
           <span className="text-[11px] font-mono text-slate-400">
             Active: <span className="text-emerald-400 font-bold">{investigationCompletedCount + completedLabsCount} Completed</span>
@@ -924,6 +938,16 @@ export default function Dashboard() {
             <BriefcaseBusiness size={15} />
             <span>6-Stage SOP Framework</span>
           </button>
+
+          <button 
+            type="button" 
+            className={`track-tab-btn motion-button ${activeTrackTab === 'comms' ? 'active tab-cyan' : ''}`}
+            onClick={() => { playTabWhoosh(); setActiveTrackTab('comms'); }}
+          >
+            <MessageSquare size={15} />
+            <span>Comms Deck (Free Chat)</span>
+            <span className="tab-pill pill-cyan">Open Hub</span>
+          </button>
         </div>
 
         {/* Tab: Career Ramp-Up & Master Directory */}
@@ -931,7 +955,7 @@ export default function Dashboard() {
           <div className="track-featured-card card-rampup animate-reveal">
             <div className="track-card-copy">
               <div className="track-eyebrow">
-                <span className="pulse-dot" style={{ backgroundColor: '#10b981' }} /> CAREER BLUEPRINTS & MASTER LAB DIRECTORY /// ALL HYPERSCALERS
+                <span className="pulse-dot" style={{ backgroundColor: '#10b981' }} /> Career Blueprints &amp; Master Lab Directory • All Hyperscalers
               </div>
               <h3>Cloud Security Roles, Ramp-Up Guides & 20 Master Labs</h3>
               <p>
@@ -968,7 +992,7 @@ export default function Dashboard() {
           <div className="track-featured-card card-battlerooms animate-reveal">
             <div className="track-card-copy">
               <div className="track-eyebrow">
-                <span className="pulse-dot" style={{ backgroundColor: '#ef4444' }} /> PURPLE TEAM ARENA /// TRYHACKME & HACKTHEBOX STYLE
+                <span className="pulse-dot" style={{ backgroundColor: '#ef4444' }} /> Purple Team Arena • Interactive CTF Challenges
               </div>
               <h3>Cloud Security Battle Rooms & CTF Arenas</h3>
               <p>
@@ -1005,7 +1029,7 @@ export default function Dashboard() {
           <div className="track-featured-card card-investigations animate-reveal">
             <div className="track-card-copy">
               <div className="track-eyebrow">
-                <span className="pulse-dot" /> FLAGSHIP FEATURE /// 25 PRODUCTION INCIDENT INVESTIGATIONS
+                <span className="pulse-dot" /> Production Security Investigations • 25 Incidents
               </div>
               <h3>Security Incident Investigation Simulator</h3>
               <p>
@@ -1048,7 +1072,7 @@ export default function Dashboard() {
           <div className="track-featured-card card-labs animate-reveal">
             <div className="track-card-copy">
               <div className="track-eyebrow">
-                <span className="pulse-dot" style={{ backgroundColor: 'var(--cyan)' }} /> REAL ENTERPRISE WORKFLOWS /// 16 HANDS-ON RUNBOOK LABS
+                <span className="pulse-dot" style={{ backgroundColor: 'var(--cyan)' }} /> Real Enterprise Workflows • 16 Hands-on Runbooks
               </div>
               <h3>Real Cloud Security Job Labs & SOP Guides</h3>
               <p>
@@ -1091,7 +1115,7 @@ export default function Dashboard() {
           <div className="track-featured-card card-playbooks animate-reveal">
             <div className="track-card-copy">
               <div className="track-eyebrow">
-                <span className="pulse-dot" style={{ backgroundColor: 'var(--purple)' }} /> END-TO-END SECOPS PLAYBOOKS /// FROM SCRATCH TO SOLVED
+                <span className="pulse-dot" style={{ backgroundColor: 'var(--purple)' }} /> End-to-End SecOps Playbooks • Zero to Solved
               </div>
               <h3>Cloud Security Job Playbook Engine & Forensic Studio</h3>
               <p>
@@ -1133,7 +1157,7 @@ export default function Dashboard() {
           <div className="track-featured-card card-projects animate-reveal">
             <div className="track-card-copy">
               <div className="track-eyebrow">
-                <span className="pulse-dot" style={{ backgroundColor: 'var(--green, #10b981)' }} /> 100% FREE TIER ELIGIBLE /// VERIFIED $0 TEARDOWN WORKFLOW
+                <span className="pulse-dot" style={{ backgroundColor: 'var(--green, #10b981)' }} /> 100% Free Tier Eligible • Verified $0 Teardown
               </div>
               <h3>Cloud Security Capstone Projects (Verified $0 Teardown Workflow)</h3>
               <p>
@@ -1176,6 +1200,43 @@ export default function Dashboard() {
             <JobProcessFramework />
           </div>
         )}
+
+        {/* Tab 7: Free Student Comms Deck */}
+        {activeTrackTab === 'comms' && (
+          <div className="animate-reveal" style={{ marginTop: '14px' }}>
+            <GlobalSecurityCommsDeck />
+          </div>
+        )}
+      </section>
+
+      {/* ======================================================== */}
+      {/* ── GLOBAL SECURITY COMMS DECK (FREE FOR ALL LEARNERS) ── */}
+      {/* ======================================================== */}
+      <section id="comms-deck" className="comms-deck-dashboard-section" style={{ margin: '36px 0 28px' }}>
+        <div 
+          className="stage-section-wrapper" 
+          style={{ 
+            background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.92) 0%, rgba(6, 10, 20, 0.98) 100%)', 
+            border: '1px solid rgba(56, 189, 248, 0.35)', 
+            borderRadius: '14px', 
+            padding: '16px 20px', 
+            marginBottom: '16px' 
+          }}
+        >
+          <div className="stage-header-info">
+            <span className="stage-badge" style={{ background: 'rgba(56, 189, 248, 0.2)', color: '#38bdf8', border: '1px solid rgba(56, 189, 248, 0.4)' }}>
+              LIVE COMMS
+            </span>
+            <div className="stage-text-block">
+              <h3><MessageSquare size={16} style={{ color: '#38bdf8' }} /> Student Comms Deck &amp; Open Discussion Hub</h3>
+              <p>Free, zero-barrier text channel for all learners. Ask lab questions, discuss AWS IAM gotchas, and collaborate in real-time.</p>
+            </div>
+          </div>
+          <div className="stage-meta-pills">
+            <span>🟢 Open Access for All</span> • <span>Multi-Channel Feed</span> • <span>Zero Friction</span>
+          </div>
+        </div>
+        <GlobalSecurityCommsDeck />
       </section>
 
       {/* ======================================================== */}

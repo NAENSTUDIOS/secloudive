@@ -129,7 +129,7 @@ export default function SkillProfileRadar({ compact = false }) {
     <section className="skill-profile-radar-section" aria-label="Skill Profile Radar">
       <div className="radar-section-header">
         <div>
-          <div className="eyebrow"><Zap size={12} /> ADAPTIVE SKILL PROFILE /// LIVE DOMAIN MASTERY</div>
+          <div className="eyebrow"><Zap size={12} /> Adaptive Skill Profile • Live Domain Mastery</div>
           <h2>Your Cloud Security Skill Map</h2>
           <p style={{ color: '#94a3b8', fontSize: '0.88rem', margin: '0.3rem 0 0' }}>
             Scores update in real-time as you complete quizzes, investigations, and tickets.

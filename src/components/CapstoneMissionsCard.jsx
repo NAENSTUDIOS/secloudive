@@ -29,7 +29,7 @@ export default function CapstoneMissionsCard() {
         <div>
           <div className="eyebrow">
             <span className="pulse-dot" style={{ backgroundColor: '#a78bfa' }} />
-            <span>CROSS-MODULE CAPSTONE MISSIONS /// END-TO-END SIMULATIONS</span>
+            <span>Capstone Missions • End-to-End Simulations</span>
           </div>
           <h2>
             Multi-Disciplinary Capstone Missions

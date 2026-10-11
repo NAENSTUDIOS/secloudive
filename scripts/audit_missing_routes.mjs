@@ -3,8 +3,11 @@ import path from 'path';
 
 const registeredRoutes = [
   '/', '/learning', '/learning/:pathId', '/learning/:pathId/:topicId',
-  '/ramp-up', '/rampup', '/career-rampup', '/career-ramp-up',
+  '/ramp-up', '/rampup', '/career-rampup', '/career-ramp-up', '/career', '/careers', '/aws-career',
   '/categories', '/roadmap', '/exploration-roadmap', '/dashboard',
+  '/profile', '/user-profile', '/student-profile', '/admin',
+  '/live-internships', '/internships', '/jobs', '/aws-jobs', '/cloud-jobs',
+  '/threat-intel', '/threats', '/cves', '/cve-radar',
   '/about', '/legal', '/downloads', '/cost-calculator', '/zero-cost-labs',
   '/labs', '/labs/:id', '/playbooks', '/playbooks/:id',
   '/projects', '/projects/:id', '/battle-rooms', '/battle-rooms/:id',
