@@ -44,7 +44,7 @@ async function runDetailedAudit() {
 
   // Battle Rooms
   const battleRoomsContent = fs.readFileSync(path.join(SRC_DATA, 'battleRooms.js'), 'utf8');
-  const battleRoomMatches = battleRoomsContent.match(/id:\s*['"`]battle-[^'"`]+['"`]/g) || [];
+  const battleRoomMatches = battleRoomsContent.match(/id:\s*['"`](room|battle)-[^'"`]+['"`]/g) || [];
   console.log(`• Purple Team Battle Rooms:             ${battleRoomMatches.length}`);
 
   // Investigation Scenarios
@@ -69,7 +69,7 @@ async function runDetailedAudit() {
 
   // IaC Templates
   const iacContent = fs.readFileSync(path.join(SRC_DATA, 'labIacTemplates.js'), 'utf8');
-  const iacMatches = iacContent.match(/'LAB-[A-Z0-9-]+':/g) || [];
+  const iacMatches = iacContent.match(/'(lab-[a-z0-9-]+|LAB-[A-Z0-9-]+)':/g) || [];
   console.log(`• Zero-Cost IaC Free-Tier Templates:    ${iacMatches.length}`);
 
   // 3. Evaluation & Career Preparedness

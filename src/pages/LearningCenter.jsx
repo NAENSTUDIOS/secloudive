@@ -37,6 +37,7 @@ import {
   Brain,
   Lightbulb,
   Crosshair,
+  Target,
   TrendingUp,
   CheckCheck,
   X,
@@ -129,12 +130,13 @@ export default function LearningCenter() {
   // Local filter & search state
   const [searchQuery, setSearchQuery] = useState('')
 
-  // NAEN Studios Learning Center View: 'map' (Step-Wise RPG Progression Map) vs 'curriculum' (Deep-dive topics)
+  // NAEN Studios Learning Center View: 'curriculum' (Deep-dive topics) vs 'map' (Step-Wise RPG Progression Map) vs 'trackMode' (Target Track Focus)
   const [activeCenterView, setActiveCenterView] = useState(() => {
     try {
-      return localStorage.getItem('secloudive_learning_view') || 'map'
+      if (currentTopicParam || currentPathParam) return 'curriculum'
+      return localStorage.getItem('secloudive_learning_view') || 'curriculum'
     } catch {
-      return 'map'
+      return 'curriculum'
     }
   })
 
@@ -596,26 +598,9 @@ export default function LearningCenter() {
       </section>
 
       {/* --------------------------------------------------------------------
-          NAEN STUDIOS LEARNING TRACK MODE & PERSONA SWITCHER
-          -------------------------------------------------------------------- */}
-      <LearningTrackModeSwitcher style={{ margin: '0 0 20px 0' }} />
-
-      {/* --------------------------------------------------------------------
-          VIEW SWITCHER TABS: STEP-WISE MAP vs. PATHS CURRICULUM
+          VIEW SWITCHER TABS: CURRICULUM vs. STEP-WISE MAP vs. TRACK FOCUS
           -------------------------------------------------------------------- */}
       <div className="naen-learning-view-tabs-bar" role="tablist" style={{ margin: '0 0 24px 0' }}>
-        <button
-          type="button"
-          className={`naen-view-tab-btn ${activeCenterView === 'map' ? 'active' : ''}`}
-          onClick={() => setCenterView('map')}
-          role="tab"
-          aria-selected={activeCenterView === 'map'}
-        >
-          <Sparkles size={16} />
-          <span>🎮 NAEN Studios Step-Wise Progression Map (TryHackMe / HTB Style)</span>
-          <span className="naen-tab-tag">Step-by-Step Unlocked</span>
-        </button>
-
         <button
           type="button"
           className={`naen-view-tab-btn ${activeCenterView === 'curriculum' ? 'active' : ''}`}
@@ -624,15 +609,115 @@ export default function LearningCenter() {
           aria-selected={activeCenterView === 'curriculum'}
         >
           <BookOpen size={16} />
-          <span>📚 NAEN Studios Deep-Dive Curriculum & CIS Benchmarks ({academyStats.totalTopics} Topics)</span>
+          <span>📚 Deep-Dive Curriculum & CIS Benchmarks ({academyStats.totalTopics} Topics)</span>
+          <span className="naen-tab-tag">8 Tracks • 410 Lessons</span>
+        </button>
+
+        <button
+          type="button"
+          className={`naen-view-tab-btn ${activeCenterView === 'map' ? 'active' : ''}`}
+          onClick={() => setCenterView('map')}
+          role="tab"
+          aria-selected={activeCenterView === 'map'}
+        >
+          <Sparkles size={16} />
+          <span>🎮 Step-Wise Progression Map (TryHackMe / HTB Style)</span>
+          <span className="naen-tab-tag">Flags & XP</span>
+        </button>
+
+        <button
+          type="button"
+          className={`naen-view-tab-btn ${activeCenterView === 'trackMode' ? 'active' : ''}`}
+          onClick={() => setCenterView('trackMode')}
+          role="tab"
+          aria-selected={activeCenterView === 'trackMode'}
+        >
+          <Target size={16} />
+          <span>🎯 Target Track Focus & Persona Engine</span>
         </button>
       </div>
 
       {activeCenterView === 'map' && (
         <div className="step-wise-map-view-wrapper animate-reveal" style={{ margin: '0 0 32px 0' }}>
           <StepWiseSkillMap />
+          <div style={{
+            marginTop: '24px',
+            padding: '16px 20px',
+            background: 'rgba(15, 23, 42, 0.8)',
+            border: '1px solid rgba(56, 189, 248, 0.2)',
+            borderRadius: '12px',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: '12px'
+          }}>
+            <div>
+              <strong style={{ color: '#f8fafc', fontSize: '14px' }}>Want to study in-depth architectural theory and CIS Benchmarks?</strong>
+              <div style={{ color: '#94a3b8', fontSize: '12px', marginTop: '2px' }}>
+                Explore 8 complete career tracks with 410 guided lessons, code snippets, and CLI inspection checklists.
+              </div>
+            </div>
+            <button
+              type="button"
+              className="button button-primary btn-sm"
+              onClick={() => setCenterView('curriculum')}
+              style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+            >
+              <span>Open Deep-Dive Curriculum</span>
+              <ArrowRight size={14} />
+            </button>
+          </div>
         </div>
       )}
+
+      {activeCenterView === 'trackMode' && (
+        <div className="track-mode-view-wrapper animate-reveal" style={{ margin: '0 0 32px 0' }}>
+          <LearningTrackModeSwitcher />
+          <div style={{
+            marginTop: '24px',
+            padding: '16px 20px',
+            background: 'rgba(15, 23, 42, 0.8)',
+            border: '1px solid rgba(167, 139, 250, 0.2)',
+            borderRadius: '12px',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: '12px'
+          }}>
+            <div>
+              <strong style={{ color: '#f8fafc', fontSize: '14px' }}>Ready to jump into interactive training?</strong>
+              <div style={{ color: '#94a3b8', fontSize: '12px', marginTop: '2px' }}>
+                Launch the Step-Wise RPG Skill Map or dive into the CIS Benchmark Curriculum.
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button
+                type="button"
+                className="button button-ghost btn-sm"
+                onClick={() => setCenterView('map')}
+                style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+              >
+                <span>Launch Skill Map</span>
+                <Sparkles size={14} />
+              </button>
+              <button
+                type="button"
+                className="button button-primary btn-sm"
+                onClick={() => setCenterView('curriculum')}
+                style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+              >
+                <span>Open Curriculum</span>
+                <BookOpen size={14} />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {activeCenterView === 'curriculum' && (
+        <>
 
       {/* --------------------------------------------------------------------
           2-MINUTE DIAGNOSTIC PLACEMENT TEST BANNER
@@ -1586,6 +1671,8 @@ export default function LearningCenter() {
           </NaenContentGuardian>
         </main>
       </div>
+      </>
+      )}
 
       {/* --------------------------------------------------------------------
           5. MODULE QUIZ RUNNER MODAL & RESULTS EXPERIENCE
