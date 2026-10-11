@@ -163,6 +163,8 @@ export default function RealLabs() {
     })
   }, [combinedLabs, selectedRole, searchQuery])
 
+  const [pendingTerminalCmd, setPendingTerminalCmd] = useState('')
+
   // Handle command copy
   const handleCopyCommand = cmd => {
     navigator.clipboard.writeText(cmd)
@@ -170,10 +172,13 @@ export default function RealLabs() {
     setTimeout(() => setCopiedCmd(false), 2000)
   }
 
-  // Handle live simulated execution in sandbox
-  const handleSimulateExecution = step => {
+  // Handle live simulated execution in sandbox terminal
+  const handleSimulateExecution = (step, specificCmd) => {
+    const cmd = specificCmd || step.cliCommand
+    setPendingTerminalCmd(cmd)
+    setWorkflowTab('terminal')
     setSimulatedExecution({
-      cmd: step.cliCommand,
+      cmd: cmd,
       output: step.expectedOutput,
       timestamp: new Date().toLocaleTimeString()
     })
@@ -550,7 +555,20 @@ Digitally verified through SeCloudive Hands-On Cloud Security Job Labs
             })() : workflowTab === 'terminal' ? (
               <div className="workflow-content wf-terminal-content animate-reveal" style={{ padding: '4px' }}>
                 <TerminalPane 
-                  labId={activeLab.id} 
+                  labId={activeLab.id}
+                  activeStep={{
+                    ...currentStep,
+                    cliCommand: activeCliData.command,
+                    verify: activeCliData.verify,
+                    expectedOutput: currentStep.expectedOutput
+                  }}
+                  activeCloud={activeCliCloud}
+                  pendingCommand={pendingTerminalCmd}
+                  onStepVerified={(stepId) => {
+                    if (!completedStepIds.includes(stepId)) {
+                      toggleLabStep(activeLab.id, stepId)
+                    }
+                  }}
                   onCommandExecuted={(cmd, out) => {
                     console.log(`[Lab Terminal Executed] ${cmd}`)
                   }} 
@@ -1048,12 +1066,27 @@ Digitally verified through SeCloudive Hands-On Cloud Security Job Labs
               <div className="lab-card-header">
                 <div className="lab-card-badges">
                   <span className="lab-num-tag">{lab.labNumber}</span>
-                  <span className="lab-role-tag">{lab.jobRole}</span>
+                  <span className="lab-role-tag">{lab.jobRole || lab.roleTitle}</span>
+                  {lab.moduleMarker && (
+                    <span style={{ fontSize: '0.65rem', background: 'rgba(52, 211, 153, 0.1)', color: '#34d399', border: '1px solid rgba(52, 211, 153, 0.3)', padding: '2px 6px', borderRadius: '4px', display: 'flex', alignItems: 'center', gap: '3px' }}>
+                      <Sparkles size={10} />
+                      {lab.moduleMarker}
+                    </span>
+                  )}
                 </div>
-                <span className="lab-mitre-tag">
-                  <Crosshair size={10} />
-                  {lab.mitreTechnique.split('-')[0].trim()}
-                </span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  {lab.xpReward && (
+                    <span style={{ fontSize: '0.65rem', color: '#ff9900', fontWeight: 800, background: 'rgba(255, 153, 0, 0.1)', padding: '2px 6px', borderRadius: '4px' }}>
+                      +{lab.xpReward} XP
+                    </span>
+                  )}
+                  {lab.mitreTechnique && (
+                    <span className="lab-mitre-tag">
+                      <Crosshair size={10} />
+                      {lab.mitreTechnique.split('-')[0].trim()}
+                    </span>
+                  )}
+                </div>
               </div>
 
               <div className="lab-card-body">
@@ -1062,9 +1095,14 @@ Digitally verified through SeCloudive Hands-On Cloud Security Job Labs
                 </h3>
                 <div className="lab-org-sub">
                   <Briefcase size={11} className="text-amber" />
-                  <span>{lab.organization}</span>
+                  <span>{lab.organization || 'Global Cloud Security Team'}</span>
                 </div>
                 <p className="lab-card-summary">{lab.scenarioSummary}</p>
+                {lab.encouragingText && (
+                  <p style={{ fontSize: '0.75rem', color: '#38bdf8', marginTop: '6px', fontWeight: 600 }}>
+                    ↳ {lab.encouragingText}
+                  </p>
+                )}
 
                 <div className="lab-services-list">
                   {lab.targetServices.map(svc => (

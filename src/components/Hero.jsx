@@ -68,13 +68,16 @@ export default function Hero() {
           <span style={{ display: 'inline-flex', alignItems: 'center', background: 'rgba(56, 189, 248, 0.1)', padding: '3px 8px', borderRadius: '4px', border: '1px solid rgba(56, 189, 248, 0.3)' }}>
             <SeCloudiveLogo size={12} variant="cyan" glow={false} />
           </span>
-          <span className="pulse-dot" /> STRUCTURED CLOUD SECURITY PATHWAY /// ZERO TO HIRE
+          <span className="pulse-dot" /> OFFICIAL AWS CLOUD SECURITY & INTERNSHIP PATHWAY /// ZERO TO HIRE
+          <span style={{ background: '#ff990022', border: '1px solid #ff990066', color: '#ffb347', fontSize: '10px', padding: '2px 8px', borderRadius: '4px', fontWeight: 800, fontFamily: "'DM Mono', monospace" }}>
+            100% AWS SPECIALIZED
+          </span>
         </div>
         <h1>
-          Master Cloud Security. <em>From Zero to Hire.</em>
+          Master AWS Cloud Security. <em>From Zero to Hire.</em>
         </h1>
         <p>
-          A crystal-clear, 4-tier engineering roadmap from zero to enterprise architect. Build Linux foundations, deploy with Docker and Terraform, scale with Kubernetes and CI/CD, then master multi-cloud architecture — all with live combat labs and $0 safe practice environments.
+          A crystal-clear engineering roadmap from zero to hired AWS Cloud Security Engineer & Intern. Master AWS IAM Least Privilege, S3 Data Guardrails, CloudTrail Forensics, GuardDuty Threat Hunting, and Bedrock AI Security — with live combat labs, 1-click Terraform templates, and $0 safe sandbox practice.
         </p>
         <div className="hero-actions" style={{ flexWrap: 'wrap', gap: '10px' }}>
           <a 
@@ -94,8 +97,26 @@ export default function Hero() {
               fontWeight: 800
             }}
           >
-            ▶ Explore Structured Path <ArrowRight size={17} />
+            ▶ Explore 4-Tier Path <ArrowRight size={17} />
           </a>
+          <Link
+            to="/live-internships"
+            className="button button-primary motion-button"
+            onClick={() => playTactileClick()}
+            style={{
+              background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.25) 0%, rgba(5, 150, 105, 0.45) 100%)',
+              border: '1px solid rgba(16, 185, 129, 0.55)',
+              color: '#34d399',
+              fontWeight: 800,
+              boxShadow: '0 0 18px rgba(16, 185, 129, 0.25)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '7px'
+            }}
+          >
+            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10b981', boxShadow: '0 0 8px #10b981' }} />
+            <span>🔴 Live Internship Offers</span>
+          </Link>
           <button
             type="button"
             className="button button-ghost motion-button"
@@ -107,18 +128,6 @@ export default function Hero() {
             title="Take 2-Minute Diagnostic Placement to fast-track to Tier 2 or 3"
           >
             ⚡ 2-Min Placement Test
-          </button>
-          <button
-            type="button"
-            className="button button-ghost motion-button"
-            onClick={() => {
-              playTactileClick()
-              window.dispatchEvent(new CustomEvent('open-platform-guide'))
-            }}
-            style={{ borderColor: 'rgba(56, 189, 248, 0.35)', color: '#38bdf8', background: 'rgba(56, 189, 248, 0.06)' }}
-            title="New to SeCloudive? Open 30-Sec Compass (Alt+H)"
-          >
-            <Compass size={15} /> 🎯 Where to Start Guide
           </button>
         </div>
 

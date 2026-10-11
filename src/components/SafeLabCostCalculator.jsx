@@ -243,7 +243,8 @@ export default function SafeLabCostCalculator({ activeLabId = null, onClose = nu
           { id: 'calculator', label: '16-Service Cost Modeler', icon: DollarSign },
           { id: 'projects', label: 'Preset Lab Architectures', icon: Layers },
           { id: 'teardown', label: '1-Click Teardown & Checklist', icon: Trash2 },
-          { id: 'audit', label: 'Teardown Audit Logs', icon: Clock }
+          { id: 'audit', label: 'Teardown Audit Logs', icon: Clock },
+          { id: 'official', label: 'Official Free AWS Programs', icon: Award }
         ].map(tab => {
           const Icon = tab.icon
           const isActive = activeTab === tab.id
@@ -826,6 +827,59 @@ export default function SafeLabCostCalculator({ activeLabId = null, onClose = nu
                 </div>
               ))}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ============================================================== */}
+      {/* TAB 5: OFFICIAL FREE AWS PROGRAMS */}
+      {/* ============================================================== */}
+      {activeTab === 'official' && (
+        <div>
+          <div style={{ marginBottom: '24px' }}>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 800, margin: '0 0 8px 0', color: '#f8fafc' }}>
+              Official Free AWS Training & Programs
+            </h3>
+            <p style={{ margin: 0, fontSize: '0.88rem', color: '#94a3b8' }}>
+              Complement your hands-on labs with official, zero-cost training directly from Amazon Web Services.
+            </p>
+          </div>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: '16px' }}>
+            
+            <div style={{ background: 'rgba(15, 23, 42, 0.6)', border: '1px solid rgba(245, 158, 11, 0.25)', borderRadius: '10px', padding: '20px' }}>
+              <div style={{ fontSize: '0.72rem', color: '#f59e0b', fontWeight: 700, textTransform: 'uppercase', marginBottom: '8px' }}>For Beginners (Pre-Cloud)</div>
+              <h4 style={{ margin: '0 0 10px 0', fontSize: '1.1rem', color: '#f8fafc' }}>AWS Educate</h4>
+              <p style={{ margin: '0 0 16px 0', fontSize: '0.85rem', color: '#cbd5e1', lineHeight: 1.5 }}>
+                Free, self-paced training for pre-professionals and students. Learn cloud computing basics without needing an AWS account or credit card. Includes free labs.
+              </p>
+              <a href="https://aws.amazon.com/education/awseducate/" target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: '#f59e0b', fontSize: '0.85rem', fontWeight: 700, textDecoration: 'none' }}>
+                Explore AWS Educate <ExternalLink size={14} />
+              </a>
+            </div>
+
+            <div style={{ background: 'rgba(15, 23, 42, 0.6)', border: '1px solid rgba(16, 185, 129, 0.25)', borderRadius: '10px', padding: '20px' }}>
+              <div style={{ fontSize: '0.72rem', color: '#10b981', fontWeight: 700, textTransform: 'uppercase', marginBottom: '8px' }}>For Career Pivoters</div>
+              <h4 style={{ margin: '0 0 10px 0', fontSize: '1.1rem', color: '#f8fafc' }}>AWS re/Start</h4>
+              <p style={{ margin: '0 0 16px 0', fontSize: '0.85rem', color: '#cbd5e1', lineHeight: 1.5 }}>
+                A free, cohort-based workforce development training program that prepares individuals for careers in the cloud and connects them with potential employers.
+              </p>
+              <a href="https://aws.amazon.com/training/restart/" target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: '#10b981', fontSize: '0.85rem', fontWeight: 700, textDecoration: 'none' }}>
+                Explore AWS re/Start <ExternalLink size={14} />
+              </a>
+            </div>
+
+            <div style={{ background: 'rgba(15, 23, 42, 0.6)', border: '1px solid rgba(56, 189, 248, 0.25)', borderRadius: '10px', padding: '20px' }}>
+              <div style={{ fontSize: '0.72rem', color: '#38bdf8', fontWeight: 700, textTransform: 'uppercase', marginBottom: '8px' }}>For Practitioners</div>
+              <h4 style={{ margin: '0 0 10px 0', fontSize: '1.1rem', color: '#f8fafc' }}>AWS Skill Builder</h4>
+              <p style={{ margin: '0 0 16px 0', fontSize: '0.85rem', color: '#cbd5e1', lineHeight: 1.5 }}>
+                600+ free digital courses and learning plans. Dive deep into specific domains like Security, Architecture, and Developer tooling.
+              </p>
+              <a href="https://explore.skillbuilder.aws/learn" target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: '#38bdf8', fontSize: '0.85rem', fontWeight: 700, textDecoration: 'none' }}>
+                Explore AWS Skill Builder <ExternalLink size={14} />
+              </a>
+            </div>
+
           </div>
         </div>
       )}

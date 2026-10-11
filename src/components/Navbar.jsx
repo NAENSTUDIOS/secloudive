@@ -35,12 +35,15 @@ import {
   Zap,
   Trophy,
   CheckCircle2,
-  LogIn
+  LogIn,
+  FileText,
+  Maximize
 } from 'lucide-react'
 import { isAudioFXEnabled, setAudioFXEnabled, playTactileClick } from '../utils/cyberMotionAudio'
 import { masterRampUpLabs } from '../data/careerRampUpData'
 import { investigations } from '../data/investigations'
 import { battleRooms } from '../data/battleRooms'
+import GeminiKeyManagerModal from './GeminiKeyManagerModal.jsx'
 
 export default function Navbar() {
   const { 
@@ -56,6 +59,7 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [activeDropdown, setActiveDropdown] = useState(null) // 'pathway' | 'handson' | 'career' | null
   const [audioEnabled, setAudioEnabled] = useState(() => isAudioFXEnabled())
+  const [isKeyModalOpen, setIsKeyModalOpen] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
   const navRef = useRef(null)
@@ -86,9 +90,9 @@ export default function Navbar() {
     setActiveDropdown(prev => prev === name ? null : name)
   }
 
-  const isPathwayActive = ['/learning', '/roadmap', '/categories'].some(p => location.pathname.startsWith(p))
-  const isHandsOnActive = ['/labs', '/battle-rooms', '/investigations', '/cloudive-studio', '/cost-calculator', '/zero-cost-labs'].some(p => location.pathname.startsWith(p))
-  const isCareerActive = ['/internship-simulator', '/interview-simulator', '/verify-audit-pack', '/verify-pack', '/downloads', '/about', '/report'].some(p => location.pathname.startsWith(p))
+  const isPathwayActive = ['/learning', '/roadmap', '/categories', '/ramp-up', '/rampup', '/career-rampup', '/career-ramp-up'].some(p => location.pathname.startsWith(p))
+  const isHandsOnActive = ['/labs', '/battle-rooms', '/investigations', '/cloudive-studio', '/cost-calculator', '/zero-cost-labs', '/projects', '/architecture-reviews', '/live-portal'].some(p => location.pathname.startsWith(p))
+  const isCareerActive = ['/internship-simulator', '/interview-simulator', '/interview', '/hiring-simulator', '/verify-audit-pack', '/verify-pack', '/verify', '/downloads', '/about', '/report', '/playbooks', '/live-internships'].some(p => location.pathname.startsWith(p))
 
   return (
     <header className="topbar clean-topbar" ref={navRef}>
@@ -98,6 +102,28 @@ export default function Navbar() {
           <ShieldCheck size={18} />
         </span>
         <SeCloudiveLogo size="sm" variant="two-tone" glow={true} />
+        <span
+          className="brand-pill-naen"
+          style={{
+            marginLeft: '6px',
+            padding: '2px 7px',
+            background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.16) 0%, rgba(217, 119, 6, 0.28) 100%)',
+            border: '1px solid rgba(245, 158, 11, 0.45)',
+            borderRadius: '999px',
+            color: '#fbbf24',
+            fontSize: '0.62rem',
+            fontWeight: 800,
+            letterSpacing: '0.06em',
+            textTransform: 'uppercase',
+            whiteSpace: 'nowrap',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '4px',
+            boxShadow: '0 0 10px rgba(245, 158, 11, 0.15)'
+          }}
+        >
+          BY NAEN STUDIOS
+        </span>
       </Link>
 
       {/* Primary Clean Navigation */}
@@ -207,7 +233,7 @@ export default function Navbar() {
           </button>
         </div>
 
-        {/* ── Dropdown 1: 🎯 Structured Learning Path ── */}
+        {/* 1. Learning Plans & Curriculum */}
         <div className="nav-dropdown-wrapper">
           <button 
             type="button" 
@@ -215,109 +241,45 @@ export default function Navbar() {
             onClick={() => toggleDropdown('pathway')}
             aria-expanded={activeDropdown === 'pathway'}
           >
-            <Compass size={14} style={{ color: '#38bdf8' }} />
-            <span>Structured Path</span>
+            <BookOpen size={14} style={{ color: '#38bdf8' }} />
+            <span>Course Catalog</span>
             <ChevronDown size={14} className="dropdown-caret" />
           </button>
-
           {activeDropdown === 'pathway' && (
             <div className="nav-dropdown-menu">
-              {/* Tier 1 */}
-              <NavLink to="/learning/foundations/linux-fundamentals" className="dropdown-item" onClick={closeMenu}>
-                <div className="item-icon-box text-cyan">
-                  <span>🛠️</span>
-                </div>
+              <NavLink to="/learning" className="dropdown-item" onClick={closeMenu}>
+                <div className="item-icon-box text-cyan"><Layers size={16} /></div>
                 <div className="item-copy">
-                  <div className="item-title">
-                    <span>Tier 1: The Core Toolbox</span>
-                    <span className="badge-pill badge-sky">Start Here</span>
-                  </div>
-                  <p>Linux, Bash, Python scripting & Git — zero-to-cloud foundations.</p>
+                  <div className="item-title"><span>Learning Plans</span></div>
+                  <p>Structured curriculum from Foundation to Architecture.</p>
                 </div>
               </NavLink>
-
-              {/* Tier 2 */}
-              <NavLink to="/learning/foundations/docker-container-security" className="dropdown-item" onClick={closeMenu}>
-                <div className="item-icon-box text-emerald">
-                  <span>📦</span>
-                </div>
+              <NavLink to="/ramp-up" className="dropdown-item" onClick={closeMenu}>
+                <div className="item-icon-box text-emerald"><GraduationCap size={16} /></div>
                 <div className="item-copy">
-                  <div className="item-title">
-                    <span>Tier 2: The Deployment Layer</span>
-                    <span className="badge-pill badge-emerald">Deploy</span>
-                  </div>
-                  <p>Docker, Cloud Primitives, Terraform IaC & Networking fundamentals.</p>
+                  <div className="item-title"><span>Career Ramp-Up Guides</span></div>
+                  <p>Role-based study plans and official certification prep.</p>
                 </div>
               </NavLink>
-
-              {/* Tier 3 */}
-              <NavLink to="/learning/foundations/kubernetes-container-orchestration" className="dropdown-item" onClick={closeMenu}>
-                <div className="item-icon-box text-purple">
-                  <span>⚡</span>
-                </div>
-                <div className="item-copy">
-                  <div className="item-title">
-                    <span>Tier 3: The Scaling Layer</span>
-                    <span className="badge-pill badge-purple">Scale</span>
-                  </div>
-                  <p>Kubernetes, CI/CD pipelines, Observability & Security hardening.</p>
-                </div>
-              </NavLink>
-
-              {/* Tier 4 */}
-              <NavLink to="/learning/architecture/multicloud-strategy-portability" className="dropdown-item" onClick={closeMenu}>
-                <div className="item-icon-box text-amber">
-                  <span>🏛️</span>
-                </div>
-                <div className="item-copy">
-                  <div className="item-title">
-                    <span>Tier 4: The Architecture Layer</span>
-                    <span className="badge-pill badge-amber">Mastery</span>
-                  </div>
-                  <p>Multi-Cloud, FinOps, Zero Trust & HA/DR enterprise architecture.</p>
-                </div>
-              </NavLink>
-
-              {/* Divider */}
-              <div style={{ margin: '6px 14px', borderTop: '1px solid rgba(255,255,255,0.06)' }} />
-
               <NavLink to="/roadmap" className="dropdown-item" onClick={closeMenu}>
-                <div className="item-icon-box text-sky">
-                  <Compass size={16} />
-                </div>
+                <div className="item-icon-box text-sky"><Compass size={16} /></div>
                 <div className="item-copy">
-                  <div className="item-title">
-                    <span>Full 4-Tier Progression Roadmap</span>
-                  </div>
-                  <p>Complete sequential pathway from recruit to enterprise architect.</p>
+                  <div className="item-title"><span>Full Progression Roadmap</span></div>
+                  <p>Visualize your path to Enterprise Cloud Security.</p>
                 </div>
               </NavLink>
-
-              <button
-                type="button"
-                className="dropdown-item"
-                onClick={() => {
-                  closeMenu()
-                  window.dispatchEvent(new CustomEvent('open-diagnostic-placement'))
-                }}
-                style={{ width: '100%', textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer' }}
-              >
-                <div className="item-icon-box text-amber">
-                  <Zap size={16} />
-                </div>
+              <NavLink to="/categories" className="dropdown-item" onClick={closeMenu}>
+                <div className="item-icon-box text-amber"><Layers size={16} /></div>
                 <div className="item-copy">
-                  <div className="item-title">
-                    <span>Take 2-Min Tier Placement Diagnostic</span>
-                    <span className="badge-pill badge-amber">Skip Ahead</span>
-                  </div>
-                  <p>Benchmark skills and fast-track to Tier 2 or 3 directly.</p>
+                  <div className="item-title"><span>Security Domain Categories</span></div>
+                  <p>Deep-dive into all 8 core AWS Security domains.</p>
                 </div>
-              </button>
+              </NavLink>
             </div>
           )}
         </div>
 
-        {/* ── Dropdown 2: 🛡️ Hands-On Arena ── */}
+        {/* 2. Hands-on Labs & Builder Arena */}
         <div className="nav-dropdown-wrapper">
           <button 
             type="button" 
@@ -326,81 +288,65 @@ export default function Navbar() {
             aria-expanded={activeDropdown === 'handson'}
           >
             <Terminal size={14} style={{ color: '#10b981' }} />
-            <span>Hands-On Arena</span>
+            <span>Hands-on Labs</span>
             <ChevronDown size={14} className="dropdown-caret" />
           </button>
-
           {activeDropdown === 'handson' && (
             <div className="nav-dropdown-menu">
               <NavLink to="/labs" className="dropdown-item" onClick={closeMenu}>
-                <div className="item-icon-box text-sky">
-                  <Terminal size={16} />
-                </div>
+                <div className="item-icon-box text-sky"><Terminal size={16} /></div>
                 <div className="item-copy">
-                  <div className="item-title">
-                    <span>{masterRampUpLabs?.length || 20} AWS Safe Labs ($0)</span>
-                    <span className="badge-pill badge-sky">Dual CLI/GUI</span>
-                  </div>
-                  <p>Step-by-step production runbooks with $0 Free-Tier guarantee.</p>
+                  <div className="item-title"><span>Builder Labs ($0 Cost)</span></div>
+                  <p>Step-by-step production builds in your own AWS account.</p>
                 </div>
               </NavLink>
-
-              <NavLink to="/battle-rooms" className="dropdown-item" onClick={closeMenu}>
-                <div className="item-icon-box text-rose">
-                  <Skull size={16} />
-                </div>
-                <div className="item-copy">
-                  <div className="item-title">
-                    <span>Purple Team Battle Rooms</span>
-                    <span className="badge-pill badge-rose">{battleRooms?.length || 10} Rooms</span>
-                  </div>
-                  <p>Live combat attack scenarios, terminal shell, and CTF flags.</p>
-                </div>
-              </NavLink>
-
-              <NavLink to="/investigations" className="dropdown-item" onClick={closeMenu}>
-                <div className="item-icon-box text-cyan">
-                  <ShieldAlert size={16} />
-                </div>
-                <div className="item-copy">
-                  <div className="item-title">
-                    <span>SOC Incident Simulator</span>
-                    <span className="badge-pill badge-cyan">{investigations?.length || 25} Tickets</span>
-                  </div>
-                  <p>Triage raw forensic evidence, assess blast radius, and contain.</p>
-                </div>
-              </NavLink>
-
-              <NavLink to="/cloudive-studio" className="dropdown-item" onClick={closeMenu}>
-                <div className="item-icon-box text-cyan">
-                  <Layers size={16} />
-                </div>
-                <div className="item-copy">
-                  <div className="item-title">
-                    <span>Cloudive Builder Studio</span>
-                    <span className="badge-pill badge-cyan">IaC Linter</span>
-                  </div>
-                  <p>Builder vs Defender canvas, Terraform auto-fixer, and FinOps.</p>
-                </div>
-              </NavLink>
-
               <NavLink to="/cost-calculator" className="dropdown-item" onClick={closeMenu}>
-                <div className="item-icon-box text-emerald">
-                  <Calculator size={16} />
-                </div>
+                <div className="item-icon-box text-emerald"><Calculator size={16} /></div>
                 <div className="item-copy">
-                  <div className="item-title">
-                    <span>$0 Free-Tier Lab Calculator</span>
-                    <span className="badge-pill badge-emerald">Tripwires</span>
-                  </div>
-                  <p>Automatic $0.01 billing alarms and teardown bash scripts.</p>
+                  <div className="item-title"><span>$0 Cost Lab Calculator</span></div>
+                  <p>AWS Free-Tier safety limits & teardown audit trails.</p>
+                </div>
+              </NavLink>
+              <NavLink to="/architecture-reviews" className="dropdown-item" onClick={closeMenu}>
+                <div className="item-icon-box text-cyan"><ShieldCheck size={16} /></div>
+                <div className="item-copy">
+                  <div className="item-title"><span>Architecture Reviews</span></div>
+                  <p>AWS Well-Architected defense & blast radius triage.</p>
+                </div>
+              </NavLink>
+              <NavLink to="/battle-rooms" className="dropdown-item" onClick={closeMenu}>
+                <div className="item-icon-box text-rose"><Skull size={16} /></div>
+                <div className="item-copy">
+                  <div className="item-title"><span>Threat Battle Rooms</span></div>
+                  <p>Live combat scenarios and attack simulations.</p>
+                </div>
+              </NavLink>
+              <NavLink to="/investigations" className="dropdown-item" onClick={closeMenu}>
+                <div className="item-icon-box text-cyan"><ShieldAlert size={16} /></div>
+                <div className="item-copy">
+                  <div className="item-title"><span>SOC Investigations</span></div>
+                  <p>Triage raw forensic evidence and contain blasts.</p>
+                </div>
+              </NavLink>
+              <NavLink to="/projects" className="dropdown-item" onClick={closeMenu}>
+                <div className="item-icon-box text-purple"><FolderGit2 size={16} /></div>
+                <div className="item-copy">
+                  <div className="item-title"><span>Portfolio Projects</span></div>
+                  <p>Enterprise-grade architectures for your resume.</p>
+                </div>
+              </NavLink>
+              <NavLink to="/cloudive-studio" className="dropdown-item" onClick={closeMenu}>
+                <div className="item-icon-box text-amber"><Sparkles size={16} /></div>
+                <div className="item-copy">
+                  <div className="item-title"><span>Cloudive Studio</span></div>
+                  <p>Interactive threat modeling & topology workbench.</p>
                 </div>
               </NavLink>
             </div>
           )}
         </div>
 
-        {/* ── Dropdown 3: 💼 Career & Proof ── */}
+        {/* 3. Job Readiness & Playbooks */}
         <div className="nav-dropdown-wrapper">
           <button 
             type="button" 
@@ -409,73 +355,90 @@ export default function Navbar() {
             aria-expanded={activeDropdown === 'career'}
           >
             <Briefcase size={14} style={{ color: '#f59e0b' }} />
-            <span>Career Hub</span>
+            <span>Job Readiness</span>
             <ChevronDown size={14} className="dropdown-caret" />
           </button>
-
           {activeDropdown === 'career' && (
-            <div className="nav-dropdown-menu nav-dropdown-sm">
-              <NavLink to="/internship-simulator" className="dropdown-item" onClick={closeMenu}>
-                <div className="item-icon-box text-amber">
-                  <Radio size={16} />
-                </div>
+            <div className="nav-dropdown-menu">
+              <NavLink to="/playbooks" className="dropdown-item" onClick={closeMenu}>
+                <div className="item-icon-box text-cyan"><Briefcase size={16} /></div>
                 <div className="item-copy">
-                  <div className="item-title">
-                    <span>SOC On-Call Internship</span>
-                    <span className="badge-pill badge-amber">Experience</span>
-                  </div>
-                  <p>Simulated on-call shifts, incident paging, and manager review.</p>
+                  <div className="item-title"><span>Job Playbooks (SOPs)</span></div>
+                  <p>Daily workflow routines and engineering manuals.</p>
                 </div>
               </NavLink>
-
               <NavLink to="/interview-simulator" className="dropdown-item" onClick={closeMenu}>
-                <div className="item-icon-box text-purple">
-                  <Sparkles size={16} />
-                </div>
+                <div className="item-icon-box text-purple"><Sparkles size={16} /></div>
                 <div className="item-copy">
-                  <div className="item-title">
-                    <span>Interview Simulator</span>
-                    <span className="badge-pill badge-purple">AI Mock</span>
-                  </div>
-                  <p>Practice technical defense questions across 5 cloud roles.</p>
+                  <div className="item-title"><span>AI Interview Simulator</span></div>
+                  <p>Mock interviews for 5 different cloud roles.</p>
                 </div>
               </NavLink>
-
-              <NavLink to="/verify-audit-pack" className="dropdown-item" onClick={closeMenu}>
-                <div className="item-icon-box text-emerald">
-                  <Award size={16} />
-                </div>
+              <NavLink to="/internship-simulator" className="dropdown-item" onClick={closeMenu}>
+                <div className="item-icon-box text-amber"><Radio size={16} /></div>
                 <div className="item-copy">
-                  <div className="item-title">
-                    <span>Verified Audit Pack Proof</span>
-                    <span className="badge-pill badge-emerald">HMAC-SHA256</span>
-                  </div>
-                  <p>Cryptographically sealed dossier for LinkedIn and employers.</p>
+                  <div className="item-title"><span>On-Call Simulator</span></div>
+                  <p>Simulate on-call shifts and incident paging.</p>
                 </div>
               </NavLink>
-
+              <NavLink to="/live-internships" className="dropdown-item" onClick={closeMenu}>
+                <div className="item-icon-box text-emerald"><Award size={16} /></div>
+                <div className="item-copy">
+                  <div className="item-title"><span>Live Internships & Jobs</span></div>
+                  <p>Verified cloud security roles & hiring pipelines.</p>
+                </div>
+              </NavLink>
+              <NavLink to="/threat-intel" className="dropdown-item" onClick={closeMenu}>
+                <div className="item-icon-box text-rose"><ShieldAlert size={16} /></div>
+                <div className="item-copy">
+                  <div className="item-title"><span>Live Threat Radar & CVEs</span></div>
+                  <p>Real-time vulnerability feeds & threat telemetry.</p>
+                </div>
+              </NavLink>
               <NavLink to="/downloads" className="dropdown-item" onClick={closeMenu}>
-                <div className="item-icon-box text-sky">
-                  <Download size={16} />
-                </div>
+                <div className="item-icon-box text-sky"><Download size={16} /></div>
                 <div className="item-copy">
-                  <div className="item-title">
-                    <span>Free Career Packs (15 Packs)</span>
-                  </div>
-                  <p>Cheatsheets, checklists, and interview study guides.</p>
+                  <div className="item-title"><span>Free Resource Packs</span></div>
+                  <p>Cheat sheets, checklists, and study guides.</p>
+                </div>
+              </NavLink>
+              <NavLink to="/verify-audit-pack" className="dropdown-item" onClick={closeMenu}>
+                <div className="item-icon-box text-emerald"><ShieldCheck size={16} /></div>
+                <div className="item-copy">
+                  <div className="item-title"><span>Verify Audit Dossier</span></div>
+                  <p>Cryptographic proof verification for employers.</p>
                 </div>
               </NavLink>
             </div>
           )}
         </div>
 
-        {/* ── Direct Link: Dashboard ── */}
+        {/* 4. Direct Link: Dashboard */}
         <NavLink to="/dashboard" onClick={closeMenu} className="clean-nav-link" style={{ fontWeight: 700 }}>
-          SOC Dashboard
+          My Dashboard
         </NavLink>
+
+        {/* 5. Admin Portal (Only visible to NAEN Studios) */}
+        {activeProfile?.email === 'naenstudios@gmail.com' && (
+          <NavLink 
+            to="/admin" 
+            onClick={closeMenu} 
+            className="clean-nav-link" 
+            style={{ 
+              fontWeight: 800, 
+              color: '#f59e0b',
+              background: 'rgba(245, 158, 11, 0.1)',
+              padding: '6px 12px',
+              borderRadius: '6px',
+              border: '1px solid rgba(245, 158, 11, 0.3)'
+            }}
+          >
+            Admin Portal
+          </NavLink>
+        )}
       </nav>
 
-      {/* ── Right Action Controls ── */}
+      {/* ── Right Action Controls: Clean, Uncluttered, Purpose-Driven ── */}
       <div className="nav-actions">
         {/* Search Trigger */}
         <button 
@@ -490,96 +453,8 @@ export default function Navbar() {
           <kbd className="nav-search-kbd">Ctrl+/</kbd>
         </button>
 
-        {/* NAEN AI Co-Pilot */}
-        <button 
-          type="button"
-          className="nav-naen-ai-btn"
-          onClick={() => window.dispatchEvent(new CustomEvent('open-naen-ai'))}
-          title="Open NAEN AI Assistant (Ctrl+K)"
-          aria-label="Open NAEN AI"
-        >
-          <Sparkles size={13} className="text-cyan animate-pulse" />
-          <span className="nav-naen-text">NAEN AI</span>
-        </button>
-
-        {/* Cyber Audio FX Toggle */}
-        <button 
-          type="button"
-          className={`audio-fx-toggle ${audioEnabled ? 'is-active' : ''}`}
-          onClick={() => {
-            const next = !audioEnabled
-            setAudioEnabled(next)
-            setAudioFXEnabled(next)
-            if (next) playTactileClick()
-          }}
-          title={audioEnabled ? 'Cyber Audio Feedback Active (Click to Mute)' : 'Cyber Audio Feedback Muted'}
-          aria-label="Toggle audio effects"
-        >
-          {audioEnabled ? <Volume2 size={13} /> : <VolumeX size={13} />}
-          <span>{audioEnabled ? 'FX' : 'MUTE'}</span>
-        </button>
-
-        {/* Welcome Onboarding Trigger */}
-        <button
-          type="button"
-          className="btn-launch-sm"
-          onClick={() => {
-            closeMenu()
-            playTactileClick()
-            window.dispatchEvent(new CustomEvent('open-welcome-modal'))
-          }}
-          title="Platform Welcome & Identity Guide"
-          aria-label="Welcome Guide"
-          style={{
-            background: 'rgba(56, 189, 248, 0.1)',
-            border: '1px solid rgba(56, 189, 248, 0.3)',
-            color: '#38bdf8',
-            cursor: 'pointer',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '5px',
-            padding: '5px 10px',
-            borderRadius: '6px',
-            fontSize: '0.76rem',
-            fontWeight: 700
-          }}
-        >
-          <Sparkles size={12} className="text-cyan animate-pulse" />
-          <span>Tour</span>
-        </button>
-
-        {/* Leaderboard Trigger */}
-        <button
-          type="button"
-          className="btn-launch-sm"
-          onClick={() => {
-            closeMenu()
-            window.dispatchEvent(new CustomEvent('open-leaderboard-modal'))
-          }}
-          title="Open Weekly Sprint Leaderboard & XP Store"
-          style={{
-            background: 'rgba(245, 158, 11, 0.12)',
-            border: '1px solid rgba(245, 158, 11, 0.35)',
-            color: '#fbbf24',
-            cursor: 'pointer',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '5px',
-            padding: '5px 10px',
-            borderRadius: '6px',
-            fontSize: '0.76rem',
-            fontFamily: 'monospace'
-          }}
-        >
-          <Trophy size={13} className="text-amber" />
-          <span>Sprint</span>
-        </button>
-
-        {/* User Sync Status Badge (Google ID / Unique User ID) */}
-        <SyncStatusBadge />
-
-        {/* Dedicated Sign In Pill when in Guest Mode */}
-        {Boolean(activeProfile?.isGuest || !activeProfile?.id || activeProfile?.id === 'guest') && (
+        {/* Single Unified Student Identity Pill */}
+        {Boolean(activeProfile?.isGuest || !activeProfile?.id || activeProfile?.id === 'guest') ? (
           <button
             type="button"
             className="btn-nav-signin-pill"
@@ -587,52 +462,30 @@ export default function Navbar() {
               playTactileClick()
               window.dispatchEvent(new CustomEvent('open-user-sync-modal'))
             }}
-            title="Sign in with Google, Email, or Unique User ID"
-            aria-label="Sign in to your account"
+            title="Sign in with Email, User ID, or Google"
+            aria-label="Student Sign In"
             style={{
-              background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.18) 0%, rgba(14, 165, 233, 0.3) 100%)',
+              background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.2) 0%, rgba(14, 165, 233, 0.35) 100%)',
               border: '1px solid rgba(56, 189, 248, 0.55)',
               color: '#38bdf8',
               borderRadius: '8px',
-              padding: '5px 12px',
-              fontSize: '0.78rem',
+              padding: '6px 14px',
+              fontSize: '0.8rem',
               fontWeight: 800,
               display: 'inline-flex',
               alignItems: 'center',
               gap: '6px',
               cursor: 'pointer',
-              boxShadow: '0 0 12px rgba(56, 189, 248, 0.18)',
+              boxShadow: '0 0 14px rgba(56, 189, 248, 0.2)',
               letterSpacing: '0.3px',
               transition: 'all 0.2s ease'
             }}
           >
             <LogIn size={13} />
-            <span>Sign In</span>
+            <span>Student Sign In</span>
           </button>
-        )}
-
-        {/* Live Tier Clearance Badge */}
-        {clearance && (
-          <span
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '5px',
-              padding: '4px 10px',
-              borderRadius: '20px',
-              fontSize: '0.7rem',
-              fontFamily: "'DM Mono', monospace",
-              fontWeight: 700,
-              border: `1px solid ${sandboxMode ? 'rgba(245,158,11,0.5)' : 'rgba(56,189,248,0.4)'}`,
-              background: sandboxMode ? 'rgba(245,158,11,0.1)' : 'rgba(56,189,248,0.08)',
-              color: sandboxMode ? '#fbbf24' : '#38bdf8',
-              whiteSpace: 'nowrap',
-              letterSpacing: '0.5px'
-            }}
-            title={sandboxMode ? 'Sandbox Mode: All tiers unlocked' : `Current clearance: ${clearance.tierName}`}
-          >
-            {sandboxMode ? '🔓 SANDBOX' : `◆ TIER ${clearance.tier}`}
-          </span>
+        ) : (
+          <SyncStatusBadge />
         )}
 
         {/* 🌟 Dynamic Primary Action: "Start Tier 1" or "Resume" */}
@@ -703,6 +556,12 @@ export default function Navbar() {
           {menuOpen ? <X size={20} /> : <Menu size={20} />}
         </button>
       </div>
+
+      {/* Gemini Key Manager Modal */}
+      <GeminiKeyManagerModal
+        isOpen={isKeyModalOpen}
+        onClose={() => setIsKeyModalOpen(false)}
+      />
     </header>
   )
 }

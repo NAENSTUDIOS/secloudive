@@ -26,11 +26,15 @@ const LiveFeedPortalPage = lazy(() => import('../pages/LiveFeedPortalPage'))
 const CloudiveStudio = lazy(() => import('../pages/CloudiveStudio'))
 const InterviewSimulator = lazy(() => import('../pages/InterviewSimulator'))
 const PlatformRoadmapPage = lazy(() => import('../pages/PlatformRoadmapPage'))
+const AdminDashboard = lazy(() => import('../pages/AdminDashboard'))
+const AdminGuard = lazy(() => import('../components/AdminGuard'))
 // ── Cloudive-extracted pages ──
 const DownloadsPage = lazy(() => import('../pages/DownloadsPage'))
 const LegalPage = lazy(() => import('../pages/LegalPage'))
 const SafeLabCostCalculator = lazy(() => import('../components/SafeLabCostCalculator'))
 const VerifyAuditPackPage = lazy(() => import('../pages/VerifyAuditPackPage'))
+const LiveInternshipsPage = lazy(() => import('../pages/LiveInternshipsPage'))
+const LiveThreatIntelPage = lazy(() => import('../pages/LiveThreatIntelPage'))
 
 import ClearanceGateCheckpoint from '../components/ClearanceGateCheckpoint'
 
@@ -113,15 +117,41 @@ export default function AppRoutes() {
         <Route path="/learning/:pathId/:topicId" element={<LearningCenter />} />
         <Route path="/ramp-up" element={<CareerRampUpDirectory />} />
         <Route path="/rampup" element={<CareerRampUpDirectory />} />
+        <Route path="/career-rampup" element={<CareerRampUpDirectory />} />
+        <Route path="/career-ramp-up" element={<CareerRampUpDirectory />} />
+        <Route path="/career" element={<CareerRampUpDirectory />} />
+        <Route path="/careers" element={<CareerRampUpDirectory />} />
+        <Route path="/aws-career" element={<CareerRampUpDirectory />} />
         <Route path="/categories" element={<Categories />} />
         <Route path="/roadmap" element={<PlatformRoadmapPage />} />
         <Route path="/exploration-roadmap" element={<PlatformRoadmapPage />} />
+        <Route path="/career-roadmap" element={<PlatformRoadmapPage />} />
+        <Route path="/aws-roadmap" element={<PlatformRoadmapPage />} />
+        <Route path="/aws-guide" element={<PlatformRoadmapPage />} />
         <Route path="/dashboard" element={<DashboardRoute />} />
         <Route path="/about" element={<About />} />
         <Route path="/legal" element={<LegalPage />} />
         <Route path="/downloads" element={<DownloadsPage />} />
         <Route path="/cost-calculator" element={<SafeLabCostCalculator />} />
         <Route path="/zero-cost-labs" element={<SafeLabCostCalculator />} />
+
+        {/* Live Internships & Threat Radar - Open to all, prominently accessible */}
+        <Route path="/live-internships" element={<LiveInternshipsPage />} />
+        <Route path="/internships" element={<LiveInternshipsPage />} />
+        <Route path="/jobs" element={<LiveInternshipsPage />} />
+        <Route path="/aws-jobs" element={<LiveInternshipsPage />} />
+        <Route path="/cloud-jobs" element={<LiveInternshipsPage />} />
+        <Route path="/threat-intel" element={<LiveThreatIntelPage />} />
+        <Route path="/threats" element={<LiveThreatIntelPage />} />
+        <Route path="/cves" element={<LiveThreatIntelPage />} />
+        <Route path="/cve-radar" element={<LiveThreatIntelPage />} />
+
+        {/* ── Admin Portal (Strictly for naenstudios@gmail.com) ── */}
+        <Route path="/admin" element={
+          <AdminGuard>
+            <AdminDashboard />
+          </AdminGuard>
+        } />
 
         {/* Tier 2 Gated: Deployment Layer (Labs, Playbooks, Projects) */}
         <Route path="/labs" element={
@@ -235,10 +265,22 @@ export default function AppRoutes() {
             <VerifyAuditPackPage />
           </GatedRoute>
         } />
+        <Route path="/verify-audit-pack" element={
+          <GatedRoute featureKey="verify-pack" featureTitle="Cryptographic Audit Dossier Verifier" requiredTier={5} requiredTierName="Tier 4 Cleared (Full Command Deck Access)">
+            <VerifyAuditPackPage />
+          </GatedRoute>
+        } />
         <Route path="/verify" element={
           <GatedRoute featureKey="verify-pack" featureTitle="Cryptographic Audit Dossier Verifier" requiredTier={5} requiredTierName="Tier 4 Cleared (Full Command Deck Access)">
             <VerifyAuditPackPage />
           </GatedRoute>
+        } />
+
+        {/* ── Admin Management Portal (Strictly restricted to naenstudios@gmail.com) ── */}
+        <Route path="/admin" element={
+          <AdminGuard>
+            <AdminDashboard />
+          </AdminGuard>
         } />
 
         <Route path="*" element={<Home />} />

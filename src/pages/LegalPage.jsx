@@ -134,6 +134,87 @@ export default function LegalPage() {
           </p>
         </div>
 
+        {/* Interactive Consent & Preferences Controls */}
+        <div style={{
+          background: 'rgba(15, 23, 42, 0.75)',
+          border: '1px solid rgba(56, 189, 248, 0.25)',
+          borderRadius: '10px',
+          padding: '24px',
+          marginBottom: '32px'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+            <Scale size={18} style={{ color: '#38bdf8' }} />
+            <div style={{ fontWeight: 800, color: '#f8fafc', fontSize: '1rem' }}>
+              Your Privacy & Agreement Controls
+            </div>
+          </div>
+          <p style={{ margin: '0 0 16px', fontSize: '0.85rem', color: '#94a3b8', lineHeight: 1.6 }}>
+            SeCloudive honors your privacy by design. We use zero third-party tracking pixels or ad trackers.
+            You can inspect or adjust your legal agreement and cookie consent at any time:
+          </p>
+          <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+            <button
+              type="button"
+              onClick={() => window.dispatchEvent(new CustomEvent('open-welcome-modal', { detail: { step: 'terms' } }))}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                background: 'rgba(56, 189, 248, 0.12)',
+                border: '1px solid rgba(56, 189, 248, 0.4)',
+                color: '#38bdf8',
+                padding: '9px 16px',
+                borderRadius: '8px',
+                fontWeight: 700,
+                fontSize: '0.82rem',
+                cursor: 'pointer'
+              }}
+            >
+              <FileText size={14} /> Review Terms & Code of Ethics
+            </button>
+
+            <button
+              type="button"
+              onClick={() => window.dispatchEvent(new CustomEvent('open-welcome-modal', { detail: { step: 'cookies' } }))}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                background: 'rgba(16, 185, 129, 0.12)',
+                border: '1px solid rgba(16, 185, 129, 0.4)',
+                color: '#34d399',
+                padding: '9px 16px',
+                borderRadius: '8px',
+                fontWeight: 700,
+                fontSize: '0.82rem',
+                cursor: 'pointer'
+              }}
+            >
+              <CheckCircle2 size={14} /> Adjust Cookie & Storage Preferences
+            </button>
+
+            <button
+              type="button"
+              onClick={() => window.dispatchEvent(new CustomEvent('open-user-sync-modal'))}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                background: 'rgba(148, 163, 184, 0.1)',
+                border: '1px solid rgba(148, 163, 184, 0.3)',
+                color: '#cbd5e1',
+                padding: '9px 16px',
+                borderRadius: '8px',
+                fontWeight: 700,
+                fontSize: '0.82rem',
+                cursor: 'pointer'
+              }}
+            >
+              <Shield size={14} /> Account Identity & Sandbox Isolation
+            </button>
+          </div>
+        </div>
+
         {/* Contact */}
         <div style={{
           background: 'rgba(15,23,42,0.7)',

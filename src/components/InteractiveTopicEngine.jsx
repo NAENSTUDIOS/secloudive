@@ -3,8 +3,11 @@ import {
   BookOpen, Zap, Terminal, FileText, ChevronRight,
   CheckCircle2, AlertTriangle, Lightbulb,
   Brain, Shield, Lock, Eye, Copy, Check, Play,
-  Layers, Target, Activity, Code2, Star, Download
+  Layers, Target, Activity, Code2, Star, Download,
+  Briefcase, Sparkles
 } from 'lucide-react'
+import TopicArchitectureDiagram from './TopicArchitectureDiagram'
+import TopicJobReadinessCard from './TopicJobReadinessCard'
 
 // ─── Utility: parse markdown bold/code inline ────────────────────────────────
 function parseInline(text) {
@@ -155,6 +158,9 @@ function TheoryTab({ topic }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      {/* ── Interactive Architecture Diagram & Visual Threat Flow ── */}
+      <TopicArchitectureDiagram topic={topic} pathId={topic.pathId} />
+
       {intros.map((b, i) => (
         <p key={i} style={{ fontSize: 14, color: '#94a3b8', lineHeight: 1.75, margin: '0 0 12px', padding: '14px 16px', background: 'rgba(56,189,248,0.04)', borderRadius: 8, borderLeft: '3px solid #38bdf8', opacity: i < visible ? 1 : 0, transition: 'opacity 0.3s ease' }}>
           {parseInline(b.text)}
@@ -326,11 +332,18 @@ function RecapTab({ topic, pathResources }) {
 
   return (
     <div>
-      <div style={{ padding: '12px 16px', background: 'rgba(56,189,248,0.06)', border: '1px solid rgba(56,189,248,0.2)', borderRadius: 8, marginBottom: 20, fontSize: 13, color: '#94a3b8', display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-        <FileText size={16} style={{ color: '#38bdf8', flexShrink: 0, marginTop: 1 }} />
+      <div style={{ padding: '14px 18px', background: 'linear-gradient(135deg, rgba(15,23,42,0.9) 0%, rgba(56,189,248,0.08) 100%)', border: '1px solid rgba(56,189,248,0.25)', borderRadius: 10, marginBottom: 20, fontSize: 13, color: '#94a3b8', display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+        <div style={{ width: 32, height: 32, borderRadius: 8, background: 'rgba(56,189,248,0.15)', border: '1px solid rgba(56,189,248,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#38bdf8', flexShrink: 0 }}>
+          <Sparkles size={16} />
+        </div>
         <div>
-          <strong style={{ color: '#f8fafc' }}>Recap & Reference Library</strong><br />
-          Supplementary PDFs, official docs, and external references for deeper reading <em>after</em> mastering the concept. Core learning lives in <em>Theory</em> and <em>How It Works</em>.
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4, flexWrap: 'wrap' }}>
+            <strong style={{ color: '#f8fafc', fontSize: 14 }}>NAEN Studios Curated Resource Library</strong>
+            <span style={{ fontSize: 10, fontWeight: 800, color: '#10b981', background: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.3)', borderRadius: 999, padding: '1px 8px', letterSpacing: '0.05em' }}>
+              OFFICIAL NAEN STUDIOS ACCREDITATION
+            </span>
+          </div>
+          Vetted architectural whitepapers, authoritative cloud documentation, and hands-on threat labs verified by NAEN Studios Security Engineers for AWS career readiness.
         </div>
       </div>
       {topic.keyTakeaways && topic.keyTakeaways.length > 0 && (
@@ -348,7 +361,10 @@ function RecapTab({ topic, pathResources }) {
       )}
       {unique.length > 0 && (
         <>
-          <div style={{ fontSize: 11, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10, fontWeight: 700 }}>📚 External Docs & Reference Materials</div>
+          <div style={{ fontSize: 11, color: '#38bdf8', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 6 }}>
+            <Sparkles size={13} />
+            <span>NAEN Studios Vetted Resources & Official AWS References</span>
+          </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {unique.map((res, i) => {
               const { color, tag } = getColor(res)
@@ -358,7 +374,14 @@ function RecapTab({ topic, pathResources }) {
                   onMouseEnter={e => { e.currentTarget.style.background = 'rgba(30,41,59,0.9)' }}
                   onMouseLeave={e => { e.currentTarget.style.background = 'rgba(15,23,42,0.85)' }}
                 >
-                  <div style={{ padding: '4px 8px', borderRadius: 5, background: `${color}18`, fontSize: 10, fontWeight: 700, color, whiteSpace: 'nowrap', flexShrink: 0 }}>{tag}</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+                    <span style={{ padding: '3px 8px', borderRadius: 4, background: 'rgba(56,189,248,0.1)', border: '1px solid rgba(56,189,248,0.25)', fontSize: 9, fontWeight: 800, color: '#38bdf8', letterSpacing: '0.05em' }}>
+                      NAEN STUDIOS
+                    </span>
+                    <div style={{ padding: '3px 8px', borderRadius: 4, background: `${color}18`, fontSize: 10, fontWeight: 700, color, whiteSpace: 'nowrap' }}>
+                      {tag}
+                    </div>
+                  </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: 13, color: '#e2e8f0', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{res.title}</div>
                     {(res.why || res.description) && <div style={{ fontSize: 11, color: '#64748b', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{res.why || res.description}</div>}
@@ -382,9 +405,10 @@ function RecapTab({ topic, pathResources }) {
 
 // ─── Main Export ─────────────────────────────────────────────────────────────
 const TABS = [
-  { id: 'theory', label: 'Theory', icon: <BookOpen size={14} />, desc: 'Core concepts explained visually' },
-  { id: 'howItWorks', label: 'How It Works', icon: <Zap size={14} />, desc: 'Step-by-step mechanics & flow' },
-  { id: 'liveCli', label: 'Live CLI', icon: <Terminal size={14} />, desc: 'Run commands interactively' },
+  { id: 'theory', label: 'Theory & Architecture', icon: <BookOpen size={14} />, desc: 'Core concepts & interactive visual flow' },
+  { id: 'jobReadiness', label: 'AWS Interview & Job Defense', icon: <Briefcase size={14} />, desc: 'STAR answers & production CLI audits' },
+  { id: 'howItWorks', label: 'How It Works', icon: <Zap size={14} />, desc: 'Step-by-step mechanics & hardening flow' },
+  { id: 'liveCli', label: 'Live CLI Sandbox', icon: <Terminal size={14} />, desc: 'Run commands interactively' },
   { id: 'recap', label: 'Recap & Refs', icon: <FileText size={14} />, desc: 'PDFs & references only (supplementary)' },
 ]
 
@@ -416,6 +440,7 @@ export default function InteractiveTopicEngine({ topic, pathResources = [] }) {
       {/* Content */}
       <div style={{ minHeight: 200 }}>
         {active === 'theory' && <TheoryTab topic={topic} />}
+        {active === 'jobReadiness' && <TopicJobReadinessCard topic={topic} pathId={topic.pathId} />}
         {active === 'howItWorks' && <HowItWorksTab topic={topic} />}
         {active === 'liveCli' && <LiveCliTab topic={topic} />}
         {active === 'recap' && <RecapTab topic={topic} pathResources={pathResources} />}

@@ -27,6 +27,9 @@ export const rampUpCategories = [
 export const officialRampUpPdfs = [
   {
     id: 'pdf-gcp-security-rampup',
+    moduleMarker: 'Guide 1 of 13',
+    encouragingText: 'Great start!',
+    xpReward: 100,
     title: 'Google Cloud Ramp-Up Guide: Security, Identity and Compliance',
     roleTag: 'Google Cloud Security Engineer (PCSE)',
     publisher: 'Google Cloud Training & Certification',
@@ -46,6 +49,9 @@ export const officialRampUpPdfs = [
   },
   {
     id: 'pdf-azure-security-rampup',
+    moduleMarker: 'Guide 2 of 13',
+    encouragingText: 'Keep ramping up!',
+    xpReward: 100,
     title: 'Microsoft Learn Ramp-Up Guide: Security, Identity and Compliance',
     roleTag: 'Azure & AI Security Engineer (SC-500 / SC-200)',
     publisher: 'Microsoft Learn',
@@ -65,6 +71,9 @@ export const officialRampUpPdfs = [
   },
   {
     id: 'pdf-tryhackme-rampup',
+    moduleMarker: 'Guide 3 of 13',
+    encouragingText: 'Keep ramping up!',
+    xpReward: 100,
     title: 'TryHackMe Ramp-Up Guide: Offensive & Defensive Security',
     roleTag: 'Hands-On Cyber & SOC Security',
     publisher: 'TryHackMe Learning Platform',
@@ -84,6 +93,9 @@ export const officialRampUpPdfs = [
   },
   {
     id: 'pdf-90day-cloud-roadmap',
+    moduleMarker: 'Guide 4 of 13',
+    encouragingText: 'Keep ramping up!',
+    xpReward: 100,
     title: '90-Day Cloud Engineer Roadmap (Zero to Cloud)',
     roleTag: 'Associate to Professional Cloud Engineer',
     publisher: 'ZeroToCloud.co',
@@ -100,6 +112,9 @@ export const officialRampUpPdfs = [
   },
   {
     id: 'pdf-security',
+    moduleMarker: 'Guide 5 of 13',
+    encouragingText: 'Keep ramping up!',
+    xpReward: 100,
     title: 'AWS Ramp-Up Guide: Security',
     roleTag: 'Cloud Security / SecOps',
     publisher: 'AWS Training & Certification',
@@ -112,6 +127,9 @@ export const officialRampUpPdfs = [
   },
   {
     id: 'pdf-architect',
+    moduleMarker: 'Guide 6 of 13',
+    encouragingText: 'Keep ramping up!',
+    xpReward: 100,
     title: 'AWS Ramp-Up Guide: Architect',
     roleTag: 'Solutions Architect',
     publisher: 'AWS Training & Certification',
@@ -124,6 +142,9 @@ export const officialRampUpPdfs = [
   },
   {
     id: 'pdf-devops',
+    moduleMarker: 'Guide 7 of 13',
+    encouragingText: 'Keep ramping up!',
+    xpReward: 100,
     title: 'AWS Ramp-Up Guide: DevOps Engineer',
     roleTag: 'DevSecOps & CI/CD',
     publisher: 'AWS Training & Certification',
@@ -136,6 +157,9 @@ export const officialRampUpPdfs = [
   },
   {
     id: 'pdf-operations',
+    moduleMarker: 'Guide 8 of 13',
+    encouragingText: 'Keep ramping up!',
+    xpReward: 100,
     title: 'AWS Ramp-Up Guide: Cloud Operations (SysOps)',
     roleTag: 'Cloud SysOps & Operations',
     publisher: 'AWS Training & Certification',
@@ -148,6 +172,9 @@ export const officialRampUpPdfs = [
   },
   {
     id: 'pdf-networking',
+    moduleMarker: 'Guide 9 of 13',
+    encouragingText: 'Keep ramping up!',
+    xpReward: 100,
     title: 'AWS Ramp-Up Guide: Advanced Networking',
     roleTag: 'Cloud Network Engineer',
     publisher: 'AWS Training & Certification',
@@ -160,6 +187,9 @@ export const officialRampUpPdfs = [
   },
   {
     id: 'pdf-cloud-essentials',
+    moduleMarker: 'Guide 10 of 13',
+    encouragingText: 'Keep ramping up!',
+    xpReward: 100,
     title: 'AWS Ramp-Up Guide: Cloud Essentials',
     roleTag: 'Cloud Foundations',
     publisher: 'AWS Training & Certification',
@@ -172,6 +202,9 @@ export const officialRampUpPdfs = [
   },
   {
     id: 'pdf-developer',
+    moduleMarker: 'Guide 11 of 13',
+    encouragingText: 'Keep ramping up!',
+    xpReward: 100,
     title: 'AWS Ramp-Up Guide: Developer',
     roleTag: 'Cloud Software Engineer',
     publisher: 'AWS Training & Certification',
@@ -184,6 +217,9 @@ export const officialRampUpPdfs = [
   },
   {
     id: 'pdf-well-architected-security',
+    moduleMarker: 'Guide 12 of 13',
+    encouragingText: 'Keep ramping up!',
+    xpReward: 100,
     title: 'AWS Well-Architected Framework: Security Pillar',
     roleTag: 'Enterprise Architecture & SecOps',
     publisher: 'AWS Technical Documentation',
@@ -196,6 +232,9 @@ export const officialRampUpPdfs = [
   },
   {
     id: 'pdf-cis-benchmark',
+    moduleMarker: 'Guide 13 of 13',
+    encouragingText: 'Keep ramping up!',
+    xpReward: 100,
     title: 'CIS AWS Foundations Benchmark v3.0 Specification',
     roleTag: 'Compliance & Hardening',
     publisher: 'Center for Internet Security (CIS)',
@@ -1157,7 +1196,7 @@ export const masterRampUpLabs = [
     roleRampUpGuide: {
       summary: 'Master the fundamental building block of all cloud security: Virtual Private Clouds. Learn CIDR subnet math, route table isolation, and stateful vs stateless traffic filtering.',
       dayInLife: 'Designing multi-tier VPC architectures, troubleshooting blocked security group ports, auditing public IP allocations, and setting up VPC Peering.',
-      keyCertifications: ['AWS Certified Advanced Networking - Specialty (ANS-C01)', 'CompTIA Network+'],
+      keyCertifications: ['AWS Certified Advanced Networking - Specialty (ANS-C01) (Retires Dec 31, 2026)', 'CompTIA Network+'],
       salaryRange: '$130,000 - $185,000'
     },
     stepsToComplete: [

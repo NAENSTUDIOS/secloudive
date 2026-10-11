@@ -70,10 +70,18 @@ CREATE TABLE IF NOT EXISTS public.user_settings (
   learning_view            TEXT        NOT NULL DEFAULT 'grid'
                            CHECK (learning_view IN ('grid','list')),
   audio_fx_enabled         BOOLEAN     NOT NULL DEFAULT TRUE,
+  terms_accepted           BOOLEAN     NOT NULL DEFAULT FALSE,
+  cookies_accepted         BOOLEAN     NOT NULL DEFAULT FALSE,
+  cookie_preference        TEXT        NOT NULL DEFAULT 'all',
   user_gemini_key          TEXT,                       -- Optional custom Gemini API key
   created_at               TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at               TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+-- Migration safety for pre-existing user_settings tables:
+ALTER TABLE public.user_settings ADD COLUMN IF NOT EXISTS terms_accepted BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE public.user_settings ADD COLUMN IF NOT EXISTS cookies_accepted BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE public.user_settings ADD COLUMN IF NOT EXISTS cookie_preference TEXT NOT NULL DEFAULT 'all';
 
 -- ── 1.3 user_progress ────────────────────────────────────────────────────────
 -- Core learning telemetry. Fast-query indexed scalar columns + full state JSONB.

@@ -1,0 +1,25 @@
+{
+  "stats": {
+    "curriculumModules": 8,
+    "curriculumSteps": 404,
+    "quizQuestions": 72,
+    "realLabs": 18,
+    "battleRooms": 13,
+    "investigations": 130,
+    "threatHunts": 0,
+    "architectureReviews": 0,
+    "cloudProjects": 4,
+    "interviewQuestions": 13,
+    "iacTemplates": 0,
+    "flashcards": 18,
+    "cheatSheets": 8,
+    "resourcesLinks": 0,
+    "placeholderCount": 0,
+    "emptyUrls": 0,
+    "gaps": []
+  },
+  "awsCount": 5149,
+  "azureCount": 198,
+  "gcpCount": 122,
+  "k8sCount": 295
+}

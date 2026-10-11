@@ -418,7 +418,12 @@ export default function VerifyAuditPackPage() {
                   </div>
 
                   <div style={{ background: 'rgba(2, 6, 23, 0.6)', padding: '12px 16px', borderRadius: '8px' }}>
-                    <div style={{ fontSize: '11px', color: '#94a3b8', textTransform: 'uppercase' }}>SHA-256 Hash</div>
+                    <div style={{ fontSize: '11px', color: '#94a3b8', textTransform: 'uppercase' }}>Accreditation Authority</div>
+                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#fbbf24', marginTop: '4px' }}>NAEN Studios Security Academy</div>
+                  </div>
+
+                  <div style={{ background: 'rgba(2, 6, 23, 0.6)', padding: '12px 16px', borderRadius: '8px', gridColumn: '1 / -1' }}>
+                    <div style={{ fontSize: '11px', color: '#94a3b8', textTransform: 'uppercase' }}>Cryptographic SHA-256 Hash</div>
                     <div style={{ fontSize: '11px', color: '#34d399', fontFamily: 'monospace', marginTop: '4px', wordBreak: 'break-all' }}>{certResult.cert_hash}</div>
                   </div>
                 </div>
@@ -674,7 +679,8 @@ export default function VerifyAuditPackPage() {
                   alignItems: 'center'
                 }}>
                   <span>Issued At: <code>{verificationResult.issuedAt}</code></span>
-                  <span>Label: <strong style={{ color: '#34d399' }}>Integrity-checked</strong></span>
+                  <span>Accreditation: <strong style={{ color: '#fbbf24' }}>NAEN Studios Security Engineering</strong></span>
+                  <span>Status: <strong style={{ color: '#34d399' }}>Integrity-checked</strong></span>
                 </div>
               </div>
             )}

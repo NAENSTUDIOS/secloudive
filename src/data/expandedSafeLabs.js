@@ -13,6 +13,10 @@ const SAFE_LAB_DOMAINS = [
     baseLabs: [
       {
         slug: 'lab-iam-permission-boundaries',
+        moduleMarker: 'Module 1 of 8',
+        encouragingText: 'Great start!',
+        difficulty: 'Intermediate',
+        xpReward: 200,
         title: 'Building Automated IAM Permission Boundaries for Delegated Developer Admins',
         objective: 'Permit developer team leads to create IAM roles for their microservices while mathematically preventing them from escalating privileges to AdministratorAccess.',
         time: '35 mins',
@@ -40,6 +44,10 @@ const SAFE_LAB_DOMAINS = [
       },
       {
         slug: 'lab-iam-cross-account-externalid',
+        moduleMarker: 'Module 2 of 8',
+        encouragingText: 'Keep going!',
+        difficulty: 'Intermediate',
+        xpReward: 250,
         title: 'Hardening Cross-Account STS AssumeRole Trust with sts:ExternalId Condition',
         objective: 'Construct a defensible cross-account trust policy that mitigates the Confused Deputy vulnerability for third-party SaaS vendors.',
         time: '30 mins',
@@ -72,6 +80,10 @@ const SAFE_LAB_DOMAINS = [
     baseLabs: [
       {
         slug: 'lab-s3-block-public-access-scp',
+        moduleMarker: 'Module 3 of 8',
+        encouragingText: 'Keep going!',
+        difficulty: 'Advanced',
+        xpReward: 150,
         title: 'Enforcing S3 Account-Level Block Public Access & Bucket Policies with TLS 1.3',
         objective: 'Lock down an Amazon S3 bucket to strictly reject HTTP traffic, enforce TLS 1.2/1.3, and enable server-side encryption with KMS.',
         time: '25 mins',
@@ -105,6 +117,10 @@ const SAFE_LAB_DOMAINS = [
     baseLabs: [
       {
         slug: 'lab-vpc-flow-logs-athena',
+        moduleMarker: 'Module 4 of 8',
+        encouragingText: 'Halfway there!',
+        difficulty: 'Intermediate',
+        xpReward: 200,
         title: 'Provisioning VPC Flow Logs to S3 and Querying Suspicious Ingress via Amazon Athena',
         objective: 'Capture rejected network traffic across a VPC and use Athena serverless SQL to hunt for port scanners and brute-force IPs.',
         time: '40 mins',
@@ -138,6 +154,10 @@ const SAFE_LAB_DOMAINS = [
     baseLabs: [
       {
         slug: 'lab-guardduty-finding-eventbridge',
+        moduleMarker: 'Module 5 of 8',
+        encouragingText: 'Keep going!',
+        difficulty: 'Expert',
+        xpReward: 250,
         title: 'Simulating GuardDuty Findings & Automating Instant Quarantine via EventBridge and Lambda',
         objective: 'Trigger sample GuardDuty findings and configure an EventBridge rule that automatically disables compromised IAM access keys within 3 seconds.',
         time: '35 mins',
@@ -172,6 +192,10 @@ const SAFE_LAB_DOMAINS = [
     baseLabs: [
       {
         slug: 'lab-terraform-checkov-pipeline',
+        moduleMarker: 'Module 6 of 8',
+        encouragingText: 'Keep going!',
+        difficulty: 'Advanced',
+        xpReward: 150,
         title: 'Building Pre-Commit Security Guardrails with Checkov and GitHub Actions OIDC',
         objective: 'Establish a local and CI/CD security gate that blocks Terraform deployments containing unencrypted S3 buckets, open security groups, or wildcard IAM policies.',
         time: '30 mins',
@@ -204,6 +228,10 @@ const SAFE_LAB_DOMAINS = [
     baseLabs: [
       {
         slug: 'lab-eks-pod-identity-least-privilege',
+        moduleMarker: 'Module 7 of 8',
+        encouragingText: 'Keep going!',
+        difficulty: 'Intermediate',
+        xpReward: 200,
         title: 'Configuring EKS Pod Identity Associations for Zero-Trust Microservice S3 Access',
         objective: 'Implement modern EKS Pod Identity to grant a containerized pod access to a specific S3 bucket prefix without node-level IAM credentials.',
         time: '45 mins',
@@ -237,6 +265,10 @@ const SAFE_LAB_DOMAINS = [
     baseLabs: [
       {
         slug: 'lab-lambda-private-vpc-endpoints',
+        moduleMarker: 'Module 8 of 8',
+        encouragingText: 'Final module! You got this.',
+        difficulty: 'Intermediate',
+        xpReward: 250,
         title: 'Isolating AWS Lambda in Private Subnets with PrivateLink Interface VPC Endpoints',
         objective: 'Deploy a serverless Lambda microservice that communicates with DynamoDB and Secrets Manager with zero exposure to the public internet.',
         time: '35 mins',

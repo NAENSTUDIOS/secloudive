@@ -38,6 +38,8 @@ import {
 } from 'lucide-react'
 import { rampUpCategories, masterRampUpLabs, officialRampUpPdfs } from '../data/careerRampUpData'
 import CopyrightDisclaimer from '../components/CopyrightDisclaimer'
+import AwsCareerGuideMap from '../components/AwsCareerGuideMap'
+import AwsSpecialtyTierGuide from '../components/AwsSpecialtyTierGuide'
 import { useChallenges } from '../context/ChallengeContext'
 
 export default function CareerRampUpDirectory() {
@@ -267,7 +269,11 @@ export default function CareerRampUpDirectory() {
         </div>
       </section>
 
-      {/* 2. OFFICIAL AWS RAMP-UP GUIDE PDFS VAULT */}
+      {/* 2. AWS CAREER GUIDE MAPS & ARCHITECTURE BLUEPRINTS */}
+      <AwsSpecialtyTierGuide />
+      <AwsCareerGuideMap />
+
+      {/* 3. OFFICIAL AWS RAMP-UP GUIDE PDFS VAULT */}
       <section id="official-pdf-vault" className="official-pdf-vault-shelf">
         <div className="vault-shelf-header">
           <div className="vault-title-group">
@@ -315,8 +321,26 @@ export default function CareerRampUpDirectory() {
                       <FileText size={10} /> {pdf.badgeText}
                     </span>
                     <span className="pdf-page-pill">{pdf.pageCount}</span>
+                    {pdf.moduleMarker && (
+                      <span className="pdf-page-pill" style={{ background: 'rgba(52, 211, 153, 0.1)', color: '#34d399', border: '1px solid rgba(52, 211, 153, 0.3)' }}>
+                        <Sparkles size={10} style={{ display: 'inline', marginRight: '4px' }} />
+                        {pdf.moduleMarker}
+                      </span>
+                    )}
                   </div>
-                  <span className="pdf-role-tag">{pdf.roleTag}</span>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span className="pdf-role-tag">{pdf.roleTag}</span>
+                    {pdf.xpReward && (
+                      <span style={{ fontSize: '0.65rem', color: '#ff9900', fontWeight: 800, background: 'rgba(255, 153, 0, 0.1)', padding: '2px 6px', borderRadius: '4px' }}>
+                        +{pdf.xpReward} XP
+                      </span>
+                    )}
+                  </div>
+                  {pdf.encouragingText && (
+                    <div style={{ fontSize: '0.7rem', color: '#38bdf8', marginTop: '6px', fontWeight: 600 }}>
+                      ↳ {pdf.encouragingText}
+                    </div>
+                  )}
                 </div>
 
                 <h3 className="pdf-card-title">{pdf.title}</h3>
@@ -472,6 +496,12 @@ export default function CareerRampUpDirectory() {
                       <span className="duration-tag">
                         <Clock size={11} /> {lab.estimatedTime}
                       </span>
+                      {lab.moduleMarker && (
+                        <span style={{ fontSize: '0.65rem', background: 'rgba(52, 211, 153, 0.1)', color: '#34d399', border: '1px solid rgba(52, 211, 153, 0.3)', padding: '2px 6px', borderRadius: '4px', display: 'flex', alignItems: 'center', gap: '3px' }}>
+                          <Sparkles size={10} />
+                          {lab.moduleMarker}
+                        </span>
+                      )}
                     </div>
 
                     <button 
@@ -489,7 +519,14 @@ export default function CareerRampUpDirectory() {
                   </div>
 
                   <div className="bento-card-body">
-                    <span className="bento-role-title">{lab.roleTitle}</span>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span className="bento-role-title">{lab.roleTitle}</span>
+                      {lab.xpReward && (
+                        <span style={{ fontSize: '0.65rem', color: '#ff9900', fontWeight: 800, background: 'rgba(255, 153, 0, 0.1)', padding: '2px 6px', borderRadius: '4px' }}>
+                          +{lab.xpReward} XP
+                        </span>
+                      )}
+                    </div>
                     <h3 className="bento-lab-title">
                       {index + 1}. {lab.labTitle}
                     </h3>
@@ -509,6 +546,11 @@ export default function CareerRampUpDirectory() {
                     ) : (
                       <p className="bento-summary-text">
                         {lab.whatYouHaveLearnt?.interviewTalkingPoint || lab.stepsToComplete[0]?.instruction}
+                      </p>
+                    )}
+                    {lab.encouragingText && (
+                      <p style={{ fontSize: '0.75rem', color: '#38bdf8', marginTop: '6px', fontWeight: 600 }}>
+                        ↳ {lab.encouragingText}
                       </p>
                     )}
 

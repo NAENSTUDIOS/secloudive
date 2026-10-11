@@ -1204,7 +1204,7 @@
       "accentColor": "#0288D1",
       "estimatedHours": "55 hours",
       "shortDescription": "Master enterprise global hybrid backbones, Direct Connect, BGP peering, and SD-WAN integrations.",
-      "suggestedExamPath": "AWS Certified Advanced Networking - Specialty",
+      "suggestedExamPath": "AWS Certified Advanced Networking - Specialty (Retires Dec 31, 2026. Retirement date revised by AWS; no replacement exam announced as of this writing.)",
       "modules": [
         {
           "number": 1,
@@ -1250,7 +1250,7 @@
         "checkedOn": "March 2026",
         "resources": [
           {
-            "label": "AWS Certified Advanced Networking - Specialty Exam Guide",
+            "label": "AWS Certified Advanced Networking - Specialty Exam Guide (Retires Dec 31, 2026)",
             "url": "https://aws.amazon.com/certification/certified-advanced-networking-specialty/",
             "type": "Exam guide"
           },

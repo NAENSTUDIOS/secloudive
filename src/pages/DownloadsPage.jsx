@@ -150,15 +150,27 @@ function DownloadCard({ item, isDownloaded, onDownload }) {
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px', flexWrap: 'wrap' }}>
           <h3 style={{ margin: 0, fontSize: '0.92rem', fontWeight: 700, color: '#e2e8f0', lineHeight: 1.3 }}>
-            {item.name}
+            {item.name || item.title}
           </h3>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
-            <span style={{ fontSize: '0.67rem', color: '#38bdf8', background: 'rgba(56,189,248,0.1)', border: '1px solid rgba(56,189,248,0.25)', borderRadius: '4px', padding: '1px 6px', fontWeight: 700 }}>
-              {item.format}
-            </span>
-            <span style={{ fontSize: '0.67rem', color: '#64748b' }}>{item.size}</span>
+            {item.moduleMarker && (
+              <span style={{ fontSize: '0.67rem', color: '#10b981', background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.25)', borderRadius: '4px', padding: '1px 6px', fontWeight: 700 }}>
+                {item.moduleMarker}
+              </span>
+            )}
+            {item.format && (
+              <span style={{ fontSize: '0.67rem', color: '#38bdf8', background: 'rgba(56,189,248,0.1)', border: '1px solid rgba(56,189,248,0.25)', borderRadius: '4px', padding: '1px 6px', fontWeight: 700 }}>
+                {item.format}
+              </span>
+            )}
+            {item.size && <span style={{ fontSize: '0.67rem', color: '#64748b' }}>{item.size}</span>}
           </div>
         </div>
+        {item.encouragingText && (
+          <div style={{ fontSize: '0.75rem', color: '#10b981', marginTop: '5px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <Sparkles size={11} /> {item.encouragingText}
+          </div>
+        )}
         <p style={{ margin: '5px 0 10px', fontSize: '0.8rem', color: '#94a3b8', lineHeight: 1.5 }}>
           {item.description}
         </p>
@@ -338,6 +350,11 @@ function CertMapSection() {
             <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#e2e8f0', marginBottom: '4px' }}>
               {path.exam}
             </div>
+            {path.retirementNote && (
+              <div style={{ fontSize: '0.72rem', color: '#ef4444', marginBottom: '4px', fontWeight: 600 }}>
+                ⚠️ {path.retirementNote}
+              </div>
+            )}
             <div style={{ fontSize: '0.72rem', color: '#a855f7', marginBottom: '6px', fontWeight: 600 }}>
               → {path.targetRole}
             </div>
@@ -347,6 +364,22 @@ function CertMapSection() {
           </div>
         ))}
       </div>
+      {certMapData.specialtyCallout && (
+        <div style={{
+          background: 'rgba(239, 68, 68, 0.05)',
+          borderLeft: '4px solid #ef4444',
+          borderRadius: '4px',
+          padding: '14px',
+          marginBottom: '18px'
+        }}>
+          <h4 style={{ margin: '0 0 6px', fontSize: '0.85rem', fontWeight: 700, color: '#fca5a5' }}>
+            {certMapData.specialtyCallout.title}
+          </h4>
+          <p style={{ margin: 0, fontSize: '0.8rem', color: '#f87171', lineHeight: 1.5 }}>
+            {certMapData.specialtyCallout.content}
+          </p>
+        </div>
+      )}
       <div style={{ fontSize: '0.65rem', color: '#475569', fontStyle: 'italic' }}>
         {certMapData.verificationNotice}
       </div>
@@ -551,6 +584,28 @@ export default function DownloadsPage() {
             <Mail size={16} />
             Auto Script to NAEN Studios
           </button>
+          <a
+            href="/SECLOUDIVE_MASTER_TRACKER_DOSSIER.pdf"
+            download="SECLOUDIVE_MASTER_TRACKER_DOSSIER.pdf"
+            onClick={() => playTactileClick()}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '7px',
+              background: 'linear-gradient(135deg, #10b981, #059669)',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '8px',
+              padding: '11px 22px',
+              fontWeight: 700,
+              fontSize: '0.9rem',
+              textDecoration: 'none',
+              boxShadow: '0 4px 15px rgba(16, 185, 129, 0.35)'
+            }}
+          >
+            <Download size={16} />
+            Master Audit & Tracker PDF
+          </a>
           <Link
             to="/ramp-up"
             style={{
@@ -621,6 +676,56 @@ export default function DownloadsPage() {
                 </div>
               )
             })}
+          </div>
+        </div>
+
+        {/* Interactive AWS Career Guide Map Callout */}
+        <div style={{
+          margin: '0 0 48px',
+          padding: '24px 28px',
+          background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(56, 189, 248, 0.08) 100%)',
+          border: '1px solid rgba(56, 189, 248, 0.28)',
+          borderRadius: '14px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '20px',
+          flexWrap: 'wrap',
+          boxShadow: '0 10px 30px rgba(0, 0, 0, 0.4)'
+        }}>
+          <div style={{ flex: 1, minWidth: '300px' }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.7rem', fontWeight: 800, color: '#38bdf8', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '8px' }}>
+              <Sparkles size={14} />
+              NEW: AWS CAREER & INTERNSHIP ACCELERATOR
+            </div>
+            <h3 style={{ margin: '0 0 6px', fontSize: '1.3rem', fontWeight: 800, color: '#f8fafc' }}>
+              Interactive AWS Career Guide Map & Interview Blueprints
+            </h3>
+            <p style={{ margin: 0, fontSize: '0.85rem', color: '#94a3b8', lineHeight: 1.6 }}>
+              4 role tracks (Cloud Security Intern, SOC Analyst, DevSecOps Engineer, Cloud Security Architect) with 6-layer defense-in-depth visual architecture and verified ATS STAR resume bullets.
+            </p>
+          </div>
+
+          <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+            <Link
+              to="/career"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '10px 20px',
+                background: 'linear-gradient(135deg, #0284c7 0%, #2563eb 100%)',
+                borderRadius: '8px',
+                color: '#fff',
+                fontSize: '0.85rem',
+                fontWeight: 700,
+                textDecoration: 'none',
+                boxShadow: '0 4px 14px rgba(2, 132, 199, 0.35)'
+              }}
+            >
+              <span>Launch AWS Career Map</span>
+              <ArrowRight size={15} />
+            </Link>
           </div>
         </div>
 
@@ -810,6 +915,61 @@ export default function DownloadsPage() {
             <Download size={15} />
             Download Featured Module (Free Pack)
           </button>
+        </div>
+
+        {/* Support Ask Box */}
+        <div style={{
+          background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(2, 132, 199, 0.08) 100%)',
+          border: '1px solid rgba(16, 185, 129, 0.3)',
+          borderRadius: '14px',
+          padding: '32px',
+          marginBottom: '48px',
+          textAlign: 'center'
+        }}>
+          <h3 style={{ margin: '0 0 12px', fontSize: '1.4rem', fontWeight: 800, color: '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+            <span style={{ color: '#10b981' }}>☕</span> Keep Cloudive Free
+          </h3>
+          <p style={{ margin: '0 auto 20px', color: '#94a3b8', fontSize: '0.9rem', lineHeight: 1.6, maxWidth: '600px' }}>
+            We don't charge for these career packs because education shouldn't be paywalled. 
+            However, server costs and development take resources. 
+            <strong style={{ color: '#e2e8f0', display: 'block', margin: '10px 0' }}>
+              Just ₹99 keeps one more pack free for a student who can't afford it.
+            </strong>
+          </p>
+          <div style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: '24px', fontStyle: 'italic', padding: '0 20px' }}>
+            Note: We are exploring a formal nonprofit/public-benefit corporate structure in the near future to ensure this mission remains permanently accessible.
+          </div>
+          <a
+            href="https://buymeacoffee.com/secloudive"
+            target="_blank"
+            rel="noreferrer"
+            onClick={playTactileClick}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              background: '#FFDD00',
+              color: '#000000',
+              border: 'none',
+              borderRadius: '8px',
+              padding: '12px 28px',
+              fontWeight: 800,
+              fontSize: '0.95rem',
+              cursor: 'pointer',
+              textDecoration: 'none',
+              boxShadow: '0 4px 14px rgba(255, 221, 0, 0.2)'
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.transform = 'translateY(-2px)'
+              e.currentTarget.style.boxShadow = '0 6px 20px rgba(255, 221, 0, 0.4)'
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.transform = 'translateY(0)'
+              e.currentTarget.style.boxShadow = '0 4px 14px rgba(255, 221, 0, 0.2)'
+            }}
+          >
+            Support the Mission (₹99)
+          </a>
         </div>
 
         {/* FAQ */}

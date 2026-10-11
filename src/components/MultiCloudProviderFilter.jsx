@@ -1,11 +1,11 @@
 // ==============================================================================
-// SeCloudive Multi-Cloud Provider Filter & Switcher Bar
-// Supports: All Clouds • AWS • Azure • Google Cloud • Oracle Cloud • IBM Cloud
+// SeCloudive AWS Security Core Services & Domain Filter Bar
+// 100% Dedicated to Amazon Web Services (AWS) Cloud Security
 // ==============================================================================
 
 import { useChallenges } from '../context/ChallengeContext'
 import { playTactileClick } from '../utils/cyberMotionAudio'
-import { ExternalLink, Sparkles, Check, Globe } from 'lucide-react'
+import { ExternalLink, Sparkles, Check, Shield } from 'lucide-react'
 
 export default function MultiCloudProviderFilter({ compact = false, showDetails = false, className = '' }) {
   const { selectedCloudProvider = 'all', setSelectedCloudProvider, cloudProviders = [] } = useChallenges() || {}
@@ -20,26 +20,26 @@ export default function MultiCloudProviderFilter({ compact = false, showDetails 
   const activeProviderObj = cloudProviders.find(p => p.id === selectedCloudProvider)
 
   return (
-    <div className={`multi-cloud-provider-bar ${compact ? 'is-compact' : ''} ${className}`} role="region" aria-label="Cloud Provider Filter">
+    <div className={`multi-cloud-provider-bar ${compact ? 'is-compact' : ''} ${className}`} role="region" aria-label="AWS Security Services Filter">
       <div className="cloud-pills-row">
         <span className="cloud-pills-label">
-          <Globe size={14} className="text-cyan animate-pulse" />
-          <span>Cloud Ecosystem:</span>
+          <Shield size={14} className="text-cyan animate-pulse" />
+          <span>AWS Security Domains:</span>
         </span>
 
-        {/* All Clouds Pill */}
+        {/* All AWS Security Pill */}
         <button
           type="button"
           onClick={() => handleSelect('all')}
           className={`cloud-pill ${selectedCloudProvider === 'all' ? 'active pill-all' : ''}`}
           aria-pressed={selectedCloudProvider === 'all'}
         >
-          <span className="cloud-pill-emoji">🌐</span>
-          <span className="cloud-pill-title">All Clouds</span>
-          <span className="cloud-pill-count">5 Clouds</span>
+          <span className="cloud-pill-emoji">🟧</span>
+          <span className="cloud-pill-title">All AWS Security</span>
+          <span className="cloud-pill-count">5 Domains</span>
         </button>
 
-        {/* Individual Cloud Provider Pills */}
+        {/* Individual AWS Security Pillar Pills */}
         {cloudProviders.map(provider => {
           const isSelected = selectedCloudProvider === provider.id
           return (
@@ -94,7 +94,7 @@ export default function MultiCloudProviderFilter({ compact = false, showDetails 
             className="cpd-cli-link"
             style={{ color: activeProviderObj.accentColor, borderColor: `color-mix(in srgb, ${activeProviderObj.accentColor} 40%, transparent)` }}
           >
-            <span>{activeProviderObj.cliName} CLI Documentation</span>
+            <span>{activeProviderObj.cliName} Documentation</span>
             <ExternalLink size={13} />
           </a>
         </div>

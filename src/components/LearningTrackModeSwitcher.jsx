@@ -46,13 +46,13 @@ export default function LearningTrackModeSwitcher({ className = '' }) {
 
   return (
     <div className={`learning-track-mode-switcher-card ${className}`} role="region" aria-label="Learning Mode & Persona Settings">
-      {/* Top Row: Track Mode Selector (Single Cloud vs Multi-Cloud) */}
+      {/* Top Row: AWS Security Track Mode Selector */}
       <div className="track-mode-header-row">
         <div className="track-mode-title-group">
-          <span className="naen-brand-pill">NAEN STUDIOS • CURRICULUM ARCHITECTURE</span>
-          <h3 className="track-mode-headline">Select Your Learning Path: Single-Cloud vs. Multi-Cloud</h3>
+          <span className="naen-brand-pill">SECLOUDIVE • DEDICATED AWS DEFENDER CURRICULUM</span>
+          <h3 className="track-mode-headline">Select Your AWS Security Track Focus</h3>
           <p className="track-mode-desc">
-            Choose whether to specialize in one ecosystem or master enterprise cross-cloud defense across all 5 providers.
+            Choose whether to focus on Core AWS Infrastructure Defense (IAM, S3, VPC) or Advanced AWS Detection & Forensic Incident Response (GuardDuty, CloudTrail, Athena).
           </p>
         </div>
 
@@ -65,7 +65,7 @@ export default function LearningTrackModeSwitcher({ className = '' }) {
             aria-checked={learningTrackMode === 'single'}
           >
             <Target size={14} />
-            <span>Single-Cloud Specialist Track</span>
+            <span>AWS Security Domain Specialist</span>
           </button>
 
           <button
@@ -75,17 +75,17 @@ export default function LearningTrackModeSwitcher({ className = '' }) {
             role="radio"
             aria-checked={learningTrackMode === 'multi'}
           >
-            <Globe size={14} />
-            <span>5-Cloud Enterprise Master Track</span>
+            <Layers size={14} />
+            <span>Full AWS Security Specialty (SCS-C02)</span>
             <span className="mode-highlight-badge">Recommended</span>
           </button>
         </div>
       </div>
 
-      {/* Sub-Row: Single Cloud Ecosystem Selector (Only displayed if Single-Cloud mode active) */}
+      {/* Sub-Row: AWS Security Domain Selector */}
       {learningTrackMode === 'single' ? (
         <div className="single-cloud-target-subrow animate-reveal">
-          <span className="subrow-label">Target Cloud Specialization:</span>
+          <span className="subrow-label">Target AWS Security Domain:</span>
           <div className="single-cloud-pills-wrap">
             {CLOUD_PROVIDERS.map(provider => {
               const isSelected = targetCloudSpecialty === provider.id
@@ -104,23 +104,23 @@ export default function LearningTrackModeSwitcher({ className = '' }) {
                   <span style={{ color: isSelected ? provider.accentColor : '#cbd5e1', fontWeight: isSelected ? 700 : 500 }}>
                     {provider.name}
                   </span>
-                  <code className="target-cli-code">{provider.cliName}</code>
+                  <code className="target-cli-code">${provider.cliName}</code>
                 </button>
               )
             })}
           </div>
           <div className="target-specialty-callout">
             <span style={{ color: activeCloudObj.accentColor, fontWeight: 700 }}>
-              {activeCloudObj.iconEmoji} {activeCloudObj.shortName} Specialist Pathway:
+              {activeCloudObj.iconEmoji} {activeCloudObj.shortName} Domain Focus:
             </span>
-            <span> Curricula, labs, CLI runbooks, and certifications will focus strictly on {activeCloudObj.name} ({activeCloudObj.certKey}).</span>
+            <span> Curricula, labs, AWS CLI runbooks, and architectures will focus strictly on {activeCloudObj.name} ({activeCloudObj.certKey}).</span>
           </div>
         </div>
       ) : (
         <div className="multi-cloud-active-notice animate-reveal">
           <Layers size={14} className="text-cyan" />
           <span>
-            <strong>5-Cloud Comparative Mode Active:</strong> Every foundational concept, lab step, and architecture review presents side-by-side runbooks across <strong>AWS</strong>, <strong>Microsoft Azure</strong>, <strong>Google Cloud (GCP)</strong>, <strong>Oracle Cloud (OCI)</strong>, and <strong>IBM Cloud</strong>.
+            <strong>Comprehensive AWS Security Engineer Track Active:</strong> Curricula spans all 5 pillars of the AWS Well-Architected Framework: <strong>IAM & Zero Trust</strong>, <strong>VPC & Network Firewalls</strong>, <strong>S3 & KMS Encryption</strong>, and <strong>GuardDuty & Incident Response</strong>.
           </span>
         </div>
       )}

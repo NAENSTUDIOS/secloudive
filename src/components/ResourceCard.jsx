@@ -1,4 +1,4 @@
-import { ArrowUpRight, BookOpen, ExternalLink, ShieldCheck, Flame, Terminal } from 'lucide-react'
+import { ArrowUpRight, BookOpen, ExternalLink, ShieldCheck, Flame, Terminal, Sparkles } from 'lucide-react'
 
 export default function ResourceCard({ resource }) {
   if (!resource) return null
@@ -67,6 +67,23 @@ export default function ResourceCard({ resource }) {
         <div style={{ display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
           <span 
             style={{ 
+              font: "800 9px 'DM Mono', monospace", 
+              color: '#38bdf8', 
+              background: 'rgba(56, 189, 248, 0.12)', 
+              padding: '2px 7px', 
+              borderRadius: '4px',
+              border: '1px solid rgba(56, 189, 248, 0.3)',
+              letterSpacing: '0.04em',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px'
+            }}
+          >
+            <Sparkles size={10} />
+            NAEN STUDIOS
+          </span>
+          <span 
+            style={{ 
               font: "700 10px 'DM Mono', monospace", 
               color: providerColor, 
               background: `${providerColor}18`, 
@@ -106,16 +123,21 @@ export default function ResourceCard({ resource }) {
         </div>
       )}
 
-      <a
-        className="resource-link"
-        href={resource.url}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label={`Open ${resource.title} in a new tab`}
-      >
-        <span>Open Resource</span>
-        <ExternalLink size={13} />
-      </a>
+      <div style={{ marginTop: 'auto', paddingTop: '10px' }}>
+        <div style={{ fontSize: '10px', color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '8px', font: "600 10px 'DM Mono', monospace" }}>
+          <span>CURATED BY NAEN STUDIOS SECURITY ENGINEERING</span>
+        </div>
+        <a
+          className="resource-link"
+          href={resource.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`Open ${resource.title} in a new tab`}
+        >
+          <span>Open Resource</span>
+          <ExternalLink size={13} />
+        </a>
+      </div>
       <ArrowUpRight className="resource-arrow" size={16} aria-hidden="true" />
     </article>
   )

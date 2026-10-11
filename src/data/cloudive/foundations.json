@@ -7,7 +7,9 @@
     "downloadKey": "foundationsLinux",
     "downloadUrl": "/downloads/foundations-linux.zip",
     "topics": ["Bash Scripting", "Systemd Services", "User Management & Sudoers", "Cloud-Init Bootstrapping", "Process Signals"],
-    "published": true
+    "published": true,
+    "moduleMarker": "Module 1 of 5",
+    "encouragingText": "Great start! Master this before moving to cloud."
   },
   {
     "id": "python",
@@ -17,7 +19,9 @@
     "downloadKey": "foundationsPython",
     "downloadUrl": "/downloads/foundations-python.zip",
     "topics": ["Python 3.12 Primitives", "Boto3 Client vs Resource", "Lambda Context & Handlers", "Pagination & Backoff", "Testing with Moto"],
-    "published": true
+    "published": true,
+    "moduleMarker": "Module 2 of 5",
+    "encouragingText": "Keep it up! Automation is key."
   },
   {
     "id": "docker",
@@ -27,7 +31,9 @@
     "downloadKey": "foundationsDocker",
     "downloadUrl": "/downloads/foundations-docker.zip",
     "topics": ["Multi-Stage Builds", "OCI Standards", "Non-Root Users", "Healthcheck Directives", "Amazon ECR Immutability"],
-    "published": true
+    "published": true,
+    "moduleMarker": "Module 3 of 5",
+    "encouragingText": "You're halfway there!"
   },
   {
     "id": "kubernetes",
@@ -37,7 +43,9 @@
     "downloadKey": "foundationsKubernetes",
     "downloadUrl": "/downloads/foundations-kubernetes.zip",
     "topics": ["K8s Control Plane", "Declarative YAML", "StatefulSets vs Deployments", "IRSA IAM Integration", "EKS Add-ons"],
-    "published": true
+    "published": true,
+    "moduleMarker": "Module 4 of 5",
+    "encouragingText": "Almost done! Orchestration unlocked."
   },
   {
     "id": "git",
@@ -47,6 +55,8 @@
     "downloadKey": "foundationsGit",
     "downloadUrl": "/downloads/foundations-git.zip",
     "topics": ["Branching Strategies", "Interactive Rebase", "PR Review Standards", "Merge Conflicts", "GitHub Actions CI/CD"],
-    "published": true
+    "published": true,
+    "moduleMarker": "Module 5 of 5",
+    "encouragingText": "Final module! You're ready."
   }
 ]

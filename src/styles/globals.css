@@ -2869,8 +2869,26 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid 
   .dossier-header-actions,
   .dossier-actions-row,
   .nav-links,
-  .nav-actions {
+  .nav-actions,
+  .learning-layout,
+  .labs-layout,
+  .battle-room-container,
+  .challenge-container,
+  .interview-sim-wrap,
+  .terminal-pane-container,
+  .naen-protected-surface {
     display: none !important;
+    visibility: hidden !important;
+  }
+  body::after {
+    content: "SECLOUDIVE ENCLAVE SECURITY: Direct browser printing of proprietary AWS courseware is restricted. Please use the official cryptographically verified dossier or certificate export tools.";
+    display: block !important;
+    visibility: visible !important;
+    font-family: 'DM Mono', monospace;
+    font-size: 14pt;
+    color: #ef4444;
+    text-align: center;
+    padding: 60px 40px;
   }
   body, .app-shell, .page-shell {
     background: #ffffff !important;
@@ -5574,19 +5592,21 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid 
 /* 1. CLEAN TOPBAR & DROPDOWN NAVIGATION */
 .clean-topbar {
   height: 72px;
-  max-width: 1280px;
+  width: 100%;
+  max-width: 1440px;
   margin: 0 auto;
   padding: 0 28px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+  border-bottom: 1px solid rgba(56, 189, 248, 0.18);
   position: sticky;
   top: 0;
-  z-index: 100;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  background: rgba(2, 6, 23, 0.88);
+  z-index: 10000;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  background: rgba(2, 6, 23, 0.96);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
 }
 
 .brand {
@@ -5730,18 +5750,18 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid 
 
 .nav-dropdown-menu {
   position: absolute;
-  top: calc(100% + 8px);
+  top: calc(100% + 10px);
   left: 0;
   min-width: 320px;
-  background: #090f1d;
-  border: 1px solid #1e293b;
+  background: #080f24 !important;
+  border: 1px solid rgba(56, 189, 248, 0.45);
   border-radius: 12px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.05);
-  padding: 8px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.95), 0 0 30px rgba(56, 189, 248, 0.2);
+  padding: 10px 8px 8px;
   display: flex;
   flex-direction: column;
   gap: 4px;
-  z-index: 1000;
+  z-index: 10001;
   animation: navDropdownSlide 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
@@ -13141,6 +13161,289 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid 
 .copy-email-btn:hover {
   background: rgba(255, 255, 255, 0.08);
   color: #f8fafc;
+}
+
+/* ============================================================
+   LIVE SECURITY TICKER — Scrolling live feed bar
+   ============================================================ */
+.live-security-ticker {
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  height: 36px;
+  background: rgba(2, 6, 23, 0.98);
+  border-bottom: 1px solid rgba(16, 185, 129, 0.25);
+  position: relative;
+  z-index: 10;
+}
+.ticker-label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 14px;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  color: #10b981;
+  letter-spacing: 1.2px;
+  border-right: 1px solid rgba(16, 185, 129, 0.25);
+  white-space: nowrap;
+  height: 100%;
+  background: rgba(16, 185, 129, 0.07);
+  flex-shrink: 0;
+}
+.ticker-label .ticker-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981;
+  animation: ticker-pulse 1.5s ease-in-out infinite;
+  display: inline-block;
+  flex-shrink: 0;
+}
+@keyframes ticker-pulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 8px #10b981; }
+  50% { opacity: 0.5; box-shadow: 0 0 4px #10b981; }
+}
+.ticker-track-wrapper {
+  flex: 1;
+  overflow: hidden;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+.ticker-track {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  animation: ticker-scroll 60s linear infinite;
+  width: max-content;
+}
+.ticker-track:hover {
+  animation-play-state: paused;
+}
+@keyframes ticker-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.ticker-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 28px;
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 11.5px;
+  white-space: nowrap;
+  height: 36px;
+  color: #94a3b8;
+}
+.ticker-item-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: 'DM Mono', monospace;
+  font-size: 9.5px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 999px;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+}
+.ticker-item--threat .ticker-item-badge {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #f87171;
+}
+.ticker-item--threat .ticker-item-text {
+  color: #fca5a5;
+}
+.ticker-item--intern .ticker-item-badge,
+.ticker-item--job .ticker-item-badge {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #34d399;
+}
+.ticker-item--intern .ticker-item-text,
+.ticker-item--job .ticker-item-text {
+  color: #6ee7b7;
+}
+.ticker-item--alert .ticker-item-badge {
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: #fbbf24;
+}
+.ticker-item--alert .ticker-item-text {
+  color: #fde68a;
+}
+
+/* ============================================================
+   LIVE INTERNSHIPS STRIP — Homepage preview section
+   ============================================================ */
+.live-internships-strip {
+  background: linear-gradient(180deg, rgba(6, 10, 20, 0.0) 0%, rgba(6, 20, 14, 0.3) 100%);
+  border-top: 1px solid rgba(16, 185, 129, 0.15);
+  border-bottom: 1px solid rgba(16, 185, 129, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+.live-internships-strip::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.5), transparent);
+}
+
+/* ============================================================
+   LIVE DOT — Pulsing green status indicator
+   ============================================================ */
+.live-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+  animation: live-pulse 2s ease-in-out infinite;
+}
+@keyframes live-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15), 0 0 8px rgba(16, 185, 129, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(16, 185, 129, 0.08), 0 0 16px rgba(16, 185, 129, 0.6);
+  }
+}
+
+/* ============================================================
+   LIVE JOURNEY BANNER — Progress strip
+   ============================================================ */
+.live-journey-banner {
+  background: rgba(9, 14, 26, 0.9);
+  border-bottom: 1px solid rgba(56, 189, 248, 0.15);
+  padding: 0;
+}
+.live-journey-inner {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 14px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.live-journey-status {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.live-journey-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #f1f5f9;
+}
+.live-journey-pct {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: #38bdf8;
+  font-weight: 800;
+  background: rgba(56, 189, 248, 0.1);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+.live-journey-sub {
+  margin: 3px 0 0;
+  font-size: 11.5px;
+  color: #64748b;
+}
+.live-journey-track {
+  height: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.live-journey-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #0ea5e9, #38bdf8, #10b981);
+  border-radius: 999px;
+  transition: width 1s cubic-bezier(0.25, 1, 0.5, 1);
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+}
+.live-journey-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.live-journey-metrics {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.live-metric-chip {
+  font-family: 'DM Mono', monospace;
+  font-size: 10.5px;
+  color: #64748b;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 4px;
+  padding: 3px 8px;
+}
+.live-metric-chip strong {
+  color: #38bdf8;
+}
+.btn-resume-journey {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 14px;
+  background: rgba(56, 189, 248, 0.1);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  color: #38bdf8;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+.btn-resume-journey:hover {
+  background: rgba(56, 189, 248, 0.18);
+  border-color: rgba(56, 189, 248, 0.6);
+  transform: translateY(-1px);
+}
+@media (max-width: 768px) {
+  .live-journey-inner { padding: 12px 16px; }
+  .live-journey-metrics { gap: 5px; }
+  .live-metric-chip { font-size: 10px; }
+}
+
+/* ============================================================
+   HOMEPAGE STICKY TICKER + ONBOARDING GATE BODY STYLES
+   ============================================================ */
+.onboarding-gate-screen {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #020617;
+}
+
+/* animate.pulse for live dot/icon */
+.animate-pulse {
+  animation: pulse-opacity 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+@keyframes pulse-opacity {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
 }
 
 

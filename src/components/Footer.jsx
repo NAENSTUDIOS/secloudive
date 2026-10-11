@@ -117,8 +117,38 @@ export default function Footer() {
           <span>© 2025–2026 SeCloudive by NAEN Studios. Independent Educational Cloud Security Simulator.</span>
           <span>Official Support: <a href="mailto:naenstudios@gmail.com" style={{ color: '#38bdf8', textDecoration: 'underline' }}>naenstudios@gmail.com</a> • All referenced trademarks belong to their respective owners.</span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-          <Link to="/legal" style={{ fontSize: '0.7rem', color: '#475569', textDecoration: 'none' }}>Terms & Legal</Link>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
+          <Link to="/legal" style={{ fontSize: '0.7rem', color: '#475569', textDecoration: 'none' }}>Legal Documentation</Link>
+          <button
+            type="button"
+            onClick={() => window.dispatchEvent(new CustomEvent('open-welcome-modal', { detail: { step: 'terms' } }))}
+            style={{
+              background: 'none',
+              border: 'none',
+              fontSize: '0.7rem',
+              color: '#475569',
+              cursor: 'pointer',
+              padding: 0,
+              textDecoration: 'underline'
+            }}
+          >
+            Terms of Service
+          </button>
+          <button
+            type="button"
+            onClick={() => window.dispatchEvent(new CustomEvent('open-welcome-modal', { detail: { step: 'cookies' } }))}
+            style={{
+              background: 'none',
+              border: 'none',
+              fontSize: '0.7rem',
+              color: '#475569',
+              cursor: 'pointer',
+              padding: 0,
+              textDecoration: 'underline'
+            }}
+          >
+            Cookie Preferences
+          </button>
           <span className="footer-status"><i /> All systems operational</span>
         </div>
       </div>

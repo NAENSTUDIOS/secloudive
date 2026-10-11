@@ -23,6 +23,7 @@ import {
 } from 'lucide-react'
 import PlatformExplorationRoadmap, { MOTIVATIONAL_QUOTES } from '../components/PlatformExplorationRoadmap'
 import CareerJourneyTrack from '../components/CareerJourneyTrack'
+import AwsCareerGuideMap from '../components/AwsCareerGuideMap'
 import { useChallenges } from '../context/ChallengeContext'
 import { playTabWhoosh, playTactileClick } from '../utils/cyberMotionAudio'
 import '../styles/platformRoadmap.css'
@@ -155,7 +156,26 @@ export default function PlatformRoadmapPage() {
           style={{ fontSize: '0.82rem', padding: '8px 18px', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
         >
           <Compass size={15} />
-          <span>Platform Roadmap (When To When Guide)</span>
+          <span>Platform Roadmap (When To Use What)</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => handleTabChange('aws-guide')}
+          className={`button ${activeTab === 'aws-guide' ? 'button-primary' : 'button-ghost'}`}
+          style={{ 
+            fontSize: '0.82rem', 
+            padding: '8px 18px', 
+            display: 'inline-flex', 
+            alignItems: 'center', 
+            gap: '8px',
+            borderColor: activeTab === 'aws-guide' ? '#ff9900' : 'rgba(255, 153, 0, 0.4)',
+            color: activeTab === 'aws-guide' ? '#0f172a' : '#ffb347',
+            background: activeTab === 'aws-guide' ? 'linear-gradient(135deg, #ff9900 0%, #f59e0b 100%)' : 'rgba(255, 153, 0, 0.08)'
+          }}
+        >
+          <Award size={15} />
+          <span>AWS Job &amp; Internship Guide Maps</span>
         </button>
 
         <button
@@ -293,6 +313,11 @@ export default function PlatformRoadmapPage() {
           </div>
           <CareerJourneyTrack />
         </div>
+      )}
+
+      {/* ── Tab 4: AWS Job & Internship Guide Maps ── */}
+      {activeTab === 'aws-guide' && (
+        <AwsCareerGuideMap />
       )}
     </main>
   )

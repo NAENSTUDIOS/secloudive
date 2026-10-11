@@ -12,7 +12,7 @@
     "preview": "vite preview",
     "audit:jsx": "node scripts/audit_jsx_imports.js",
     "diagnose:keys": "node scripts/diagnose_keys.mjs",
-    "test": "node scripts/test_simulated_identifiers.mjs && node scripts/test_sentinel_scope.mjs && node scripts/test_unique_user_id_system.mjs && node scripts/audit_jsx_imports.js"
+    "test": "node scripts/test_simulated_identifiers.mjs && node --dns-result-order=ipv4first scripts/test_sentinel_scope.mjs && node scripts/test_unique_user_id_system.mjs && node scripts/verify_onboarding_persistence.mjs && node scripts/audit_jsx_imports.js"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^6.1.1",

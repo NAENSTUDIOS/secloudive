@@ -37,7 +37,7 @@ export default function OfficialLearningPaths({ variant = 'report' }) {
           <div>
             <div className="report-section-label">
               <Compass size={13} /> 
-              <span>{isCareer ? 'NAEN STUDIOS • CAREER READINESS & MULTI-CLOUD REPOSITORY' : 'OFFICIAL MULTI-CLOUD & CTF LEARNING PATHS'}</span>
+              <span>{isCareer ? 'NAEN STUDIOS • CAREER READINESS & AWS / MULTI-CLOUD REPOSITORY' : 'NAEN STUDIOS • ACCREDITED MULTI-CLOUD & CTF LEARNING PATHS'}</span>
             </div>
             <h2 id={`${variant}-learning-path-title`}>
               {isCareer ? 'Build the verified skills behind your next milestone.' : 'Recommended Learning Path & Practice Rooms.'}
@@ -74,7 +74,7 @@ export default function OfficialLearningPaths({ variant = 'report' }) {
         <div className="recommended-path-block">
           <div className="learning-subheading">
             <div>
-              <span>01 / YOUR HIGHEST PRIORITY DOMAIN</span>
+              <span>01 / YOUR HIGHEST PRIORITY DOMAIN • NAEN STUDIOS CURATED</span>
               <h3>{path.title}</h3>
             </div>
             <span className="path-score">
@@ -92,8 +92,8 @@ export default function OfficialLearningPaths({ variant = 'report' }) {
         <div className="all-paths-block">
           <div className="learning-subheading">
             <div>
-              <span>02 / MULTI-CLOUD CURRICULUM & CTF LABS</span>
-              <h3>Comprehensive Documentation & TryHackMe® / HackTheBox® Catalog</h3>
+              <span>02 / MULTI-CLOUD CURRICULUM & CTF LABS • NAEN STUDIOS</span>
+              <h3>NAEN Studios Curated Architecture Documentation & Practice Catalog</h3>
             </div>
           </div>
           <div className="path-groups">

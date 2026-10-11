@@ -396,11 +396,19 @@ ${evaluation.improvementPlan.map(p => `• ${p}`).join('\n')}
       ...keyCandidates.slice(0, startIndex)
     ]
 
-    // Assemble the complete grounded prompt
-    let contextBlock = `\n\n[PAGE CONTEXT]:\n- Active Platform Route: ${route}\n- Active Scenario/Lab ID: ${activeScenarioId || 'None'}\n- Student Readiness: ${studentTelemetry.masterProgressPercent || 0}% Mastery (${studentTelemetry.masterTotalXP || 0} XP)\n- Notice: ${ATTACHED_TELEMETRY_DISCLOSURE}`
+    // Assemble the complete grounded prompt with full student context & platform knowledge
+    let contextBlock = `\n\n[STUDENT IDENTITY & ACTIVE TELEMETRY]:
+- Learner ID: ${studentTelemetry.activeProfileId || 'guest'}
+- Learner Name: ${studentTelemetry.activeProfileName || 'Guest Learner'}
+- Active Route: ${route}
+- Active Lab / Scenario: ${activeScenarioId || 'Courseware Browsing'}
+- Platform Mastery: ${studentTelemetry.masterProgressPercent || 0}% (${studentTelemetry.masterTotalXP || 0} XP)
+- Completed Activities / Labs: ${studentTelemetry.completedMasterActivities || 0}
+- Active Notes Snippet: ${studentTelemetry.currentNotesSnippet ? studentTelemetry.currentNotesSnippet.slice(0, 300) : 'None'}
+- Telemetry Notice: ${ATTACHED_TELEMETRY_DISCLOSURE}`
 
     if (retrieval.groundedText) {
-      contextBlock += `\n\n[RETRIEVED PLATFORM CONTENT LIBRARY GROUNDING]:\n${retrieval.groundedText}`
+      contextBlock += `\n\n[RETRIEVED PLATFORM CONTENT & CURRICULUM GROUNDING]:\n${retrieval.groundedText}`
     }
 
     if (retrieval.noMatchDirective) {
@@ -410,10 +418,9 @@ ${evaluation.improvementPlan.map(p => `• ${p}`).join('\n')}
     const combinedSystemPrompt = `${SENTINEL_SYSTEM_PROMPT}${contextBlock}`
 
     const candidateModels = [
-      'gemini-flash-lite-latest',
-      'gemini-3.5-flash',
-      'gemini-3.5-flash-lite',
-      'gemini-3.8-flash'
+      'gemini-3.8-flash',
+      'gemini-flash-latest',
+      'gemini-flash-lite-latest'
     ]
     let lastError = null
 
@@ -440,7 +447,7 @@ ${evaluation.improvementPlan.map(p => `• ${p}`).join('\n')}
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
-            signal: AbortSignal.timeout(25000)
+            signal: AbortSignal.timeout(8000)
           })
 
           if (response.status === 429) {

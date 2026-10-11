@@ -559,41 +559,57 @@ export const resourceCatalog = {
 export const learningPaths = {
   foundations: {
     title: 'Genesis Cloud Foundations Path',
+    brand: 'NAEN Studios',
+    curator: 'NAEN Studios Security Engineering',
     intro: 'Master hypervisors, virtualization primitives, Linux administration, Python scripting, networking CIDRs, Docker isolation, and the Shared Responsibility model across all clouds.',
     resources: ['securityBestPractices', 'thmCloudBasics', 'linuxSurvivalOfficial', 'pythonBoto3Official', 'networkingCloudGuide', 'dockerHardeningGuide', 'terraformLearnOfficial', 'azureSecurityBenchmark', 'cisBenchmarksOfficial', 'roadmap90DayCloud']
   },
   iam: { 
     title: 'Identity & Access Management (IAM) Path', 
+    brand: 'NAEN Studios',
+    curator: 'NAEN Studios Security Engineering',
     intro: 'Your identity and access architecture is the primary perimeter in the modern cloud.', 
     resources: ['iamDocs', 'thmAwsCompromise', 'azureEntraDocs', 'gcpWorkloadIdentity', 'skillBuilder', 'azureSecurityRampUpGuide', 'gcpSecurityRampUpGuide'] 
   },
   s3: { 
     title: 'Storage & Cryptographic Protection Path', 
+    brand: 'NAEN Studios',
+    curator: 'NAEN Studios Security Engineering',
     intro: 'Enforce Block Public Access, customer-managed KMS encryption, and object immutability.', 
     resources: ['s3Docs', 'htbBucket', 'azureKeyVaultDocs', 'gcpKmsDocs', 'azurePurviewGovernance', 'gcpCloudDlpDocs', 'securityResources'] 
   },
   network: { 
     title: 'Virtual Networks & Perimeter Defense Path', 
+    brand: 'NAEN Studios',
+    curator: 'NAEN Studios Security Engineering',
     intro: 'Eliminate 0.0.0.0/0 ingress, configure private endpoints, and isolate critical compute workloads.', 
     resources: ['vpcDocs', 'networkingCloudGuide', 'ibmCbrDocs', 'gcpVpcScDocs', 'wellArchitected', 'terraformCheckov'] 
   },
   monitoring: { 
     title: 'Threat Detection & SIEM Observability Path', 
+    brand: 'NAEN Studios',
+    curator: 'NAEN Studios Security Engineering',
     intro: 'Turn multi-cloud API activity into reliable audit evidence, GuardDuty findings, and Sentinel KQL hunts.', 
     resources: ['cloudTrailDocs', 'cloudWatchDocs', 'azureSentinelKql', 'azureDefenderXdr', 'gcpSccDocs', 'gcpChronicleSecOps', 'thmSocLevel1'] 
   },
   'incident-response': {
     title: 'Incident Response & Minute-0 Threat Containment Path',
+    brand: 'NAEN Studios',
+    curator: 'NAEN Studios Security Engineering',
     intro: 'Contain real attacks: SSRF metadata theft, compromised STS tokens, and supply-chain CI/CD poisoning.',
     resources: ['thmRedCloud', 'thmAzureIr', 'htbIncluded', 'thmJrPentester', 'securityBestPractices']
   },
   architecture: { 
     title: 'Multi-Cloud Architecture & Hardened IaC Path', 
+    brand: 'NAEN Studios',
+    curator: 'NAEN Studios Security Engineering',
     intro: 'Build the broad 5-cloud systems view expected from an enterprise cloud security architect.', 
     resources: ['wellArchitected', 'gcpArchitectureFramework', 'ociSecurityArch', 'ibmFinancialFramework', 'dockerHardeningGuide', 'terraformLearnOfficial', 'terraformCheckov'] 
   },
   career: { 
     title: 'Cloud Security Engineer Career & Capstone Path', 
+    brand: 'NAEN Studios',
+    curator: 'NAEN Studios Security Engineering',
     intro: 'Demonstrate verified employability, defend architectural choices in interviews, and claim the NAEN Studios Credential.', 
     resources: ['skillsHub', 'skillBuilder', 'azureLearn', 'azureSc900Fundamentals', 'azureSc500Exam', 'gcpPcseExamGuide', 'thmCompTIASecPlus', 'roadmap90DayCloud', 'wellArchitected'] 
   }
@@ -604,7 +620,15 @@ export const learningPaths = {
 // ------------------------------------------------------------------------------
 export function getResourcesForDomain(domainKey, cloudProvider = 'all') {
   const path = learningPaths[domainKey] || learningPaths.iam
-  const allRes = path.resources.map(resKey => resourceCatalog[resKey]).filter(Boolean)
+  const allRes = path.resources
+    .map(resKey => resourceCatalog[resKey])
+    .filter(Boolean)
+    .map(res => ({
+      ...res,
+      curator: 'NAEN Studios',
+      brand: 'NAEN Studios',
+      curatedBy: 'NAEN Studios Security Engineering'
+    }))
   
   if (cloudProvider === 'all') return allRes
   return allRes.filter(res => res.provider === cloudProvider || res.provider === 'tryhackme' || res.provider === 'hackthebox')
@@ -615,6 +639,12 @@ export function getTryHackMeRoomsForDomain(domainKey) {
   return path.resources
     .map(resKey => resourceCatalog[resKey])
     .filter(res => res && res.provider === 'tryhackme')
+    .map(res => ({
+      ...res,
+      curator: 'NAEN Studios',
+      brand: 'NAEN Studios',
+      curatedBy: 'NAEN Studios Security Engineering'
+    }))
 }
 
 export function getHackTheBoxRoomsForDomain(domainKey) {
@@ -622,8 +652,19 @@ export function getHackTheBoxRoomsForDomain(domainKey) {
   return path.resources
     .map(resKey => resourceCatalog[resKey])
     .filter(res => res && res.provider === 'hackthebox')
+    .map(res => ({
+      ...res,
+      curator: 'NAEN Studios',
+      brand: 'NAEN Studios',
+      curatedBy: 'NAEN Studios Security Engineering'
+    }))
 }
 
 export function getAllMultiCloudResources() {
-  return Object.values(resourceCatalog)
+  return Object.values(resourceCatalog).map(res => ({
+    ...res,
+    curator: 'NAEN Studios',
+    brand: 'NAEN Studios',
+    curatedBy: 'NAEN Studios Security Engineering'
+  }))
 }

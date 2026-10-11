@@ -4,7 +4,11 @@
     "title": "AWS Career Decision Tree & Skills Audit",
     "subtitle": "Eliminate ambiguity. Answer 3 quick architectural questions to identify your optimal career path, then audit and track your hands-on competencies."
   },
-  "verificationNotice": "Exam pathways and code alignments verified as of March 2026 against official AWS Certification blueprints. Exam codes subject to retirement cycles.",
+  "verificationNotice": "Exam pathways and code alignments verified as of October 2026 against official AWS Certification blueprints. Exam codes subject to retirement cycles.",
+  "specialtyCallout": {
+    "title": "Why AWS's Specialty tier is shrinking",
+    "content": "Database, Data Analytics and SAP Specialty retired in April 2024; Machine Learning Specialty retired March 2026; Advanced Networking Specialty retires December 31, 2026. After that, Security Specialty is the only Specialty-tier exam remaining. Note AWS opened a new Business-track beta exam, AI Business Strategist (AIF-C01), reflecting a shift toward role-based and AI-focused certifications rather than domain specialties."
+  },
   "examPaths": [
     {
       "tier": "Foundational & Associate",
@@ -23,6 +27,13 @@
       "exam": "AWS Certified Security – Specialty (SCS-C02)",
       "targetRole": "Cloud Security & DevSecOps Engineer",
       "description": "KMS key policies, GuardDuty automated remediation, IAM permission boundaries, and SCP guardrails."
+    },
+    {
+      "tier": "Specialty / Networking",
+      "exam": "AWS Certified Advanced Networking - Specialty",
+      "retirementNote": "Retires Dec 31, 2026. Retirement date revised by AWS; no replacement exam announced as of this writing.",
+      "targetRole": "Cloud Network Specialist",
+      "description": "Enterprise global hybrid backbones, Direct Connect, BGP peering, and SD-WAN integrations."
     },
     {
       "tier": "Specialty / Data & AI",

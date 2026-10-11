@@ -60,11 +60,11 @@ class ClientKeyPoolManager {
     this.keyUsageCount = new Map() // key -> total successful calls
   }
 
-  // Validate that a key looks like a real Google AI Studio key
+  // Validate that a key looks like a real Google AI Studio key or Gemini token
   isValidKey(key) {
     if (!key || typeof key !== 'string') return false
     const trimmed = key.trim()
-    if (!trimmed.startsWith('AIzaSy')) return false
+    if (!trimmed.startsWith('AIzaSy') && !trimmed.startsWith('AQ.')) return false
     if (trimmed.includes('YourFirstKey') || trimmed.includes('YourSecondKey') || trimmed.includes('YourKey') || trimmed.includes('YOUR_KEY')) {
       return false
     }
@@ -88,8 +88,11 @@ class ClientKeyPoolManager {
       keys.push({ key: userCustomKey.trim(), source: 'Local User Key', id: 'custom' })
     }
 
-    // 2. Option B: Multi-Key Pool from Vite Environment Variables (.env)
-    const env = (typeof import.meta !== 'undefined' && import.meta.env) ? import.meta.env : {}
+    // 2. Option B: Multi-Key Pool from Vite Environment Variables (.env) or Node environment
+    const metaEnv = (typeof import.meta !== 'undefined' && import.meta.env) ? import.meta.env : {}
+    const procEnv = (typeof process !== 'undefined' && process.env) ? process.env : {}
+    const env = { ...procEnv, ...metaEnv }
+
     const envKeys = [
       { key: env.VITE_GEMINI_KEY_6, id: 'env_pool_6' },
       { key: env.VITE_GEMINI_API_KEY, id: 'env_fallback' },
@@ -157,6 +160,11 @@ class ClientKeyPoolManager {
     console.warn(`[GeminiKeyRotator] Key ...${key.slice(-4)} rate-limited (429). Cooldown: ${cooldownSeconds}s.`)
   }
 
+  // Method alias for executeChat
+  execute(params) {
+    return this.executeChat(params)
+  }
+
   // Execute Gemini API call with automatic round-robin and instant failover across all pool keys
   async executeChat({ prompt, systemInstruction, model = 'gemini-flash-latest' }) {
     const configuredKeys = this.getAllConfiguredKeys()
@@ -180,7 +188,13 @@ class ClientKeyPoolManager {
       ...keyCandidates.slice(0, startIndex)
     ]
 
-    const candidateModels = [model, 'gemini-3.5-flash', 'gemini-flash-latest']
+    const candidateModels = [
+      'gemini-3.8-flash',
+      'gemini-flash-latest',
+      model,
+      'gemini-3.5-flash',
+      'gemini-3.5-flash-lite'
+    ]
 
     for (const keyItem of orderedKeys) {
       const activeKey = keyItem.key
@@ -194,7 +208,7 @@ class ClientKeyPoolManager {
                 role: 'user',
                 parts: [
                   {
-                    text: `[System Instruction: ${systemInstruction}]\n\n${prompt}`
+                    text: systemInstruction ? `[System Instruction: ${systemInstruction}]\n\n${prompt}` : prompt
                   }
                 ]
               }
@@ -215,7 +229,7 @@ class ClientKeyPoolManager {
 
           if (!response.ok) {
             const errData = await response.json().catch(() => ({}))
-            console.warn(`[GeminiKeyRotator] Key ${keyItem.id} returned HTTP ${response.status}:`, errData?.error?.message || errData)
+            console.warn(`[GeminiKeyRotator] Key ${keyItem.id} returned HTTP ${response.status} for ${currentModel}:`, errData?.error?.message || errData)
             if (response.status === 400 || response.status === 403) {
               this.markRateLimited(activeKey, 120)
               break // Try next key
@@ -247,6 +261,89 @@ class ClientKeyPoolManager {
     }
 
     // All keys exhausted or failed -> Fallback to grounded local knowledge engine
+    return null
+  }
+
+  // Execute Gemini API call with structured JSON response
+  async executeJson({ prompt, systemInstruction, model = 'gemini-flash-latest' }) {
+    const configuredKeys = this.getAllConfiguredKeys()
+    if (configuredKeys.length === 0) return null
+
+    const now = Date.now()
+    const availableKeys = configuredKeys.filter(k => (this.disabledUntil.get(k.key) || 0) <= now)
+    const keyCandidates = availableKeys.length > 0
+      ? availableKeys
+      : [...configuredKeys].sort((a, b) => (this.disabledUntil.get(a.key) || 0) - (this.disabledUntil.get(b.key) || 0))
+
+    const candidateModels = [
+      'gemini-3.8-flash',
+      'gemini-flash-latest',
+      model,
+      'gemini-3.5-flash',
+      'gemini-3.5-flash-lite'
+    ]
+
+    for (const keyItem of keyCandidates) {
+      const activeKey = keyItem.key
+
+      for (const currentModel of candidateModels) {
+        try {
+          const url = `https://generativelanguage.googleapis.com/v1beta/models/${currentModel}:generateContent?key=${activeKey}`
+          const payload = {
+            contents: [
+              {
+                role: 'user',
+                parts: [
+                  {
+                    text: systemInstruction ? `[System Instruction: ${systemInstruction}]\n\n${prompt}` : prompt
+                  }
+                ]
+              }
+            ],
+            generationConfig: {
+              responseMimeType: 'application/json'
+            }
+          }
+
+          const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          })
+
+          if (response.status === 429) {
+            this.markRateLimited(activeKey, 60)
+            break
+          }
+
+          if (!response.ok) {
+            continue
+          }
+
+          const data = await response.json()
+          const rawJson = data.candidates?.[0]?.content?.parts?.[0]?.text
+          if (rawJson) {
+            try {
+              const parsed = JSON.parse(rawJson)
+              const currentUsage = this.keyUsageCount.get(activeKey) || 0
+              this.keyUsageCount.set(activeKey, currentUsage + 1)
+              return {
+                data: parsed,
+                keyUsed: `${activeKey.slice(0, 6)}...${activeKey.slice(-4)}`,
+                modelUsed: currentModel,
+                success: true
+              }
+            } catch (jsonErr) {
+              console.warn('[GeminiKeyRotator] JSON parse error:', jsonErr)
+            }
+          }
+        } catch (e) {
+          console.warn('[GeminiKeyRotator] executeJson error:', e)
+          break
+        }
+      }
+    }
+
     return null
   }
 }

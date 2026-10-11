@@ -25,8 +25,17 @@
 import { supabase, isSupabaseConfigured } from '../lib/supabase'
 
 // ─── Guard Helper ────────────────────────────────────────────────────────────
-function guard(actionName) {
+export function isGuestUser(userId) {
+  if (!userId) return true
+  const clean = String(userId).trim().toLowerCase()
+  return clean === 'guest' || clean.startsWith('guest-')
+}
+
+function guard(actionName, userId = null) {
   if (!isSupabaseConfigured || !supabase) {
+    return false
+  }
+  if (userId && isGuestUser(userId)) {
     return false
   }
   return true
@@ -180,7 +189,7 @@ export async function fetchUserProgress(userId) {
  * Save user progress using server-validated RPC save_progress (with upsert fallback).
  */
 export async function saveUserProgress(userId, progressData, tier = 1, xp = 0) {
-  if (!guard('saveUserProgress') || !userId) return
+  if (!guard('saveUserProgress', userId) || !userId || isGuestUser(userId)) return
   try {
     const safeTier = Math.max(1, Math.min(4, Number(tier) || 1))
     const safeXp = Math.max(0, Number(xp) || 0)
@@ -834,7 +843,7 @@ export function subscribeToUserProgress(userId, onUpdate) {
  * Fetch user note for a specific context.
  */
 export async function fetchUserNote(userId, contextId = 'universal') {
-  if (!guard('fetchUserNote') || !userId) return ''
+  if (!guard('fetchUserNote', userId) || !userId || isGuestUser(userId)) return ''
   try {
     const { data, error } = await supabase
       .from('user_notes')
@@ -854,7 +863,7 @@ export async function fetchUserNote(userId, contextId = 'universal') {
  * Save user note for a specific context.
  */
 export async function saveUserNote(userId, contextId = 'universal', noteContent = '') {
-  if (!guard('saveUserNote') || !userId) return
+  if (!guard('saveUserNote', userId) || !userId || isGuestUser(userId)) return
   try {
     const { error } = await supabase
       .from('user_notes')

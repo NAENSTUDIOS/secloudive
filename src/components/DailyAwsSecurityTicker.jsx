@@ -21,6 +21,7 @@ import {
 } from 'lucide-react'
 import { dailyAwsSyncEngine } from '../services/dailyAwsSecuritySync'
 import { playTactileClick, playSuccessChime } from '../utils/cyberMotionAudio'
+import GeminiKeyManagerModal from './GeminiKeyManagerModal.jsx'
 import '../styles/dailyAwsSecurityTicker.css'
 
 export default function DailyAwsSecurityTicker() {
@@ -33,6 +34,7 @@ export default function DailyAwsSecurityTicker() {
   const [copiedId, setCopiedId] = useState(null)
   const [telemetry, setTelemetry] = useState(() => dailyAwsSyncEngine.getSyncTelemetry())
   const [countdown, setCountdown] = useState(180) // 3 minutes auto-sync countdown
+  const [isKeyModalOpen, setIsKeyModalOpen] = useState(false)
 
   useEffect(() => {
     // Initial fetch to guarantee live AWS updates are loaded immediately
@@ -200,7 +202,21 @@ export default function DailyAwsSecurityTicker() {
           </div>
         </div>
 
-        <div className="dast-actions">
+        <div className="dast-actions" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <button
+            type="button"
+            className="dast-sync-btn"
+            style={{ background: 'rgba(255, 255, 255, 0.05)', borderColor: 'rgba(56, 189, 248, 0.3)', color: '#38bdf8' }}
+            onClick={() => {
+              playTactileClick()
+              setIsKeyModalOpen(true)
+            }}
+            aria-label="Inspect Gemini AI Keys"
+          >
+            <Key size={14} />
+            <span>Gemini AI Keys</span>
+          </button>
+
           <button 
             type="button" 
             className={`dast-sync-btn ${isSyncing ? 'spinning' : ''}`}
@@ -438,6 +454,13 @@ export default function DailyAwsSecurityTicker() {
           })}
         </div>
       )}
+
+      {/* Gemini Key Manager Modal */}
+      <GeminiKeyManagerModal
+        isOpen={isKeyModalOpen}
+        onClose={() => setIsKeyModalOpen(false)}
+        onKeyUpdated={handleForceSync}
+      />
     </section>
   )
 }

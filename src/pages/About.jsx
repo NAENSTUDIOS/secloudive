@@ -25,6 +25,7 @@ import {
 } from 'lucide-react'
 import CopyrightDisclaimer from '../components/CopyrightDisclaimer'
 import { NaenStudiosLogoBadge, CloudArchitectureGraphic } from '../components/CloudGraphics'
+import { masterRampUpLabs } from '../data/careerRampUpData'
 
 const careerRoles = [
   {
@@ -376,7 +377,7 @@ export default function About() {
                 Launch Job Playbook Engine <ArrowRight size={16} />
               </Link>
               <Link to="/labs" className="button button-ghost">
-                Explore 16 Hands-on Labs
+                Explore {masterRampUpLabs?.length || 20} Hands-on Labs
               </Link>
             </div>
           </div>

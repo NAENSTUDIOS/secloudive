@@ -21,7 +21,10 @@ import {
   CheckCircle2,
   Cpu,
   Users,
-  Cloud
+  Cloud,
+  Briefcase,
+  ShieldCheck,
+  FolderGit2
 } from 'lucide-react'
 import { learningAcademyPaths } from '../data/learning/index.js'
 import { realLabs } from '../data/jobLabs.js'
@@ -209,6 +212,46 @@ export default function GlobalCommandPalette() {
         path: '/report',
         icon: <FileCheck2 size={16} className="text-amber" />,
         badge: 'Audit'
+      },
+      {
+        id: 'tool-playbooks',
+        title: 'Job Playbook Engine (Role SOPs & Workflows)',
+        subtitle: 'Daily workflows, hiring rubrics, and salary benchmarks across 5 cloud roles',
+        path: '/playbooks',
+        icon: <Briefcase size={16} className="text-cyan" />,
+        badge: 'Playbooks'
+      },
+      {
+        id: 'tool-projects',
+        title: 'Production Cloud Projects (Portfolio Capstones)',
+        subtitle: 'Multi-tier cloud deployments with production IaC and architecture documentation',
+        path: '/projects',
+        icon: <FolderGit2 size={16} className="text-purple" />,
+        badge: 'Projects'
+      },
+      {
+        id: 'tool-arch-reviews',
+        title: 'Multi-Cloud Architecture Reviews (Well-Architected)',
+        subtitle: 'Deep-dive security architecture audits across AWS, GCP, and Azure workloads',
+        path: '/architecture-reviews',
+        icon: <ShieldCheck size={16} className="text-amber" />,
+        badge: 'Architecture'
+      },
+      {
+        id: 'tool-verify-pack',
+        title: 'Cryptographic Audit Dossier Verifier',
+        subtitle: 'Validate HMAC-SHA256 signatures on official SeCloudive candidate dossiers',
+        path: '/verify-audit-pack',
+        icon: <Award size={16} className="text-emerald" />,
+        badge: 'Verifier'
+      },
+      {
+        id: 'tool-roadmap',
+        title: 'Platform Exploration & 4-Tier Progression Roadmap',
+        subtitle: 'Sequential path from recruit foundations to enterprise cloud architect',
+        path: '/roadmap',
+        icon: <Compass size={16} className="text-sky" />,
+        badge: 'Roadmap'
       },
       {
         id: 'tool-career-rampup',

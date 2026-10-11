@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react'
-import { useParams, useNavigate, Link } from 'react-router-dom'
+import { useParams, useNavigate, useSearchParams, Link } from 'react-router-dom'
 import {
   BookOpen,
   CheckCircle2,
@@ -101,17 +101,21 @@ export default function LearningCenter() {
     resetLearningProgress
   } = useChallenges()
 
+  const [searchParams] = useSearchParams()
+  const currentPathParam = pathId || searchParams.get('track') || searchParams.get('path')
+  const currentTopicParam = topicId || searchParams.get('topic')
+
   // Selected Path & Topic State
-  const activePathId = pathId && learningPathsMap[pathId] ? pathId : 'iam'
+  const activePathId = currentPathParam && learningPathsMap[currentPathParam] ? currentPathParam : 'iam'
   const activePath = learningPathsMap[activePathId] || learningAcademyPaths[0]
 
   const activeTopic = useMemo(() => {
-    if (topicId) {
-      const found = getTopicById(activePathId, topicId)
+    if (currentTopicParam) {
+      const found = getTopicById(activePathId, currentTopicParam)
       if (found) return found
     }
     return activePath.topics[0]
-  }, [activePathId, topicId, activePath])
+  }, [activePathId, currentTopicParam, activePath])
 
   // Multi-type knowledge check suite for active topic (3 Quick Checks + 1 Scenario + 1 Engineer Decision)
   const topicSuite = useMemo(() => {
@@ -458,11 +462,11 @@ export default function LearningCenter() {
             <div className="academy-badge-strip">
               <span className="academy-pill pill-cyan">
                 <Sparkles size={13} />
-                SeCloudive Academy
+                NAEN Studios Cloud Security Academy
               </span>
               <span className="academy-pill pill-emerald">
                 <ShieldCheck size={13} />
-                Knowledge Check & Certification Preparation
+                NAEN Studios Verified Specification
               </span>
             </div>
             <h1 className="academy-title">
@@ -514,6 +518,81 @@ export default function LearningCenter() {
             </div>
           </div>
         </div>
+
+        {/* ── REAL-TIME ENCOURAGEMENT & LIVE SUPABASE SYNC BAR ── */}
+        <div 
+          className="learning-encouragement-bar" 
+          style={{
+            marginTop: '24px',
+            padding: '14px 20px',
+            background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(30, 41, 59, 0.75) 100%)',
+            border: '1px solid rgba(56, 189, 248, 0.25)',
+            borderRadius: '12px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '16px',
+            flexWrap: 'wrap'
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1, minWidth: '280px' }}>
+            <div style={{
+              width: '38px',
+              height: '38px',
+              borderRadius: '10px',
+              background: 'rgba(16, 185, 129, 0.12)',
+              border: '1px solid rgba(16, 185, 129, 0.35)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#10b981',
+              flexShrink: 0
+            }}>
+              <Zap size={18} />
+            </div>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.72rem', color: '#10b981', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                  <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10b981', boxShadow: '0 0 8px #10b981', display: 'inline-block' }} />
+                  Live Sync Active
+                </span>
+                <span style={{ fontSize: '0.72rem', color: '#94a3b8', fontFamily: "'DM Mono', monospace" }}>
+                  Candidate ID: {activeProfile?.id || 'guest-session'}
+                </span>
+                <span style={{ fontSize: '0.72rem', background: 'rgba(245, 158, 11, 0.15)', border: '1px solid rgba(245, 158, 11, 0.3)', color: '#f59e0b', padding: '1px 8px', borderRadius: '999px', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                  <Flame size={12} />
+                  AWS Career Pipeline: Hiring-Ready
+                </span>
+              </div>
+              <div style={{ fontSize: '0.85rem', color: '#cbd5e1', fontWeight: 600, marginTop: '2px' }}>
+                Every topic check and topology defense completed is automatically synced to your persistent profile.
+              </div>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <Link
+              to="/career"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '7px',
+                padding: '8px 16px',
+                background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.2) 0%, rgba(99, 102, 241, 0.2) 100%)',
+                border: '1px solid rgba(56, 189, 248, 0.4)',
+                borderRadius: '8px',
+                color: '#38bdf8',
+                fontSize: '0.82rem',
+                fontWeight: 700,
+                textDecoration: 'none',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              <span>Explore AWS Career Tracks</span>
+              <ArrowRight size={14} />
+            </Link>
+          </div>
+        </div>
       </section>
 
       {/* --------------------------------------------------------------------
@@ -533,7 +612,7 @@ export default function LearningCenter() {
           aria-selected={activeCenterView === 'map'}
         >
           <Sparkles size={16} />
-          <span>🎮 Step-Wise Progression Map (TryHackMe / HTB Style)</span>
+          <span>🎮 NAEN Studios Step-Wise Progression Map (TryHackMe / HTB Style)</span>
           <span className="naen-tab-tag">Step-by-Step Unlocked</span>
         </button>
 
@@ -545,7 +624,7 @@ export default function LearningCenter() {
           aria-selected={activeCenterView === 'curriculum'}
         >
           <BookOpen size={16} />
-          <span>📚 Deep-Dive Topics & CIS Curriculum ({academyStats.totalTopics} Topics)</span>
+          <span>📚 NAEN Studios Deep-Dive Curriculum & CIS Benchmarks ({academyStats.totalTopics} Topics)</span>
         </button>
       </div>
 
