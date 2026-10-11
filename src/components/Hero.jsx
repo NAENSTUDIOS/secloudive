@@ -49,6 +49,21 @@ const CONSOLE_MODES = {
     riskLabel: 'CRITICAL ALERT',
     riskClass: 'text-rose',
     footer: '> containment completed in 420ms with $0 data loss_'
+  },
+  bedrockAi: {
+    id: 'bedrockAi',
+    title: 'secloudive / bedrock-guardrails',
+    badge: 'AI DEFENSE',
+    lines: [
+      { text: '> LLM Invocation: bedrock:InvokeModel (Claude 3.5 Sonnet)', type: 'muted' },
+      { text: '> Prompt Inspection: Testing indirect RAG prompt injection', type: 'normal' },
+      { text: '✓ Guardrails for Bedrock: PII redaction & malicious prompt blocked', type: 'success' },
+      { text: '> Zero IAM credentials leaked into model context window', type: 'success' },
+    ],
+    score: '12',
+    riskLabel: 'SECURE',
+    riskClass: 'risk-low',
+    footer: '> model safety boundary verified. zero data leakage_'
   }
 }
 
@@ -203,8 +218,25 @@ export default function Hero() {
               >
                 GUARDDUTY
               </button>
+              <button
+                type="button"
+                onClick={() => switchMode('bedrockAi')}
+                style={{
+                  background: activeConsole === 'bedrockAi' ? 'rgba(168, 85, 247, 0.2)' : 'transparent',
+                  border: 'none',
+                  borderRadius: '4px',
+                  color: activeConsole === 'bedrockAi' ? '#c084fc' : '#64748b',
+                  fontSize: '0.62rem',
+                  fontFamily: "'DM Mono', monospace",
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  padding: '2px 5px'
+                }}
+              >
+                BEDROCK-AI
+              </button>
             </div>
-            <span className={`console-live ${activeConsole === 'guardDuty' ? 'text-rose' : activeConsole === 'cloudTrail' ? 'text-amber' : ''}`} style={{ fontSize: '0.65rem' }}>
+            <span className={`console-live ${activeConsole === 'guardDuty' ? 'text-rose' : activeConsole === 'cloudTrail' ? 'text-amber' : activeConsole === 'bedrockAi' ? 'text-purple' : ''}`} style={{ fontSize: '0.65rem' }}>
               {currentMode.badge}
             </span>
           </div>

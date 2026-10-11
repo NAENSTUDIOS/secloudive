@@ -283,6 +283,202 @@ export default function GlobalSecurityCommsDeck({ className = '' }) {
     return matchesChannel && matchesSearch
   })
 
+  // Quick insertion helpers for rich composer
+  const handleInsertCodeSnippet = () => {
+    playTactileClick()
+    const template = `\n\`\`\`bash\n# aws s3api get-bucket-policy --bucket example-bucket\n\`\`\`\n`
+    setInputMessage(prev => prev ? `${prev}${template}` : template)
+    if (inputRef.current) inputRef.current.focus()
+  }
+
+  const handleInsertHashtag = (tag) => {
+    playTactileClick()
+    setInputMessage(prev => {
+      const trimmed = prev.trim()
+      return trimmed ? `${trimmed} ${tag} ` : `${tag} `
+    })
+    if (inputRef.current) inputRef.current.focus()
+  }
+
+  // Rich inline parser: detects `code` snippets and #hashtags
+  const renderInlineMarkup = (rawText) => {
+    const tokens = rawText.split(/(`[^`]+`|#[\w-]+)/g)
+    return tokens.map((token, tIdx) => {
+      if (token.startsWith('`') && token.endsWith('`') && token.length > 2) {
+        const codeText = token.slice(1, -1)
+        return (
+          <code
+            key={tIdx}
+            style={{
+              background: 'rgba(56, 189, 248, 0.12)',
+              border: '1px solid rgba(56, 189, 248, 0.3)',
+              color: '#38bdf8',
+              borderRadius: '4px',
+              padding: '1px 6px',
+              fontSize: '0.82rem',
+              fontFamily: 'Consolas, Monaco, "Courier New", monospace'
+            }}
+          >
+            {codeText}
+          </code>
+        )
+      }
+
+      if (token.startsWith('#') && token.length > 1) {
+        const tag = token.slice(1).toLowerCase()
+        return (
+          <button
+            key={tIdx}
+            type="button"
+            onClick={() => {
+              playTactileClick()
+              const foundChannel = CHANNELS.find(c => c.id === tag)
+              if (foundChannel) {
+                setActiveChannel(foundChannel.id)
+              } else {
+                setSearchQuery(token)
+              }
+            }}
+            style={{
+              background: 'rgba(56, 189, 248, 0.12)',
+              border: '1px solid rgba(56, 189, 248, 0.25)',
+              color: '#38bdf8',
+              borderRadius: '4px',
+              padding: '0 6px',
+              fontSize: '0.8rem',
+              fontWeight: 700,
+              cursor: 'pointer',
+              margin: '0 2px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              verticalAlign: 'baseline'
+            }}
+            title={`Filter by ${token}`}
+          >
+            {token}
+          </button>
+        )
+      }
+
+      return token
+    })
+  }
+
+  // Rich message body parser supporting multi-line code blocks
+  const renderFormattedContent = (text) => {
+    if (!text) return null
+    const parts = []
+    const codeBlockRegex = /```([a-zA-Z0-9_-]*)\n?([\s\S]*?)```/g
+    let lastIndex = 0
+    let match
+
+    while ((match = codeBlockRegex.exec(text)) !== null) {
+      if (match.index > lastIndex) {
+        parts.push({
+          type: 'text',
+          content: text.substring(lastIndex, match.index)
+        })
+      }
+      parts.push({
+        type: 'codeblock',
+        lang: match[1] || 'bash',
+        code: match[2].trimEnd()
+      })
+      lastIndex = match.index + match[0].length
+    }
+
+    if (lastIndex < text.length) {
+      parts.push({
+        type: 'text',
+        content: text.substring(lastIndex)
+      })
+    }
+
+    if (parts.length === 0) {
+      parts.push({ type: 'text', content: text })
+    }
+
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        {parts.map((part, pIdx) => {
+          if (part.type === 'codeblock') {
+            return (
+              <div 
+                key={pIdx}
+                style={{
+                  background: 'rgba(5, 10, 20, 0.95)',
+                  border: '1px solid rgba(56, 189, 248, 0.25)',
+                  borderRadius: '8px',
+                  overflow: 'hidden',
+                  margin: '6px 0'
+                }}
+              >
+                <div 
+                  style={{
+                    background: 'rgba(15, 23, 42, 0.85)',
+                    padding: '4px 12px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    borderBottom: '1px solid rgba(255, 255, 255, 0.07)',
+                    fontSize: '0.72rem',
+                    color: '#64748b'
+                  }}
+                >
+                  <span style={{ fontFamily: 'monospace', color: '#38bdf8', textTransform: 'uppercase', fontWeight: 700 }}>
+                    {part.lang || 'CODE'}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      navigator.clipboard?.writeText(part.code)
+                      playTactileClick()
+                    }}
+                    style={{
+                      background: 'transparent',
+                      border: 'none',
+                      color: '#94a3b8',
+                      cursor: 'pointer',
+                      fontSize: '0.72rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      padding: '2px 6px',
+                      borderRadius: '4px'
+                    }}
+                  >
+                    <Copy size={11} />
+                    <span>Copy snippet</span>
+                  </button>
+                </div>
+                <pre 
+                  style={{
+                    margin: 0,
+                    padding: '10px 14px',
+                    fontSize: '0.82rem',
+                    color: '#e2e8f0',
+                    fontFamily: 'Consolas, Monaco, "Courier New", monospace',
+                    overflowX: 'auto',
+                    lineHeight: 1.45,
+                    whiteSpace: 'pre'
+                  }}
+                >
+                  {part.code}
+                </pre>
+              </div>
+            )
+          }
+
+          return (
+            <div key={pIdx} style={{ lineHeight: 1.55, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+              {renderInlineMarkup(part.content)}
+            </div>
+          )
+        })}
+      </div>
+    )
+  }
+
   return (
     <div 
       className={`global-comms-deck-container ${className}`}
@@ -416,6 +612,10 @@ export default function GlobalSecurityCommsDeck({ className = '' }) {
           {CHANNELS.map(ch => {
             const IconComponent = ch.icon
             const isActive = activeChannel === ch.id
+            const channelCount = ch.id === 'all' 
+              ? messages.length 
+              : messages.filter(m => m.channel === ch.id).length
+
             return (
               <button
                 key={ch.id}
@@ -434,7 +634,7 @@ export default function GlobalSecurityCommsDeck({ className = '' }) {
                   fontWeight: isActive ? 800 : 600,
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '5px',
+                  gap: '6px',
                   cursor: 'pointer',
                   transition: 'all 0.15s ease',
                   whiteSpace: 'nowrap'
@@ -442,12 +642,25 @@ export default function GlobalSecurityCommsDeck({ className = '' }) {
               >
                 <IconComponent size={12} />
                 <span>{ch.label}</span>
+                <span 
+                  style={{
+                    background: isActive ? ch.color : 'rgba(255, 255, 255, 0.08)',
+                    color: isActive ? '#090e1a' : '#64748b',
+                    borderRadius: '10px',
+                    fontSize: '0.66rem',
+                    padding: '1px 5px',
+                    fontWeight: 800,
+                    lineHeight: 1.2
+                  }}
+                >
+                  {channelCount}
+                </span>
               </button>
             )
           })}
         </div>
 
-        {/* Search input */}
+        {/* Search input with clear button */}
         <div style={{ position: 'relative', width: '220px' }}>
           <Search size={13} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: '#64748b' }} />
           <input
@@ -460,11 +673,32 @@ export default function GlobalSecurityCommsDeck({ className = '' }) {
               background: 'rgba(15, 23, 42, 0.8)',
               border: '1px solid rgba(255, 255, 255, 0.1)',
               borderRadius: '6px',
-              padding: '6px 10px 6px 30px',
+              padding: searchQuery ? '6px 26px 6px 30px' : '6px 10px 6px 30px',
               color: '#f8fafc',
               fontSize: '0.78rem'
             }}
           />
+          {searchQuery && (
+            <button
+              type="button"
+              onClick={() => setSearchQuery('')}
+              style={{
+                position: 'absolute',
+                right: '8px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                background: 'none',
+                border: 'none',
+                color: '#94a3b8',
+                cursor: 'pointer',
+                fontSize: '11px',
+                padding: '2px'
+              }}
+              title="Clear search"
+            >
+              ✕
+            </button>
+          )}
         </div>
       </div>
 
@@ -750,17 +984,15 @@ export default function GlobalSecurityCommsDeck({ className = '' }) {
                   </div>
                 )}
 
-                {/* Message Content */}
+                {/* Message Content with Markdown & Code Block Support */}
                 <div 
                   style={{
                     fontSize: '0.86rem',
                     color: '#e2e8f0',
-                    lineHeight: 1.55,
-                    whiteSpace: 'pre-wrap',
-                    wordBreak: 'break-word'
+                    lineHeight: 1.55
                   }}
                 >
-                  {msg.content}
+                  {renderFormattedContent(msg.content)}
                 </div>
 
                 {/* Reactions Bar */}
@@ -835,13 +1067,61 @@ export default function GlobalSecurityCommsDeck({ className = '' }) {
           background: 'rgba(6, 10, 20, 0.85)',
           display: 'flex',
           flexDirection: 'column',
-          gap: '10px'
+          gap: '8px'
         }}
       >
+        {/* Quick formatting toolbar */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+            <span style={{ fontSize: '0.7rem', color: '#64748b' }}>Insert Topic:</span>
+            {['#iam', '#s3', '#bedrock', '#terraform', '#cve', '#battle-rooms'].map(tag => (
+              <button
+                key={tag}
+                type="button"
+                onClick={() => handleInsertHashtag(tag)}
+                style={{
+                  background: 'rgba(15, 23, 42, 0.7)',
+                  border: '1px solid rgba(56, 189, 248, 0.25)',
+                  borderRadius: '12px',
+                  color: '#38bdf8',
+                  padding: '2px 8px',
+                  fontSize: '0.72rem',
+                  fontWeight: 600,
+                  cursor: 'pointer'
+                }}
+              >
+                {tag}
+              </button>
+            ))}
+          </div>
+
+          <button
+            type="button"
+            onClick={handleInsertCodeSnippet}
+            style={{
+              background: 'rgba(56, 189, 248, 0.12)',
+              border: '1px solid rgba(56, 189, 248, 0.3)',
+              color: '#38bdf8',
+              borderRadius: '6px',
+              padding: '2px 8px',
+              fontSize: '0.72rem',
+              fontWeight: 700,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px',
+              cursor: 'pointer'
+            }}
+          >
+            <Code size={12} />
+            <span>+ Code Block</span>
+          </button>
+        </div>
+
         <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
           <textarea
             ref={inputRef}
             rows={2}
+            maxLength={500}
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
             onKeyDown={(e) => {
@@ -892,7 +1172,15 @@ export default function GlobalSecurityCommsDeck({ className = '' }) {
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px', fontSize: '0.72rem', color: '#64748b' }}>
           <span>Free community text feed • Markdown &amp; code blocks supported • Saved locally &amp; synced across tabs</span>
-          <span>Targeting #{activeChannel === 'all' ? 'general' : activeChannel}</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <span>Targeting #{activeChannel === 'all' ? 'general' : activeChannel}</span>
+            <span style={{ 
+              color: inputMessage.length >= 480 ? '#ef4444' : inputMessage.length >= 400 ? '#f59e0b' : '#64748b',
+              fontWeight: inputMessage.length >= 400 ? 700 : 400
+            }}>
+              {inputMessage.length} / 500
+            </span>
+          </div>
         </div>
       </form>
     </div>

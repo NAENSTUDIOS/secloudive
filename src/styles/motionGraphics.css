@@ -735,4 +735,59 @@ html, body {
   }
 }
 
+/* ── 8. Print Stylesheet for Certified Candidate Dossier & Transcripts ── */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #0f172a !important;
+  }
 
+  /* Hide distracting web chrome during printing */
+  nav, .navbar, .navbar-container, .cyber-hud-palette, .global-cyber-hud-trigger,
+  .hero, .landing-hero, .footer, .no-print, button:not(.print-include) {
+    display: none !important;
+  }
+
+  .transcript-printable-document,
+  .audit-modal-window {
+    position: static !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-shadow: none !important;
+    border: 2px solid #0284c7 !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
+    padding: 24px !important;
+    page-break-inside: avoid;
+  }
+
+  .audit-modal-window * {
+    color: #0f172a !important;
+    background-color: transparent !important;
+    border-color: #cbd5e1 !important;
+  }
+}
+
+/* ── 9. Micro-Interaction Polish for Badges & Comms ── */
+.badge-evidence-card {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.2s ease;
+}
+
+.badge-evidence-card:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(56, 189, 248, 0.25);
+}
+
+.comms-reaction-btn {
+  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.comms-reaction-btn:hover {
+  transform: scale(1.12);
+}
+
+.comms-reaction-btn:active {
+  transform: scale(0.92);
+}

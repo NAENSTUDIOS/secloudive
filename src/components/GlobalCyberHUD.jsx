@@ -19,7 +19,8 @@ import {
   Volume2,
   VolumeX,
   ChevronUp,
-  Cpu
+  Cpu,
+  MessageSquare
 } from 'lucide-react'
 import { useChallenges } from '../context/ChallengeContext'
 import { isAudioFXEnabled, setAudioFXEnabled, playTactileClick, playTabWhoosh } from '../utils/cyberMotionAudio'
@@ -94,6 +95,22 @@ export default function GlobalCyberHUD() {
         e.preventDefault()
         playTactileClick()
         navigate('/roadmap')
+        return
+      }
+
+      // Alt + O -> Security Profile & Dossier
+      if ((e.altKey && e.key.toLowerCase() === 'o') || (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'o')) {
+        e.preventDefault()
+        playTactileClick()
+        navigate('/profile')
+        return
+      }
+
+      // Alt + C -> Community Comms Deck
+      if ((e.altKey && e.key.toLowerCase() === 'c') || (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'c')) {
+        e.preventDefault()
+        playTactileClick()
+        navigate('/dashboard#comms-deck')
         return
       }
 
@@ -230,6 +247,38 @@ export default function GlobalCyberHUD() {
                 <span>User ID & Sync</span>
               </div>
               <kbd className="hud-kbd">Alt+U</kbd>
+            </button>
+
+            {/* Tool: Security Profile & Dossier */}
+            <button
+              type="button"
+              className="hud-item-btn"
+              onClick={() => { playTactileClick(); setIsOpen(false); navigate('/profile'); }}
+              title="Open Security Profile & Cryptographic Career Dossier (Alt+O)"
+            >
+              <div className="hud-item-left">
+                <div className="hud-item-icon text-cyan">
+                  <User size={14} />
+                </div>
+                <span>Profile &amp; Dossier</span>
+              </div>
+              <kbd className="hud-kbd">Alt+O</kbd>
+            </button>
+
+            {/* Tool: Community Comms Deck */}
+            <button
+              type="button"
+              className="hud-item-btn"
+              onClick={() => { playTactileClick(); setIsOpen(false); navigate('/dashboard#comms-deck'); }}
+              title="Open Global Security Comms Deck & Free Chat (Alt+C)"
+            >
+              <div className="hud-item-left">
+                <div className="hud-item-icon text-emerald">
+                  <MessageSquare size={14} />
+                </div>
+                <span>Community Chat Deck</span>
+              </div>
+              <kbd className="hud-kbd">Alt+C</kbd>
             </button>
 
             {/* Tool: 10-Week Exploration Roadmap */}
