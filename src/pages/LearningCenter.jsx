@@ -41,12 +41,14 @@ import {
   TrendingUp,
   CheckCheck,
   X,
-  FileText
+  FileText,
+  Download
 } from 'lucide-react'
 import { useChallenges } from '../context/ChallengeContext'
 import { userSyncManager } from '../services/userSyncManager'
 import LabNotesScratchpad from '../components/LabNotesScratchpad'
 import DefenderQuoteCallout from '../components/DefenderQuoteCallout'
+import { playTactileClick, playTabWhoosh } from '../utils/cyberMotionAudio'
 import {
   learningAcademyPaths,
   learningPathsMap,
@@ -78,6 +80,59 @@ const PATH_ICONS = {
   ShieldAlert: <ShieldAlert size={18} />,
   ShieldCheck: <ShieldCheck size={18} />,
   Briefcase: <Briefcase size={18} />
+}
+
+/**
+ * Generates an accredited Markdown Study Dossier & Cheatsheet for export
+ */
+function generateTopicStudyDossier(topic, path) {
+  if (!topic) return ''
+  const dateStr = new Date().toISOString().split('T')[0]
+  const checks = topic.whatEngineerChecks || topic.whatACloudSecEngineerChecks || []
+  const mistakes = topic.commonMistakes || []
+  const interviewQ = topic.interviewQuestions || []
+  const takeaways = topic.keyTakeaways || topic.bullets || []
+
+  return `# =========================================================================
+# SECLOUDIVE ACCREDITED TOPIC STUDY DOSSIER & ARCHITECTURAL CHEATSHEET
+# Topic: ${topic.title} (${topic.id})
+# Track: ${path?.title || 'Cloud Security Engineering'}
+# Difficulty: ${topic.difficulty || 'Intermediate'} | Estimated Time: ${topic.estimatedMinutes || 25} Minutes
+# Export Date: ${dateStr} | Accredited by NAEN Studios (naenstudios@gmail.com)
+# =========================================================================
+
+## 1. Executive Summary & Security Baseline
+${topic.summary || topic.description || 'Enterprise cloud security architecture, least-privilege enforcement, and defensive engineering.'}
+
+${topic.overview ? `## 2. Theoretical Architecture & Threat Context\n${topic.overview}\n` : ''}
+
+${checks.length > 0 ? `## 3. Senior Cloud Security Engineer Verification Checklist
+${checks.map((chk, i) => {
+  const title = chk.title || `Check #${i + 1}`
+  const detail = chk.detail || (typeof chk === 'string' ? chk : '')
+  const cmd = chk.command ? `\n\`\`\`bash\n${chk.command}\n\`\`\`` : ''
+  return `### ${i + 1}. ${title}\n${detail}${cmd}`
+}).join('\n\n')}\n` : ''}
+
+${mistakes.length > 0 ? `## 4. Common Security Anti-Patterns & Pitfalls
+${mistakes.map((m, i) => {
+  const title = typeof m === 'string' ? m : (m.title || m.mistake)
+  const fix = typeof m === 'object' && (m.solution || m.whyBad) ? `\n> **Hardened Fix**: ${m.solution || m.whyBad}` : ''
+  return `- **[Pitfall ${i + 1}]** ${title}${fix}`
+}).join('\n')}\n` : ''}
+
+${interviewQ.length > 0 ? `## 5. Technical Interview Drills & Model STAR Answer
+${interviewQ.map((qa, i) => `### Question ${i + 1}: ${qa.question}
+> **Interviewer Evaluation Rationale**: ${qa.interviewerRationale || 'Evaluating operational security judgment and blast radius awareness.'}
+> **Model Answer**: ${qa.answer}
+${qa.pitfalls ? `> **Pitfall to Avoid**: ${qa.pitfalls}` : ''}`).join('\n\n')}\n` : ''}
+
+${takeaways.length > 0 ? `## 6. Key Engineering Takeaways
+${takeaways.map(t => `- [x] ${t}`).join('\n')}\n` : ''}
+
+---
+*Generated via SeCloudive Cloud Security Career Platform — https://secloudive.io*
+`
 }
 
 export default function LearningCenter() {
@@ -187,7 +242,46 @@ export default function LearningCenter() {
   const [levelFilter, setLevelFilter] = useState('all') // 'all' | 'beginner' | 'intermediate' | 'advanced' | 'bookmarked' | 'completed'
 
   const [copiedSnippetIndex, setCopiedSnippetIndex] = useState(null)
+  const [dossierCopied, setDossierCopied] = useState(false)
   const [showResetConfirm, setShowResetConfirm] = useState(false)
+
+  const handleCopyStudyDossier = () => {
+    playTactileClick()
+    const content = generateTopicStudyDossier(activeTopic, activePath)
+    navigator.clipboard?.writeText(content).then(() => {
+      setDossierCopied(true)
+      setTimeout(() => setDossierCopied(false), 2200)
+    })
+  }
+
+  const handleDownloadStudyDossier = () => {
+    playTactileClick()
+    const content = generateTopicStudyDossier(activeTopic, activePath)
+    const blob = new Blob([content], { type: 'text/markdown;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `secloudive-${activeTopic.id}-study-dossier.md`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
+
+  const handleToggleTopic = (tId) => {
+    playTactileClick()
+    toggleLearningTopic(tId)
+  }
+
+  const handleToggleBookmark = (tId) => {
+    playTactileClick()
+    toggleLearningBookmark(tId)
+  }
+
+  const handleNavigateTopic = (pId, tId) => {
+    playTabWhoosh()
+    navigate(`/learning/${pId}/${tId}`)
+  }
 
   // -------------------------------------------------------------------------
   // ADAPTIVE MODULE QUIZ RUNNER STATE (10 Questions from 30 Bank)
@@ -334,6 +428,7 @@ export default function LearningCenter() {
 
   // Handle Selection in Topic Multi-Type Checks
   const handleSelectTopicCheckOption = (checkKey, optionIdx, isCorrect) => {
+    playTactileClick()
     submitTopicCheck(activeTopic.id, checkKey, optionIdx)
 
     // Automatically mark topic complete when answering the concept or decision check correctly
@@ -344,6 +439,7 @@ export default function LearningCenter() {
 
   // Handle Clipboard Copy for CLI / Code blocks
   const handleCopyCode = (text, index) => {
+    playTactileClick()
     if (navigator?.clipboard?.writeText) {
       navigator.clipboard.writeText(text)
       setCopiedSnippetIndex(index)
@@ -353,6 +449,7 @@ export default function LearningCenter() {
 
   // Handle Path Tab Selection
   const handleSelectPath = (selectedPathId) => {
+    playTabWhoosh()
     const targetPath = learningPathsMap[selectedPathId]
     if (targetPath && targetPath.topics.length > 0) {
       navigate(`/learning/${targetPath.id}/${targetPath.topics[0].id}`)
@@ -361,6 +458,7 @@ export default function LearningCenter() {
 
   // Handle Topic Navigation
   const handleSelectTopic = (targetTopicId) => {
+    playTabWhoosh()
     navigate(`/learning/${activePath.id}/${targetTopicId}`)
   }
 
@@ -1207,7 +1305,7 @@ export default function LearningCenter() {
                 <button
                   type="button"
                   className={`btn-complete-toggle ${isCurrentTopicCompleted ? 'completed' : 'incomplete'}`}
-                  onClick={() => toggleLearningTopic(activeTopic.id)}
+                  onClick={() => handleToggleTopic(activeTopic.id)}
                 >
                   {isCurrentTopicCompleted ? (
                     <>
@@ -1223,7 +1321,7 @@ export default function LearningCenter() {
                 <button
                   type="button"
                   className={`btn-bookmark-toggle ${isCurrentTopicBookmarked ? 'bookmarked' : ''}`}
-                  onClick={() => toggleLearningBookmark(activeTopic.id)}
+                  onClick={() => handleToggleBookmark(activeTopic.id)}
                   title={isCurrentTopicBookmarked ? 'Remove Bookmark' : 'Bookmark Topic'}
                 >
                   <Bookmark size={16} />
@@ -1232,6 +1330,7 @@ export default function LearningCenter() {
                 <button
                   type="button"
                   onClick={() => {
+                    playTactileClick()
                     window.dispatchEvent(new CustomEvent('secloudive:toggle-notes', {
                       detail: { contextId: `learning-topic-${activeTopic.id}` }
                     }))
@@ -1252,6 +1351,49 @@ export default function LearningCenter() {
                   <FileText size={14} />
                   <span>Topic Notes</span>
                 </button>
+
+                {/* ── ONE-CLICK STUDY DOSSIER & CHEATSHEET EXPORTER ── */}
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                  <button
+                    type="button"
+                    onClick={handleCopyStudyDossier}
+                    className="button button-ghost"
+                    style={{
+                      fontSize: '0.78rem',
+                      padding: '6px 12px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      color: dossierCopied ? '#4ade80' : '#a78bfa',
+                      borderColor: dossierCopied ? 'rgba(74, 222, 128, 0.4)' : 'rgba(167, 139, 250, 0.35)',
+                      borderRadius: '8px'
+                    }}
+                    title="Copy complete markdown study dossier and cheatsheet for this topic"
+                  >
+                    {dossierCopied ? <Check size={14} /> : <Copy size={14} />}
+                    <span>{dossierCopied ? 'Dossier Copied!' : 'Copy Dossier'}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleDownloadStudyDossier}
+                    className="button button-ghost"
+                    style={{
+                      fontSize: '0.78rem',
+                      padding: '6px 10px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      color: '#a78bfa',
+                      borderColor: 'rgba(167, 139, 250, 0.35)',
+                      borderRadius: '8px'
+                    }}
+                    title="Download .md study dossier for offline portfolio"
+                  >
+                    <Download size={14} />
+                    <span>.md</span>
+                  </button>
+                </div>
               </div>
 
               {/* Prev / Next Header shortcuts */}
@@ -1260,7 +1402,7 @@ export default function LearningCenter() {
                   <button
                     type="button"
                     className="filter-btn"
-                    onClick={() => navigate(`/learning/${prevItem.path.id}/${prevItem.topic.id}`)}
+                    onClick={() => handleNavigateTopic(prevItem.path.id, prevItem.topic.id)}
                     title={`Previous: ${prevItem.topic.title}`}
                   >
                     <ArrowLeft size={13} style={{ display: 'inline', marginRight: '4px' }} /> Prev
@@ -1270,7 +1412,7 @@ export default function LearningCenter() {
                   <button
                     type="button"
                     className="filter-btn"
-                    onClick={() => navigate(`/learning/${nextItem.path.id}/${nextItem.topic.id}`)}
+                    onClick={() => handleNavigateTopic(nextItem.path.id, nextItem.topic.id)}
                     title={`Next: ${nextItem.topic.title}`}
                   >
                     Next <ArrowRight size={13} style={{ display: 'inline', marginLeft: '4px' }} />
@@ -1629,7 +1771,7 @@ export default function LearningCenter() {
               <button
                 type="button"
                 className="btn-nav-step"
-                onClick={() => navigate(`/learning/${prevItem.path.id}/${prevItem.topic.id}`)}
+                onClick={() => handleNavigateTopic(prevItem.path.id, prevItem.topic.id)}
               >
                 <ArrowLeft size={16} />
                 <span>
@@ -1646,7 +1788,7 @@ export default function LearningCenter() {
                 type="button"
                 className="btn-nav-step"
                 style={{ marginLeft: 'auto', background: 'rgba(56, 189, 248, 0.1)', borderColor: 'rgba(56, 189, 248, 0.3)' }}
-                onClick={() => navigate(`/learning/${nextItem.path.id}/${nextItem.topic.id}`)}
+                onClick={() => handleNavigateTopic(nextItem.path.id, nextItem.topic.id)}
               >
                 <span style={{ textAlign: 'right' }}>
                   <small style={{ display: 'block', fontSize: '10px', color: '#38bdf8', textTransform: 'uppercase' }}>Next Topic</small>

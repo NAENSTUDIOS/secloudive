@@ -4,10 +4,11 @@ import {
   CheckCircle2, AlertTriangle, Lightbulb,
   Brain, Shield, Lock, Eye, Copy, Check, Play,
   Layers, Target, Activity, Code2, Star, Download,
-  Briefcase, Sparkles
+  Briefcase, Sparkles, Globe
 } from 'lucide-react'
 import TopicArchitectureDiagram from './TopicArchitectureDiagram'
 import TopicJobReadinessCard from './TopicJobReadinessCard'
+import TopicMultiCloudCrosswalk from './TopicMultiCloudCrosswalk'
 
 // ─── Utility: parse markdown bold/code inline ────────────────────────────────
 function parseInline(text) {
@@ -409,6 +410,7 @@ const TABS = [
   { id: 'jobReadiness', label: 'AWS Interview & Job Defense', icon: <Briefcase size={14} />, desc: 'STAR answers & production CLI audits' },
   { id: 'howItWorks', label: 'How It Works', icon: <Zap size={14} />, desc: 'Step-by-step mechanics & hardening flow' },
   { id: 'liveCli', label: 'Live CLI Sandbox', icon: <Terminal size={14} />, desc: 'Run commands interactively' },
+  { id: 'multiCloud', label: 'Multi-Cloud Crosswalk (Azure / GCP)', icon: <Globe size={14} />, desc: 'Side-by-side AWS vs Azure vs GCP architecture & CLI matrix' },
   { id: 'recap', label: 'Recap & Refs', icon: <FileText size={14} />, desc: 'PDFs & references only (supplementary)' },
 ]
 
@@ -443,6 +445,7 @@ export default function InteractiveTopicEngine({ topic, pathResources = [] }) {
         {active === 'jobReadiness' && <TopicJobReadinessCard topic={topic} pathId={topic.pathId} />}
         {active === 'howItWorks' && <HowItWorksTab topic={topic} />}
         {active === 'liveCli' && <LiveCliTab topic={topic} />}
+        {active === 'multiCloud' && <TopicMultiCloudCrosswalk topic={topic} pathId={topic.pathId} />}
         {active === 'recap' && <RecapTab topic={topic} pathResources={pathResources} />}
       </div>
     </div>

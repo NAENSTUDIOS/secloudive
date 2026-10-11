@@ -115,6 +115,12 @@ export default function AppRoutes() {
         <Route path="/learning" element={<LearningCenter />} />
         <Route path="/learning/:pathId" element={<LearningCenter />} />
         <Route path="/learning/:pathId/:topicId" element={<LearningCenter />} />
+        <Route path="/learn" element={<LearningCenter />} />
+        <Route path="/learn/:pathId" element={<LearningCenter />} />
+        <Route path="/learn/:pathId/:topicId" element={<LearningCenter />} />
+        <Route path="/academy" element={<LearningCenter />} />
+        <Route path="/academy/:pathId" element={<LearningCenter />} />
+        <Route path="/academy/:pathId/:topicId" element={<LearningCenter />} />
         <Route path="/ramp-up" element={<CareerRampUpDirectory />} />
         <Route path="/rampup" element={<CareerRampUpDirectory />} />
         <Route path="/career-rampup" element={<CareerRampUpDirectory />} />
