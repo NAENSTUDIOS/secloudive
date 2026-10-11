@@ -85,6 +85,16 @@ export default function Profile() {
   const isGuest = Boolean(activeProfile?.isGuest || !activeProfile?.id || activeProfile?.id === 'guest')
   const currentUserId = activeProfile?.id || 'GUEST-SANDBOX-7104'
 
+  // Admin Identification check
+  const isAdminUser = Boolean(
+    activeProfile?.email === 'naenstudios@gmail.com' ||
+    (activeProfile?.id && String(activeProfile.id).toLowerCase().includes('naenstud')) ||
+    activeProfile?.role === 'admin' ||
+    activeProfile?.isAdmin ||
+    localStorage.getItem('secloudive_admin_authenticated') === 'true' ||
+    localStorage.getItem('secloudive_user_email') === 'naenstudios@gmail.com'
+  )
+
   // Editable Profile Form State
   const [isEditing, setIsEditing] = useState(false)
   const [name, setName] = useState(activeProfile?.name || 'On-Call Cloud Security Analyst')
@@ -411,6 +421,28 @@ export default function Profile() {
                   <span className="pulse-dot" style={{ width: '5px', height: '5px', background: isGuest ? '#f59e0b' : '#10b981' }} />
                   {isGuest ? 'Guest Sandbox Profile' : activeProfile?.authProvider === 'google' ? 'Google Authenticated' : 'Verified Student Account'}
                 </span>
+
+                {/* Admin Clearance Badge */}
+                {isAdminUser && (
+                  <span 
+                    style={{
+                      background: 'rgba(168, 85, 247, 0.2)',
+                      border: '1px solid rgba(192, 132, 252, 0.5)',
+                      color: '#d8b4fe',
+                      fontSize: '0.72rem',
+                      fontWeight: 800,
+                      padding: '2px 8px',
+                      borderRadius: '12px',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      boxShadow: '0 0 10px rgba(168, 85, 247, 0.3)'
+                    }}
+                  >
+                    <ShieldCheck size={12} style={{ color: '#c084fc' }} />
+                    Admin Clearance Active
+                  </span>
+                )}
               </div>
 
               {/* Student ID & Email Row */}
@@ -477,6 +509,32 @@ export default function Profile() {
                 Tier 0{clearance?.tier || 1} Passport Level
               </div>
             </div>
+
+            {isAdminUser && (
+              <button
+                type="button"
+                onClick={() => {
+                  playTactileClick()
+                  navigate('/admin')
+                }}
+                className="button motion-button"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.25) 0%, rgba(217, 70, 239, 0.35) 100%)',
+                  border: '1px solid rgba(192, 132, 252, 0.6)',
+                  color: '#f3e8ff',
+                  fontSize: '0.8rem',
+                  fontWeight: 700,
+                  padding: '8px 16px',
+                  gap: '6px',
+                  width: '100%',
+                  justifyContent: 'center',
+                  boxShadow: '0 0 16px rgba(168, 85, 247, 0.3)'
+                }}
+              >
+                <ShieldCheck size={14} style={{ color: '#c084fc' }} />
+                <span>Launch Admin Console</span>
+              </button>
+            )}
 
             <button
               type="button"
@@ -953,6 +1011,26 @@ export default function Profile() {
           >
             <Compass size={14} />
             <span>Switch to Guest Mode</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              playTactileClick()
+              navigate('/admin')
+            }}
+            className="button button-ghost motion-button"
+            style={{
+              fontSize: '0.82rem',
+              padding: '8px 16px',
+              gap: '6px',
+              color: '#d8b4fe',
+              borderColor: 'rgba(168, 85, 247, 0.4)',
+              background: 'rgba(168, 85, 247, 0.08)'
+            }}
+          >
+            <Shield size={14} style={{ color: '#c084fc' }} />
+            <span>{isAdminUser ? 'Admin Operations Console' : 'Administrator Clearance'}</span>
           </button>
 
           <button

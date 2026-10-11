@@ -422,8 +422,15 @@ export default function Navbar() {
           Profile
         </NavLink>
 
-        {/* 5. Admin Portal (Only visible to NAEN Studios) */}
-        {activeProfile?.email === 'naenstudios@gmail.com' && (
+        {/* 5. Admin Portal (Visible to NAEN Studios Administration) */}
+        {(activeProfile?.email?.toLowerCase() === 'naenstudios@gmail.com' ||
+          activeProfile?.id?.toLowerCase().includes('naenstud') ||
+          activeProfile?.role === 'admin' ||
+          (typeof window !== 'undefined' && (
+            localStorage.getItem('secloudive_user_email')?.toLowerCase() === 'naenstudios@gmail.com' ||
+            localStorage.getItem('secloudive_admin_authenticated') === 'true'
+          ))
+        ) && (
           <NavLink 
             to="/admin" 
             onClick={closeMenu} 
@@ -431,13 +438,16 @@ export default function Navbar() {
             style={{ 
               fontWeight: 800, 
               color: '#f59e0b',
-              background: 'rgba(245, 158, 11, 0.1)',
-              padding: '6px 12px',
+              background: 'rgba(245, 158, 11, 0.12)',
+              padding: '6px 14px',
               borderRadius: '6px',
-              border: '1px solid rgba(245, 158, 11, 0.3)'
+              border: '1px solid rgba(245, 158, 11, 0.35)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px'
             }}
           >
-            Admin Portal
+            <span>Admin Console</span>
           </NavLink>
         )}
       </nav>
