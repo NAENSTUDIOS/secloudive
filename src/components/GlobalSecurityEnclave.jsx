@@ -36,11 +36,47 @@ export default function GlobalSecurityEnclave() {
   const [copiedEmail, setCopiedEmail] = useState(false)
   const alertTimerRef = useRef(null)
 
+  // ── Admin Exemption Check (naenstudios@gmail.com) ──
+  // The administrator account is fully exempted from screenshot protection,
+  // blackout veils, keyboard interceptors, and alert modals.
+  const isAdminUser = (() => {
+    if (typeof window === 'undefined') return false
+    const email = (activeProfile?.email || '').trim().toLowerCase()
+    const storedEmail = (localStorage.getItem('secloudive_user_email') || '').trim().toLowerCase()
+    const currentId = (activeProfile?.id || '').trim().toLowerCase()
+    const storedId = (localStorage.getItem('secloudive_user_id') || '').trim().toLowerCase()
+    const activeProfileId = (localStorage.getItem('secloudive_active_profile_id') || '').trim().toLowerCase()
+    const isAdminAuth = localStorage.getItem('secloudive_admin_authenticated') === 'true'
+
+    if (email === 'naenstudios@gmail.com' || storedEmail === 'naenstudios@gmail.com') return true
+    if (activeProfile?.role === 'admin' || activeProfile?.isAdmin === true) return true
+    if (isAdminAuth) return true
+    if (currentId.includes('naenstud') || storedId.includes('naenstud') || activeProfileId.includes('naenstud')) return true
+
+    try {
+      const raw = localStorage.getItem('secloudive_registered_profiles_v1')
+      if (raw) {
+        const list = JSON.parse(raw)
+        const match = list.find(p => 
+          (p.id && (p.id.toLowerCase() === currentId || p.id.toLowerCase() === activeProfileId)) ||
+          (p.email && p.email.toLowerCase() === 'naenstudios@gmail.com')
+        )
+        if (match && (match.email?.toLowerCase() === 'naenstudios@gmail.com' || match.id?.toLowerCase().includes('naenstud') || match.role === 'admin')) {
+          return true
+        }
+      }
+    } catch {}
+
+    return false
+  })()
+
   const userId = activeProfile?.id || (typeof window !== 'undefined' ? localStorage.getItem('secloudive_user_id') || 'SEC-LEARNER-7749' : 'SEC-LEARNER-7749')
   const sessionStamp = new Date().toISOString().slice(0, 10)
 
-  // Record incident and bypass to Administrator (naenstudios@gmail.com)
+  // Record incident and bypass directly to Administrator telemetry behind the scenes
   const recordAdminSecurityIncident = useCallback((type, title, message) => {
+    if (isAdminUser) return
+
     const incidentId = `INC-SS-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`
     const nowIso = new Date().toISOString()
     const nowLocal = new Date().toLocaleString()
@@ -69,7 +105,7 @@ export default function GlobalSecurityEnclave() {
       forwardedTo: 'naenstudios@gmail.com'
     }
 
-    // Persist incident in telemetry queue for Admin Dashboard
+    // Persist incident in telemetry queue for Admin Dashboard (bypassed directly to Admin)
     try {
       const stored = localStorage.getItem('secloudive_admin_screenshot_incidents')
       const list = stored ? JSON.parse(stored) : []
@@ -83,30 +119,32 @@ export default function GlobalSecurityEnclave() {
       console.warn(`[SECURITY BYPASS -> naenstudios@gmail.com] Unauthorized screenshot intercepted (${incident.methodDescription}). Incident ID: ${incidentId} logged and bypassed to administrator.`)
     }
 
-    // Flash black shield over display to blackout external screenshot grabs
+    // Flash protective shield briefly over display
     setIsScreenshotShieldActive(true)
     setTimeout(() => {
       setIsScreenshotShieldActive(false)
-    }, 1800)
+    }, 1500)
 
     setSecurityEvent({
       type,
-      title: title || 'Screenshot Capture Strictly Prohibited',
-      message: message || 'Unauthorized screen capture is strictly forbidden on SeCloudive proprietary AWS architecture courseware.',
+      title: title || 'Courseware Content Protection',
+      message: message || 'Capturing screenshots of proprietary AWS architecture diagrams, lab questions, and offensive threat models is restricted under SeCloudive & NAEN Studios content policies.',
       incident
     })
-  }, [userId, activeProfile])
+  }, [isAdminUser, userId, activeProfile])
 
   // 1. Global Keyboard Shortcut Interceptor
   const handleKeyDown = useCallback((e) => {
+    if (isAdminUser) return
+
     // A. PrintScreen (KeyCode 44 or 'PrintScreen')
     if (e.key === 'PrintScreen' || e.keyCode === 44 || e.code === 'PrintScreen') {
       e.preventDefault()
       e.stopPropagation()
       recordAdminSecurityIncident(
         'print_screen',
-        'Screenshot Capture Prohibited',
-        'Capturing screenshots of proprietary AWS architecture diagrams, lab questions, and offensive threat models is strictly prohibited under DMCA & NAEN Studios Enclave Policy.'
+        'Courseware Content Protection',
+        'Capturing screenshots of proprietary AWS architecture diagrams, lab questions, and offensive threat models is restricted under SeCloudive & NAEN Studios content policies.'
       )
       return false
     }
@@ -117,8 +155,8 @@ export default function GlobalSecurityEnclave() {
       e.stopPropagation()
       recordAdminSecurityIncident(
         'snipping_tool',
-        'Screen Snipping Intercepted',
-        'External window capture and snipping tools are strictly restricted. All courseware is cryptographically watermarked and tied to your authorized session.'
+        'Screen Snipping Restricted',
+        'External window capture and snipping tools are restricted during interactive lab sessions to protect courseware integrity.'
       )
       return false
     }
@@ -129,7 +167,7 @@ export default function GlobalSecurityEnclave() {
       e.stopPropagation()
       recordAdminSecurityIncident(
         'mac_screenshot',
-        'Screen Capture Intercepted',
+        'Screen Capture Restricted',
         'System screenshot shortcuts are restricted on proprietary AWS lab environments.'
       )
       return false
@@ -159,10 +197,12 @@ export default function GlobalSecurityEnclave() {
         return false
       }
     }
-  }, [recordAdminSecurityIncident])
+  }, [isAdminUser, recordAdminSecurityIncident])
 
   // 2. Global Context Menu (Right Click) Protection
   const handleContextMenu = useCallback((e) => {
+    if (isAdminUser) return
+
     // In local development, permit right-click context menu
     if (import.meta.env.DEV) return
 
@@ -185,7 +225,7 @@ export default function GlobalSecurityEnclave() {
       'Direct asset extraction and image downloading are restricted to protect proprietary AWS architecture diagrams.'
     )
     return false
-  }, [recordAdminSecurityIncident])
+  }, [isAdminUser, recordAdminSecurityIncident])
 
   // 3. Window Focus Handler (graceful background state)
   const handleWindowBlur = useCallback(() => {
@@ -197,6 +237,8 @@ export default function GlobalSecurityEnclave() {
   }, [])
 
   useEffect(() => {
+    if (isAdminUser) return
+
     window.addEventListener('keydown', handleKeyDown, true)
     window.addEventListener('keyup', handleKeyDown, true)
     window.addEventListener('contextmenu', handleContextMenu, true)
@@ -211,7 +253,7 @@ export default function GlobalSecurityEnclave() {
       window.removeEventListener('focus', handleWindowFocus)
       if (alertTimerRef.current) clearTimeout(alertTimerRef.current)
     }
-  }, [handleKeyDown, handleContextMenu, handleWindowBlur, handleWindowFocus])
+  }, [isAdminUser, handleKeyDown, handleContextMenu, handleWindowBlur, handleWindowFocus])
 
   // Ask doubt in NAEN AI Chatbox
   const handleOpenAiDoubt = () => {
@@ -243,6 +285,10 @@ export default function GlobalSecurityEnclave() {
     window.location.href = `mailto:naenstudios@gmail.com?subject=${subject}&body=${body}`
   }
 
+  if (isAdminUser) {
+    return null
+  }
+
   return (
     <>
       {/* ── Anti-Capture Instant Blackout Shield (Activated on printscreen/snipping attempt) ── */}
@@ -266,18 +312,18 @@ export default function GlobalSecurityEnclave() {
           <div style={{
             padding: '28px 40px',
             background: 'rgba(15, 23, 42, 0.98)',
-            border: '2px solid #ef4444',
+            border: '2px solid rgba(239, 68, 68, 0.6)',
             borderRadius: '16px',
-            boxShadow: '0 0 60px rgba(239, 68, 68, 0.7)'
+            boxShadow: '0 0 60px rgba(239, 68, 68, 0.5)'
           }}>
-            <h2 style={{ fontSize: '1.8rem', fontWeight: 900, color: '#f87171', margin: '0 0 10px', letterSpacing: '-0.5px' }}>
-              ⚠️ SCREENSHOT STRICTLY PROHIBITED
+            <h2 style={{ fontSize: '1.6rem', fontWeight: 900, color: '#f87171', margin: '0 0 8px', letterSpacing: '-0.3px' }}>
+              ⚠️ CONTENT PROTECTED
             </h2>
-            <p style={{ fontSize: '1rem', color: '#f8fafc', margin: '0 0 8px', fontWeight: 800 }}>
+            <p style={{ fontSize: '0.95rem', color: '#f8fafc', margin: '0 0 6px', fontWeight: 700 }}>
               SeCloudive Intellectual Property Enclave
             </p>
-            <p style={{ fontSize: '0.85rem', color: '#94a3b8', margin: 0 }}>
-              Unauthorized screen capture intercepted. Incident report bypassed directly to Admin: <strong>naenstudios@gmail.com</strong>
+            <p style={{ fontSize: '0.82rem', color: '#94a3b8', margin: 0 }}>
+              Proprietary courseware is protected. Please use our built-in SOC Scratchpad &amp; Sentinel AI Mentor.
             </p>
           </div>
         </div>
@@ -402,12 +448,12 @@ export default function GlobalSecurityEnclave() {
             </button>
 
             <div className="guardian-modal-header">
-              <div className="guardian-shield-icon" style={{ borderColor: 'rgba(239, 68, 68, 0.4)', background: 'rgba(239, 68, 68, 0.15)' }}>
-                <ShieldAlert size={26} style={{ color: '#ef4444' }} />
+              <div className="guardian-shield-icon" style={{ borderColor: 'rgba(56, 189, 248, 0.4)', background: 'rgba(56, 189, 248, 0.15)' }}>
+                <ShieldAlert size={26} style={{ color: '#38bdf8' }} />
               </div>
               <div>
-                <span className="guardian-eyebrow" style={{ color: '#ef4444' }}>
-                  SECURITY VIOLATION • AUTOMATED ADMIN TELEMETRY RELAY
+                <span className="guardian-eyebrow" style={{ color: '#38bdf8' }}>
+                  COURSEWARE PROTECTION • ACADEMIC INTEGRITY
                 </span>
                 <h3 className="guardian-title" style={{ fontSize: '1.25rem', color: '#ffffff' }}>
                   {securityEvent.title}
@@ -420,51 +466,13 @@ export default function GlobalSecurityEnclave() {
                 {securityEvent.message}
               </p>
 
-              {/* Real-Time Admin Bypass Notice Box */}
-              <div style={{
-                background: 'rgba(239, 68, 68, 0.1)',
-                border: '1px solid rgba(239, 68, 68, 0.35)',
-                borderRadius: '10px',
-                padding: '14px 16px',
-                marginBottom: '16px',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '8px'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#f87171', fontWeight: 800, fontSize: '0.82rem' }}>
-                  <Send size={15} />
-                  <span>INCIDENT BYPASS DISPATCHED TO ADMINISTRATOR</span>
-                </div>
-                <div style={{ fontSize: '0.78rem', color: '#cbd5e1', lineHeight: 1.5 }}>
-                  This unauthorized capture event has been logged and forwarded directly to the administrator: <strong style={{ color: '#38bdf8' }}>naenstudios@gmail.com</strong>.
-                </div>
-                {securityEvent.incident && (
-                  <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(2, 1fr)',
-                    gap: '6px 12px',
-                    fontSize: '0.72rem',
-                    fontFamily: "'DM Mono', monospace",
-                    color: '#94a3b8',
-                    marginTop: '4px',
-                    paddingTop: '8px',
-                    borderTop: '1px solid rgba(255, 255, 255, 0.08)'
-                  }}>
-                    <div><strong>Incident ID:</strong> {securityEvent.incident.id}</div>
-                    <div><strong>Time:</strong> {securityEvent.incident.localTime}</div>
-                    <div><strong>Learner:</strong> {securityEvent.incident.userId}</div>
-                    <div><strong>Trigger:</strong> {securityEvent.incident.methodDescription}</div>
-                  </div>
-                )}
-              </div>
-
               <div className="guardian-callout-box" style={{ background: 'rgba(15, 23, 42, 0.85)', borderColor: 'rgba(56, 189, 248, 0.3)' }}>
                 <div className="callout-head" style={{ color: '#38bdf8' }}>
                   <Sparkles size={14} className="text-cyan" />
                   <strong>Need to save notes or ask questions about this AWS architecture?</strong>
                 </div>
                 <p className="callout-text" style={{ fontSize: '0.82rem', color: '#cbd5e1', margin: '6px 0 0 0', lineHeight: 1.5 }}>
-                  You have full authorized access to our built-in <strong>SOC Scratchpad</strong>, <strong>Live AI Sentinel Mentor</strong>, and official downloadable cryptographic audit packs.
+                  You have full authorized access to our built-in <strong>SOC Scratchpad</strong>, <strong>Live AI Sentinel Mentor</strong>, and official downloadable cryptographic audit packs in your dashboard.
                 </p>
               </div>
 
@@ -484,7 +492,7 @@ export default function GlobalSecurityEnclave() {
                   </div>
                 </button>
 
-                {/* Email Instructors */}
+                {/* Contact Support */}
                 <button
                   type="button"
                   className="guardian-action-card email-action"
@@ -494,46 +502,30 @@ export default function GlobalSecurityEnclave() {
                     <Mail size={18} />
                   </div>
                   <div className="action-card-text">
-                    <strong>Notify Administrator</strong>
-                    <span>Send details to naenstudios@gmail.com</span>
+                    <strong>Contact Support</strong>
+                    <span>Inquiries directed to naenstudios@gmail.com</span>
                   </div>
                 </button>
               </div>
 
-              <div className="guardian-footer-meta" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '16px' }}>
-                <span className="learner-stamp">
-                  Verified Learner Session: <code>{userId}</code>
-                </span>
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  <button
-                    type="button"
-                    className="copy-email-btn"
-                    onClick={() => {
-                      navigator.clipboard.writeText('naenstudios@gmail.com')
-                      setCopiedEmail(true)
-                      setTimeout(() => setCopiedEmail(false), 2000)
-                    }}
-                  >
-                    {copiedEmail ? <Check size={12} className="text-emerald" /> : <Copy size={12} />}
-                    <span>{copiedEmail ? 'Copied Email' : 'Copy naenstudios@gmail.com'}</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setSecurityEvent(null)}
-                    style={{
-                      background: 'rgba(255, 255, 255, 0.1)',
-                      border: '1px solid rgba(255, 255, 255, 0.2)',
-                      color: '#ffffff',
-                      borderRadius: '6px',
-                      padding: '4px 12px',
-                      fontSize: '0.74rem',
-                      fontWeight: 700,
-                      cursor: 'pointer'
-                    }}
-                  >
-                    I Understand & Comply
-                  </button>
-                </div>
+              <div className="guardian-footer-meta" style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginTop: '16px' }}>
+                <button
+                  type="button"
+                  onClick={() => setSecurityEvent(null)}
+                  style={{
+                    background: 'linear-gradient(135deg, #0284c7 0%, #2563eb 100%)',
+                    border: 'none',
+                    color: '#ffffff',
+                    borderRadius: '8px',
+                    padding: '8px 22px',
+                    fontSize: '0.82rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 14px rgba(2, 132, 199, 0.35)'
+                  }}
+                >
+                  I Understand &amp; Comply
+                </button>
               </div>
             </div>
           </div>
