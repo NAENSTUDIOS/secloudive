@@ -156,7 +156,9 @@ export default function WelcomeOnboardingModal({ isFullPageGate = false, onCompl
   const greeting = getTimeOfDayGreeting()
   const hasEverCompleted = (() => {
     try {
-      return sessionStorage.getItem('secloudive_session_unlocked_v1') === 'true'
+      const strictCompleted = localStorage.getItem('secloudive_welcome_user_strict_enforced_v5') === 'true'
+      const legacyCompleted = localStorage.getItem('secloudive_onboarding_completed_v1') === 'true'
+      return strictCompleted && legacyCompleted
     } catch {
       return false
     }
@@ -197,7 +199,9 @@ export default function WelcomeOnboardingModal({ isFullPageGate = false, onCompl
 
   // Initial gate check
   useEffect(() => {
-    const hasCompleted = sessionStorage.getItem('secloudive_session_unlocked_v1') === 'true'
+    const strictCompleted = localStorage.getItem('secloudive_welcome_user_strict_enforced_v5') === 'true'
+    const legacyCompleted = localStorage.getItem('secloudive_onboarding_completed_v1') === 'true'
+    const hasCompleted = strictCompleted && legacyCompleted
     if (!hasCompleted || isFullPageGate) {
       setIsOpen(true)
       setIsMandatory(true)
@@ -223,6 +227,7 @@ export default function WelcomeOnboardingModal({ isFullPageGate = false, onCompl
     playTactileClick()
     try {
       sessionStorage.setItem('secloudive_session_unlocked_v1', 'true')
+      localStorage.setItem('secloudive_welcome_user_strict_enforced_v5', 'true')
       localStorage.setItem('secloudive_welcome_dismissed', 'true')
       localStorage.setItem('secloudive_onboarding_completed_v1', 'true')
       localStorage.setItem('secloudive_terms_accepted_v1', 'true')
@@ -436,7 +441,7 @@ export default function WelcomeOnboardingModal({ isFullPageGate = false, onCompl
             </div>
           </div>
 
-          {/* Step Breadcrumb Indicators */}
+          {/* Step Breadcrumb Indicators & Close Button */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             {['welcome', 'explains', 'terms_cookies', 'login', 'diagnostic_test', 'ready'].map((s, idx) => (
               <div
@@ -450,6 +455,27 @@ export default function WelcomeOnboardingModal({ isFullPageGate = false, onCompl
                 }}
               />
             ))}
+            {!isMandatory && (
+              <button
+                type="button"
+                onClick={() => { playTactileClick(); setIsOpen(false); }}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.08)',
+                  border: '1px solid rgba(255, 255, 255, 0.15)',
+                  borderRadius: '6px',
+                  color: '#94a3b8',
+                  cursor: 'pointer',
+                  padding: '3px',
+                  display: 'grid',
+                  placeItems: 'center',
+                  marginLeft: '8px'
+                }}
+                title="Close Orientation Modal"
+                aria-label="Close"
+              >
+                <X size={15} />
+              </button>
+            )}
           </div>
         </div>
 

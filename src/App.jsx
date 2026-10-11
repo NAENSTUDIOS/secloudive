@@ -17,9 +17,20 @@ import './styles/motionGraphics.css'
 export default function App() {
   const [isOnboardingCompleted, setIsOnboardingCompleted] = useState(() => {
     try {
-      const isCompleted = localStorage.getItem('secloudive_onboarding_completed_v1') === 'true'
-      const sessionCleared = sessionStorage.getItem('secloudive_session_unlocked_v1') === 'true'
-      return sessionCleared
+      // 1. Force welcome screen if query param ?welcome=true, ?onboarding=true, or ?reset=true is present
+      if (typeof window !== 'undefined') {
+        const params = new URLSearchParams(window.location.search)
+        if (params.get('welcome') === 'true' || params.get('onboarding') === 'true' || params.get('reset') === 'true') {
+          return false
+        }
+      }
+
+      // 2. Strict Welcome User Gate: Must have explicitly completed strict v5 welcome flow
+      const strictCompleted = localStorage.getItem('secloudive_welcome_user_strict_enforced_v5') === 'true'
+      const legacyCompleted = localStorage.getItem('secloudive_onboarding_completed_v1') === 'true'
+
+      // Strictly gate: requires verified completion
+      return strictCompleted && legacyCompleted
     } catch {
       return false
     }

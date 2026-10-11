@@ -29,7 +29,8 @@ import {
   FileCode2,
   FileText,
   Globe,
-  Compass
+  Compass,
+  Sparkles
 } from 'lucide-react'
 import { useChallenges } from '../context/ChallengeContext'
 import JobProcessFramework from '../components/JobProcessFramework'

@@ -453,6 +453,35 @@ export default function Navbar() {
           <kbd className="nav-search-kbd">Ctrl+/</kbd>
         </button>
 
+        {/* Welcome Onboarding Tour Trigger */}
+        <button 
+          type="button"
+          className="nav-welcome-trigger-btn"
+          onClick={() => {
+            playTactileClick()
+            window.dispatchEvent(new CustomEvent('open-welcome-modal', { detail: { step: 'welcome' } }))
+          }}
+          title="Open Welcome Onboarding & Architecture Tour"
+          aria-label="Welcome Tour"
+          style={{
+            background: 'rgba(255, 153, 0, 0.12)',
+            border: '1px solid rgba(255, 153, 0, 0.4)',
+            color: '#fbbf24',
+            borderRadius: '8px',
+            padding: '6px 11px',
+            fontSize: '0.78rem',
+            fontWeight: 800,
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease'
+          }}
+        >
+          <Sparkles size={13} style={{ color: '#ff9900' }} />
+          <span>Welcome Tour</span>
+        </button>
+
         {/* Single Unified Student Identity Pill */}
         {Boolean(activeProfile?.isGuest || !activeProfile?.id || activeProfile?.id === 'guest') ? (
           <button
