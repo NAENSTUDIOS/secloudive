@@ -397,30 +397,30 @@ export default function WelcomeOnboardingModal({ isFullPageGate = false, onCompl
         }} />
 
         {/* Modal Header */}
-        <div style={{
-          padding: '16px 24px',
+        <div className="welcome-header-compact" style={{
+          padding: '12px 20px',
           borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          background: 'rgba(15, 23, 42, 0.8)'
+          background: 'rgba(15, 23, 42, 0.85)'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <div style={{
-              width: '36px',
-              height: '36px',
-              borderRadius: '10px',
+              width: '32px',
+              height: '32px',
+              borderRadius: '8px',
               background: 'linear-gradient(135deg, rgba(255, 153, 0, 0.2) 0%, rgba(56, 189, 248, 0.2) 100%)',
               border: '1px solid rgba(255, 153, 0, 0.5)',
               display: 'grid',
               placeItems: 'center',
               color: '#ff9900'
             }}>
-              <ShieldCheck size={20} />
+              <ShieldCheck size={18} />
             </div>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <h2 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: '#f8fafc', letterSpacing: '-0.3px' }}>
+                <h2 style={{ margin: 0, fontSize: '1.02rem', fontWeight: 800, color: '#f8fafc', letterSpacing: '-0.3px' }}>
                   SeCloudive • AWS Cloud Security Academy
                 </h2>
                 <span style={{
@@ -428,14 +428,14 @@ export default function WelcomeOnboardingModal({ isFullPageGate = false, onCompl
                   border: '1px solid rgba(255, 153, 0, 0.4)',
                   color: '#fbbf24',
                   borderRadius: '9999px',
-                  padding: '1px 8px',
-                  fontSize: '0.68rem',
+                  padding: '1px 7px',
+                  fontSize: '0.65rem',
                   fontWeight: 800
                 }}>
                   100% AWS DEFENDER
                 </span>
               </div>
-              <p style={{ margin: 0, fontSize: '0.74rem', color: '#94a3b8' }}>
+              <p style={{ margin: 0, fontSize: '0.7rem', color: '#94a3b8' }}>
                 The Complete Educational Pipeline from Linux Foundations to Enterprise AWS Defense
               </p>
             </div>
@@ -447,8 +447,8 @@ export default function WelcomeOnboardingModal({ isFullPageGate = false, onCompl
               <div
                 key={s}
                 style={{
-                  width: currentStep === s ? '20px' : '7px',
-                  height: '7px',
+                  width: currentStep === s ? '18px' : '6px',
+                  height: '6px',
                   borderRadius: '9999px',
                   background: currentStep === s ? '#ff9900' : 'rgba(255, 255, 255, 0.15)',
                   transition: 'all 0.25s ease'
@@ -480,59 +480,59 @@ export default function WelcomeOnboardingModal({ isFullPageGate = false, onCompl
         </div>
 
         {/* Modal Scrollable Content */}
-        <div style={{ padding: '24px', overflowY: 'auto', flex: 1 }}>
+        <div className="welcome-onboarding-scroll welcome-body-compact" style={{ padding: 'clamp(14px, 1.8vh, 20px)', flex: 1, minHeight: 0 }}>
 
           {/* ═══════════════════════════════════════════════════════════════════ */}
           {/* STEP 1: TIME-OF-DAY SALUTATION, ENCOURAGEMENT & ACCESS GATE        */}
           {/* ═══════════════════════════════════════════════════════════════════ */}
           {currentStep === 'welcome' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               {/* Dynamic Time-of-Day Salutation & Encouragement Card */}
-              <div style={{
-                background: `linear-gradient(135deg, ${greeting.accentGlow} 0%, rgba(15, 23, 42, 0.9) 100%)`,
+              <div className="welcome-greeting-banner" style={{
+                background: `linear-gradient(135deg, ${greeting.accentGlow} 0%, rgba(15, 23, 42, 0.92) 100%)`,
                 border: `1.5px solid ${greeting.badgeColor}66`,
-                borderRadius: '16px',
-                padding: '24px',
+                borderRadius: '14px',
+                padding: '12px 18px',
                 textAlign: 'center',
-                boxShadow: `0 10px 30px ${greeting.accentGlow}`
+                boxShadow: `0 8px 25px ${greeting.accentGlow}`
               }}>
                 <div style={{
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '8px',
+                  gap: '6px',
                   background: `${greeting.badgeColor}22`,
-                  border: `1px solid ${greeting.badgeColor}66`,
+                  border: `1px solid ${greeting.badgeColor}55`,
                   color: greeting.badgeColor,
                   borderRadius: '9999px',
-                  padding: '4px 14px',
-                  fontSize: '0.74rem',
+                  padding: '2px 10px',
+                  fontSize: '0.68rem',
                   fontWeight: 800,
-                  marginBottom: '12px'
+                  marginBottom: '4px'
                 }}>
-                  <Sparkles size={14} />
+                  <Sparkles size={12} />
                   <span>{greeting.badgeText} • 100% AWS CLOUD DEFENSE</span>
                 </div>
 
-                <div style={{ fontSize: '1.25rem', fontWeight: 800, color: greeting.badgeColor, marginBottom: '6px' }}>
+                <div style={{ fontSize: '1.05rem', fontWeight: 800, color: greeting.badgeColor, marginBottom: '2px' }}>
                   {greeting.salutation}
                 </div>
 
-                <h1 style={{
-                  fontSize: '1.65rem',
+                <h1 className="welcome-greeting-headline" style={{
+                  fontSize: '1.35rem',
                   fontWeight: 900,
                   color: '#ffffff',
-                  letterSpacing: '-0.5px',
-                  margin: '0 0 10px',
-                  lineHeight: 1.3
+                  letterSpacing: '-0.4px',
+                  margin: '2px 0 4px',
+                  lineHeight: 1.25
                 }}>
                   {greeting.headline}
                 </h1>
-                <p style={{
-                  fontSize: '0.92rem',
+                <p className="welcome-greeting-subtext" style={{
+                  fontSize: '0.82rem',
                   color: '#cbd5e1',
-                  maxWidth: '720px',
-                  margin: '0 auto 14px',
-                  lineHeight: 1.6
+                  maxWidth: '700px',
+                  margin: '0 auto 6px',
+                  lineHeight: 1.45
                 }}>
                   {greeting.subtext}
                 </p>
@@ -541,12 +541,12 @@ export default function WelcomeOnboardingModal({ isFullPageGate = false, onCompl
                 <div style={{
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '10px',
+                  gap: '8px',
                   background: 'rgba(2, 6, 23, 0.65)',
-                  border: '1px solid rgba(255, 255, 255, 0.12)',
-                  borderRadius: '10px',
-                  padding: '8px 16px',
-                  fontSize: '0.8rem',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  borderRadius: '8px',
+                  padding: '5px 12px',
+                  fontSize: '0.74rem',
                   color: '#94a3b8'
                 }}>
                   <span style={{ color: '#38bdf8' }}>💡 <strong>Encouragement:</strong></span>
@@ -555,21 +555,21 @@ export default function WelcomeOnboardingModal({ isFullPageGate = false, onCompl
               </div>
 
               {/* ── THE STRICT ENTRY ACCESS GATE: Login or Guest ── */}
-              <div style={{
-                background: 'rgba(15, 23, 42, 0.85)',
+              <div className="welcome-gate-enclave" style={{
+                background: 'rgba(15, 23, 42, 0.88)',
                 border: '1.5px solid rgba(56, 189, 248, 0.35)',
-                borderRadius: '16px',
-                padding: '24px',
-                boxShadow: '0 10px 40px rgba(0, 0, 0, 0.6)'
+                borderRadius: '14px',
+                padding: '16px 18px',
+                boxShadow: '0 8px 30px rgba(0, 0, 0, 0.5)'
               }}>
-                <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-                  <span style={{ fontSize: '0.72rem', color: '#ff9900', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px' }}>
+                <div style={{ textAlign: 'center', marginBottom: '14px' }}>
+                  <span style={{ fontSize: '0.68rem', color: '#ff9900', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px' }}>
                     GATE ACCESS ENCLAVE
                   </span>
-                  <h3 style={{ margin: '4px 0 6px', fontSize: '1.25rem', fontWeight: 800, color: '#f8fafc' }}>
+                  <h3 style={{ margin: '2px 0 4px', fontSize: '1.15rem', fontWeight: 800, color: '#f8fafc' }}>
                     Select Access Mode to Unlock the UHD Auto-Built Layer
                   </h3>
-                  <p style={{ margin: 0, fontSize: '0.82rem', color: '#94a3b8' }}>
+                  <p style={{ margin: 0, fontSize: '0.78rem', color: '#94a3b8' }}>
                     Choose your identity method below. Upon authentication or guest selection, the platform immediately launches in high-definition.
                   </p>
                 </div>
@@ -579,11 +579,11 @@ export default function WelcomeOnboardingModal({ isFullPageGate = false, onCompl
                     background: 'rgba(239, 68, 68, 0.15)',
                     border: '1px solid rgba(239, 68, 68, 0.35)',
                     borderRadius: '8px',
-                    padding: '10px 14px',
+                    padding: '8px 12px',
                     color: '#f87171',
-                    fontSize: '0.82rem',
+                    fontSize: '0.78rem',
                     fontWeight: 600,
-                    marginBottom: '16px',
+                    marginBottom: '12px',
                     textAlign: 'center'
                   }}>
                     {authError}
@@ -653,34 +653,34 @@ export default function WelcomeOnboardingModal({ isFullPageGate = false, onCompl
                 )}
 
                 {/* 3 Access Options Grid: Google, Email, and Guest */}
-                <div style={{
+                <div className="welcome-options-grid" style={{
                   display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-                  gap: '16px',
-                  marginBottom: '16px'
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))',
+                  gap: '12px',
+                  marginBottom: '12px'
                 }}>
                   {/* Option 1: Google 1-Click */}
-                  <div style={{
+                  <div className="welcome-option-card" style={{
                     background: 'linear-gradient(135deg, rgba(255, 153, 0, 0.08) 0%, rgba(2, 6, 23, 0.7) 100%)',
                     border: '1px solid rgba(255, 153, 0, 0.35)',
                     borderRadius: '12px',
-                    padding: '18px',
+                    padding: '14px',
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'space-between',
                     textAlign: 'center'
                   }}>
                     <div>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '6px' }}>
-                        <Sparkles size={16} style={{ color: '#ff9900' }} />
-                        <strong style={{ fontSize: '0.92rem', color: '#f8fafc' }}>Google 1-Click Access</strong>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', marginBottom: '4px' }}>
+                        <Sparkles size={15} style={{ color: '#ff9900' }} />
+                        <strong style={{ fontSize: '0.88rem', color: '#f8fafc' }}>Google 1-Click Access</strong>
                       </div>
-                      <p style={{ fontSize: '0.76rem', color: '#94a3b8', margin: '0 0 14px', lineHeight: 1.4 }}>
+                      <p style={{ fontSize: '0.74rem', color: '#94a3b8', margin: '0 0 10px', lineHeight: 1.35 }}>
                         Instant verification. Auto-creates permanent Student ID & backs up progress to cloud.
                       </p>
                     </div>
 
-                    <div style={{ display: 'flex', justifyContent: 'center', margin: '8px 0' }}>
+                    <div style={{ display: 'flex', justifyContent: 'center', margin: '6px 0' }}>
                       <GoogleLogin
                         onSuccess={handleGoogleSuccess}
                         onError={() => setAuthError('Google sign in could not be completed.')}
@@ -691,24 +691,24 @@ export default function WelcomeOnboardingModal({ isFullPageGate = false, onCompl
                       />
                     </div>
 
-                    <div style={{ fontSize: '0.72rem', color: '#38bdf8', marginTop: '8px' }}>
+                    <div style={{ fontSize: '0.7rem', color: '#38bdf8', marginTop: '6px' }}>
                       ✓ Auto-unlocks UHD Layer immediately
                     </div>
                   </div>
 
                   {/* Option 2: Email & Password */}
-                  <div style={{
+                  <div className="welcome-option-card" style={{
                     background: 'rgba(2, 6, 23, 0.7)',
                     border: '1px solid rgba(255, 255, 255, 0.12)',
                     borderRadius: '12px',
-                    padding: '18px',
+                    padding: '14px',
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'space-between'
                   }}>
                     <div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                        <strong style={{ fontSize: '0.92rem', color: '#f8fafc' }}>Email & Password</strong>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                        <strong style={{ fontSize: '0.88rem', color: '#f8fafc' }}>Email & Password</strong>
                         <div style={{ display: 'flex', background: 'rgba(15, 23, 42, 0.9)', borderRadius: '4px', padding: '2px' }}>
                           <button
                             type="button"
@@ -717,9 +717,9 @@ export default function WelcomeOnboardingModal({ isFullPageGate = false, onCompl
                               background: authMode === 'login' ? 'rgba(56, 189, 248, 0.25)' : 'transparent',
                               color: authMode === 'login' ? '#38bdf8' : '#94a3b8',
                               border: 'none',
-                              padding: '2px 6px',
+                              padding: '2px 5px',
                               borderRadius: '3px',
-                              fontSize: '0.68rem',
+                              fontSize: '0.66rem',
                               fontWeight: 700,
                               cursor: 'pointer'
                             }}
@@ -733,9 +733,9 @@ export default function WelcomeOnboardingModal({ isFullPageGate = false, onCompl
                               background: authMode === 'register' ? 'rgba(56, 189, 248, 0.25)' : 'transparent',
                               color: authMode === 'register' ? '#38bdf8' : '#94a3b8',
                               border: 'none',
-                              padding: '2px 6px',
+                              padding: '2px 5px',
                               borderRadius: '3px',
-                              fontSize: '0.68rem',
+                              fontSize: '0.66rem',
                               fontWeight: 700,
                               cursor: 'pointer'
                             }}
@@ -745,7 +745,7 @@ export default function WelcomeOnboardingModal({ isFullPageGate = false, onCompl
                         </div>
                       </div>
 
-                      <form onSubmit={handleEmailAuth} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      <form onSubmit={handleEmailAuth} style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                         {authMode === 'register' && (
                           <input
                             type="text"
@@ -753,12 +753,12 @@ export default function WelcomeOnboardingModal({ isFullPageGate = false, onCompl
                             onChange={(e) => setStudentName(e.target.value)}
                             placeholder="Student Full Name"
                             style={{
-                              padding: '7px 9px',
+                              padding: '6px 8px',
                               background: 'rgba(15, 23, 42, 0.9)',
                               border: '1px solid rgba(255, 255, 255, 0.15)',
                               borderRadius: '6px',
                               color: '#f8fafc',
-                              fontSize: '0.78rem'
+                              fontSize: '0.76rem'
                             }}
                           />
                         )}
@@ -769,12 +769,12 @@ export default function WelcomeOnboardingModal({ isFullPageGate = false, onCompl
                           onChange={(e) => setEmail(e.target.value)}
                           placeholder="learner@university.edu"
                           style={{
-                            padding: '7px 9px',
+                            padding: '6px 8px',
                             background: 'rgba(15, 23, 42, 0.9)',
                             border: '1px solid rgba(255, 255, 255, 0.15)',
                             borderRadius: '6px',
                             color: '#f8fafc',
-                            fontSize: '0.78rem'
+                            fontSize: '0.76rem'
                           }}
                         />
                         <input
@@ -784,12 +784,12 @@ export default function WelcomeOnboardingModal({ isFullPageGate = false, onCompl
                           onChange={(e) => setPassword(e.target.value)}
                           placeholder="Password (min 6 chars)"
                           style={{
-                            padding: '7px 9px',
+                            padding: '6px 8px',
                             background: 'rgba(15, 23, 42, 0.9)',
                             border: '1px solid rgba(255, 255, 255, 0.15)',
                             borderRadius: '6px',
                             color: '#f8fafc',
-                            fontSize: '0.78rem'
+                            fontSize: '0.76rem'
                           }}
                         />
                         <button
@@ -799,10 +799,10 @@ export default function WelcomeOnboardingModal({ isFullPageGate = false, onCompl
                             background: 'linear-gradient(135deg, #0284c7 0%, #2563eb 100%)',
                             border: 'none',
                             color: '#ffffff',
-                            padding: '8px',
+                            padding: '7px',
                             borderRadius: '6px',
                             fontWeight: 700,
-                            fontSize: '0.78rem',
+                            fontSize: '0.76rem',
                             cursor: 'pointer'
                           }}
                         >
@@ -813,22 +813,22 @@ export default function WelcomeOnboardingModal({ isFullPageGate = false, onCompl
                   </div>
 
                   {/* Option 3: Continue as Guest */}
-                  <div style={{
+                  <div className="welcome-option-card" style={{
                     background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(2, 6, 23, 0.7) 100%)',
                     border: '1px solid rgba(16, 185, 129, 0.35)',
                     borderRadius: '12px',
-                    padding: '18px',
+                    padding: '14px',
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'space-between',
                     textAlign: 'center'
                   }}>
                     <div>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '6px' }}>
-                        <UserCheck size={16} style={{ color: '#10b981' }} />
-                        <strong style={{ fontSize: '0.92rem', color: '#f8fafc' }}>Continue as Guest</strong>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', marginBottom: '4px' }}>
+                        <UserCheck size={15} style={{ color: '#10b981' }} />
+                        <strong style={{ fontSize: '0.88rem', color: '#f8fafc' }}>Continue as Guest</strong>
                       </div>
-                      <p style={{ fontSize: '0.76rem', color: '#94a3b8', margin: '0 0 14px', lineHeight: 1.4 }}>
+                      <p style={{ fontSize: '0.74rem', color: '#94a3b8', margin: '0 0 10px', lineHeight: 1.35 }}>
                         Instant sandbox access. Zero credentials required. Local browser persistence enabled.
                       </p>
                     </div>
@@ -840,15 +840,15 @@ export default function WelcomeOnboardingModal({ isFullPageGate = false, onCompl
                         background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
                         border: 'none',
                         color: '#ffffff',
-                        padding: '11px 18px',
+                        padding: '10px 16px',
                         borderRadius: '8px',
-                        fontSize: '0.84rem',
+                        fontSize: '0.82rem',
                         fontWeight: 800,
                         cursor: 'pointer',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        gap: '8px',
+                        gap: '6px',
                         boxShadow: '0 4px 15px rgba(16, 185, 129, 0.35)'
                       }}
                     >
@@ -856,7 +856,7 @@ export default function WelcomeOnboardingModal({ isFullPageGate = false, onCompl
                       <ArrowRight size={14} />
                     </button>
 
-                    <div style={{ fontSize: '0.72rem', color: '#34d399', marginTop: '8px' }}>
+                    <div style={{ fontSize: '0.7rem', color: '#34d399', marginTop: '6px' }}>
                       ✓ Opens UHD Auto-Built Layer immediately
                     </div>
                   </div>
