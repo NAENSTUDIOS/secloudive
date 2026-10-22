@@ -15,7 +15,9 @@ export const resourceCatalog = {
     category: 'Learning Platform', 
     difficulty: 'All Levels', 
     url: 'https://explore.skillbuilder.aws/', 
-    why: 'Build structured AWS knowledge with guided digital learning, ramp-up guides, and hands-on practice.' 
+    why: 'Build structured AWS knowledge with guided digital learning, ramp-up guides, and hands-on practice.',
+    verificationStatus: 'VERIFIED',
+    frssScore: 92
   },
   skillsHub: { 
     id: 'skillsHub',
@@ -24,7 +26,9 @@ export const resourceCatalog = {
     category: 'Career Development', 
     difficulty: 'All Levels', 
     url: 'https://aws.amazon.com/training/skills/', 
-    why: 'Find role-based training and certification pathways aligned to cloud security careers.' 
+    why: 'Find role-based training and certification pathways aligned to cloud security careers.',
+    verificationStatus: 'VERIFIED',
+    frssScore: 88
   },
   iamDocs: { 
     id: 'iamDocs',
@@ -33,7 +37,9 @@ export const resourceCatalog = {
     category: 'IAM Security', 
     difficulty: 'Intermediate', 
     url: 'https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html', 
-    why: 'Deepen policy analysis, identity boundaries, least privilege, and trust relationships.' 
+    why: 'Deepen policy analysis, identity boundaries, least privilege, and trust relationships.',
+    verificationStatus: 'VERIFIED',
+    frssScore: 95
   },
   s3Docs: { 
     id: 's3Docs',
@@ -42,7 +48,9 @@ export const resourceCatalog = {
     category: 'Data Security', 
     difficulty: 'Beginner', 
     url: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html', 
-    why: 'Strengthen practical knowledge of bucket access, encryption, versioning, and Block Public Access.' 
+    why: 'Strengthen practical knowledge of bucket access, encryption, versioning, and Block Public Access.',
+    verificationStatus: 'VERIFIED',
+    frssScore: 93
   },
   vpcDocs: { 
     id: 'vpcDocs',
@@ -51,7 +59,9 @@ export const resourceCatalog = {
     category: 'Network Security', 
     difficulty: 'Intermediate', 
     url: 'https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html', 
-    why: 'Learn how subnets, routes, security groups, PrivateLink, and network boundaries shape risk.' 
+    why: 'Learn how subnets, routes, security groups, PrivateLink, and network boundaries shape risk.',
+    verificationStatus: 'VERIFIED',
+    frssScore: 93
   },
   cloudTrailDocs: { 
     id: 'cloudTrailDocs',
@@ -60,7 +70,9 @@ export const resourceCatalog = {
     category: 'Monitoring & SIEM', 
     difficulty: 'Intermediate', 
     url: 'https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html', 
-    why: 'Turn AWS API activity into reliable audit trails, log validation hashes, and incident evidence.' 
+    why: 'Turn AWS API activity into reliable audit trails, log validation hashes, and incident evidence.',
+    verificationStatus: 'VERIFIED',
+    frssScore: 94
   },
   cloudWatchDocs: { 
     id: 'cloudWatchDocs',
@@ -69,7 +81,9 @@ export const resourceCatalog = {
     category: 'Monitoring & SIEM', 
     difficulty: 'Intermediate', 
     url: 'https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/WhatIsCloudWatch.html', 
-    why: 'Build practical detection, alerting, metrics, and operational visibility.' 
+    why: 'Build practical detection, alerting, metrics, and operational visibility.',
+    verificationStatus: 'VERIFIED',
+    frssScore: 91
   },
   securityBestPractices: { 
     id: 'securityBestPractices',
@@ -78,7 +92,9 @@ export const resourceCatalog = {
     category: 'Security Foundations', 
     difficulty: 'Intermediate', 
     url: 'https://aws.amazon.com/architecture/security-identity-compliance/', 
-    why: 'Connect AWS security controls to a durable identity, data, and compliance strategy.' 
+    why: 'Connect AWS security controls to a durable identity, data, and compliance strategy.',
+    verificationStatus: 'VERIFIED',
+    frssScore: 90
   },
   wellArchitected: { 
     id: 'wellArchitected',
@@ -87,7 +103,9 @@ export const resourceCatalog = {
     category: 'Architecture Security', 
     difficulty: 'Advanced', 
     url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/welcome.html', 
-    why: 'Review workloads systematically through the Security Pillar and resilient design principles.' 
+    why: 'Review workloads systematically through the Security Pillar and resilient design principles.',
+    verificationStatus: 'VERIFIED',
+    frssScore: 96
   },
   securityResources: { 
     id: 'securityResources',
@@ -96,7 +114,9 @@ export const resourceCatalog = {
     category: 'Security Foundations', 
     difficulty: 'All Levels', 
     url: 'https://aws.amazon.com/security/resources/', 
-    why: 'Explore AWS-curated security guidance, solutions, and practical learning references.' 
+    why: 'Explore AWS-curated security guidance, solutions, and practical learning references.',
+    verificationStatus: 'VERIFIED',
+    frssScore: 88
   },
 
   // ----------------------------------------------------------------------------
@@ -109,7 +129,9 @@ export const resourceCatalog = {
     category: 'Learning Platform',
     difficulty: 'Intermediate',
     url: 'https://learn.microsoft.com/en-us/training/courses/az-500t00',
-    why: 'Official Microsoft guided learning paths covering identity, platform protection, and security operations.'
+    why: 'Official Microsoft guided learning paths covering identity, platform protection, and security operations.',
+    verificationStatus: 'VERIFIED',
+    frssScore: 91
   },
   azureSecurityBenchmark: {
     id: 'azureSecurityBenchmark',
@@ -118,7 +140,9 @@ export const resourceCatalog = {
     category: 'Security Foundations',
     difficulty: 'Intermediate',
     url: 'https://learn.microsoft.com/en-us/security/benchmark/azure/introduction',
-    why: 'Industry standard security baseline mapping Azure controls to CIS and NIST SP 800-53.'
+    why: 'Industry standard security baseline mapping Azure controls to CIS and NIST SP 800-53.',
+    verificationStatus: 'VERIFIED',
+    frssScore: 90
   },
   azureEntraDocs: {
     id: 'azureEntraDocs',
@@ -127,7 +151,9 @@ export const resourceCatalog = {
     category: 'IAM Security',
     difficulty: 'Intermediate',
     url: 'https://learn.microsoft.com/en-us/entra/identity/',
-    why: 'Master Conditional Access, Privileged Identity Management (PIM), and Workload Managed Identities.'
+    why: 'Master Conditional Access, Privileged Identity Management (PIM), and Workload Managed Identities.',
+    verificationStatus: 'VERIFIED',
+    frssScore: 92
   },
   azureKeyVaultDocs: {
     id: 'azureKeyVaultDocs',
@@ -136,7 +162,9 @@ export const resourceCatalog = {
     category: 'Data Security',
     difficulty: 'Intermediate',
     url: 'https://learn.microsoft.com/en-us/azure/key-vault/general/overview',
-    why: 'Cryptographic key management, customer-managed keys (CMK), and automated certificate lifecycle.'
+    why: 'Cryptographic key management, customer-managed keys (CMK), and automated certificate lifecycle.',
+    verificationStatus: 'VERIFIED',
+    frssScore: 91
   },
   azureSentinelKql: {
     id: 'azureSentinelKql',
@@ -147,7 +175,9 @@ export const resourceCatalog = {
     url: 'https://learn.microsoft.com/en-us/azure/sentinel/kusto-overview',
     why: 'Learn Kusto Query Language (KQL) to hunt advanced persistent threats across enterprise telemetry.',
     tier: 'Free Docs',
-    billingSafetyNote: 'Zero cloud billing; reference syntax & hunting queries'
+    billingSafetyNote: 'Zero cloud billing; reference syntax & hunting queries',
+    verificationStatus: 'VERIFIED',
+    frssScore: 89
   },
   azureSecurityRampUpGuide: {
     id: 'azureSecurityRampUpGuide',
@@ -158,7 +188,9 @@ export const resourceCatalog = {
     url: 'https://learn.microsoft.com/security',
     why: 'Official Microsoft Ramp-Up curriculum mapping role pathways from fundamentals (SC-900) to enterprise security engineering.',
     tier: '100% Free',
-    billingSafetyNote: 'Free interactive modules with zero-cost Microsoft Learn Sandboxes'
+    billingSafetyNote: 'Free interactive modules with zero-cost Microsoft Learn Sandboxes',
+    verificationStatus: 'VERIFIED',
+    frssScore: 88
   },
   azureDefenderXdr: {
     id: 'azureDefenderXdr',
@@ -169,7 +201,9 @@ export const resourceCatalog = {
     url: 'https://learn.microsoft.com/en-us/defender-for-cloud/',
     why: 'Unified security posture management (CSPM), regulatory compliance dashboards, and multi-cloud server protection.',
     tier: 'Free Docs / 30-Day Trial',
-    billingSafetyNote: 'Free documentation & Microsoft Learn lab walkthroughs'
+    billingSafetyNote: 'Free documentation & Microsoft Learn lab walkthroughs',
+    verificationStatus: 'VERIFIED',
+    frssScore: 87
   },
   azurePurviewGovernance: {
     id: 'azurePurviewGovernance',
@@ -180,7 +214,9 @@ export const resourceCatalog = {
     url: 'https://learn.microsoft.com/en-us/purview/',
     why: 'Automate data classification, sensitivity labels, DLP policies, and data lineage across multi-cloud estates.',
     tier: 'Free Docs',
-    billingSafetyNote: 'Zero-billing architecture reference & policy templates'
+    billingSafetyNote: 'Zero-billing architecture reference & policy templates',
+    verificationStatus: 'VERIFIED',
+    frssScore: 85
   },
   azureSc900Fundamentals: {
     id: 'azureSc900Fundamentals',
@@ -191,7 +227,9 @@ export const resourceCatalog = {
     url: 'https://learn.microsoft.com/en-us/credentials/certifications/security-compliance-and-identity-fundamentals/',
     why: 'Foundational certification covering Zero Trust, Microsoft Entra, Defender, Sentinel, and compliance concepts.',
     tier: 'Free Learning / $99 Exam',
-    billingSafetyNote: 'Free online self-paced learning paths on Microsoft Learn'
+    billingSafetyNote: 'Free online self-paced learning paths on Microsoft Learn',
+    verificationStatus: 'VERIFIED',
+    frssScore: 86
   },
   azureSc500Exam: {
     id: 'azureSc500Exam',
@@ -202,7 +240,9 @@ export const resourceCatalog = {
     url: 'https://learn.microsoft.com/en-us/credentials/certifications/azure-security-engineer/',
     why: 'Advanced security engineering across identity, platform protection, network perimeters, and operations.',
     tier: 'Free Learning / $165 Exam',
-    billingSafetyNote: 'Free Microsoft Learn courseware & hands-on GitHub labs'
+    billingSafetyNote: 'Free Microsoft Learn courseware & hands-on GitHub labs',
+    verificationStatus: 'VERIFIED',
+    frssScore: 88
   },
 
   // ----------------------------------------------------------------------------

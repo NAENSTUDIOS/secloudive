@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useChallenges } from '../context/ChallengeContext';
-import { ShieldAlert, Lock, Key, ArrowRight, CheckCircle2, ShieldCheck, UserCheck } from 'lucide-react';
+import { ShieldAlert, Lock, Key, ShieldCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { playTactileClick, playSuccessChime } from '../utils/cyberMotionAudio';
 
@@ -61,18 +61,15 @@ export default function AdminGuard({ children }) {
     setAuthError('');
     setIsVerifying(true);
 
+    // NOTE: This is a client-side gate only — suitable for a static educational
+    // platform with no backend. It prevents casual access but cannot prevent a
+    // determined user from bypassing localStorage. A production admin panel
+    // requires server-side session validation.
     const input = passkeyInput.trim().toLowerCase();
-    const validKeys = [
-      'naenstudios@gmail.com',
-      'naenstudios',
-      'naen-admin',
-      'naen2026',
-      'admin',
-      'secloudive-admin'
-    ];
+    const validKeys = ['naenstudios@gmail.com'];
 
     setTimeout(() => {
-      if (validKeys.includes(input) || input.includes('naen')) {
+      if (validKeys.includes(input)) {
         localStorage.setItem('secloudive_admin_authenticated', 'true');
         localStorage.setItem('secloudive_user_email', 'naenstudios@gmail.com');
         setIsAdminUnlocked(true);
@@ -211,33 +208,6 @@ export default function AdminGuard({ children }) {
               <span>{isVerifying ? 'Verifying Clearance...' : 'Verify & Enter Admin Console'}</span>
             </button>
 
-            <button
-              type="button"
-              onClick={() => {
-                // One-click authenticate as naenstudios@gmail.com
-                localStorage.setItem('secloudive_admin_authenticated', 'true');
-                localStorage.setItem('secloudive_user_email', 'naenstudios@gmail.com');
-                setIsAdminUnlocked(true);
-                playSuccessChime();
-              }}
-              style={{
-                background: 'rgba(255, 255, 255, 0.05)',
-                border: '1px solid rgba(255, 255, 255, 0.12)',
-                color: '#cbd5e1',
-                padding: '9px 16px',
-                borderRadius: '8px',
-                fontSize: '0.78rem',
-                fontWeight: 700,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '6px'
-              }}
-            >
-              <UserCheck size={14} style={{ color: '#38bdf8' }} />
-              <span>Authorize as naenstudios@gmail.com</span>
-            </button>
           </form>
 
           <div style={{ marginTop: '20px', paddingTop: '16px', borderTop: '1px solid rgba(255, 255, 255, 0.08)' }}>

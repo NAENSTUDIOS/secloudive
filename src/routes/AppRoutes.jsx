@@ -160,7 +160,7 @@ export default function AppRoutes() {
         <Route path="/cves" element={<LiveThreatIntelPage />} />
         <Route path="/cve-radar" element={<LiveThreatIntelPage />} />
 
-        {/* ── Admin Portal (Strictly for naenstudios@gmail.com) ── */}
+        {/* ── Admin Portal (single registration — duplicate removed) ── */}
         <Route path="/admin" element={
           <AdminGuard>
             <AdminDashboard />
@@ -288,13 +288,6 @@ export default function AppRoutes() {
           <GatedRoute featureKey="verify-pack" featureTitle="Cryptographic Audit Dossier Verifier" requiredTier={5} requiredTierName="Tier 4 Cleared (Full Command Deck Access)">
             <VerifyAuditPackPage />
           </GatedRoute>
-        } />
-
-        {/* ── Admin Management Portal (Strictly restricted to naenstudios@gmail.com) ── */}
-        <Route path="/admin" element={
-          <AdminGuard>
-            <AdminDashboard />
-          </AdminGuard>
         } />
 
         <Route path="*" element={<Home />} />
