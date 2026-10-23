@@ -36,41 +36,16 @@ export default function GlobalSecurityEnclave() {
   const [copiedEmail, setCopiedEmail] = useState(false)
   const alertTimerRef = useRef(null)
 
-  // ── Admin Exemption Check (naenstudios@gmail.com) ──
-  // The administrator account is fully exempted from screenshot protection,
-  // blackout veils, keyboard interceptors, and alert modals.
+  // The administrator account is exempted only when the active authenticated
+  // profile carries the owner email or an explicit admin role.
   const isAdminUser = (() => {
-    if (typeof window === 'undefined') return false
     const email = (activeProfile?.email || '').trim().toLowerCase()
-    const storedEmail = (localStorage.getItem('secloudive_user_email') || '').trim().toLowerCase()
-    const currentId = (activeProfile?.id || '').trim().toLowerCase()
-    const storedId = (localStorage.getItem('secloudive_user_id') || '').trim().toLowerCase()
-    const activeProfileId = (localStorage.getItem('secloudive_active_profile_id') || '').trim().toLowerCase()
-    const isAdminAuth = localStorage.getItem('secloudive_admin_authenticated') === 'true'
-
-    if (email === 'naenstudios@gmail.com' || storedEmail === 'naenstudios@gmail.com') return true
+    if (email === 'naenstudios@gmail.com') return true
     if (activeProfile?.role === 'admin' || activeProfile?.isAdmin === true) return true
-    if (isAdminAuth) return true
-    if (currentId.includes('naenstud') || storedId.includes('naenstud') || activeProfileId.includes('naenstud')) return true
-
-    try {
-      const raw = localStorage.getItem('secloudive_registered_profiles_v1')
-      if (raw) {
-        const list = JSON.parse(raw)
-        const match = list.find(p => 
-          (p.id && (p.id.toLowerCase() === currentId || p.id.toLowerCase() === activeProfileId)) ||
-          (p.email && p.email.toLowerCase() === 'naenstudios@gmail.com')
-        )
-        if (match && (match.email?.toLowerCase() === 'naenstudios@gmail.com' || match.id?.toLowerCase().includes('naenstud') || match.role === 'admin')) {
-          return true
-        }
-      }
-    } catch {}
-
     return false
   })()
 
-  const userId = activeProfile?.id || (typeof window !== 'undefined' ? localStorage.getItem('secloudive_user_id') || 'SEC-LEARNER-7749' : 'SEC-LEARNER-7749')
+  const userId = activeProfile?.id || 'SEC-LEARNER-7749'
   const sessionStamp = new Date().toISOString().slice(0, 10)
 
   // Record incident and bypass directly to Administrator telemetry behind the scenes
@@ -360,7 +335,7 @@ export default function GlobalSecurityEnclave() {
               whiteSpace: 'nowrap'
             }}
           >
-            SECLOUDIVE • AWS SECURITY ARCHITECT • ENCLAVE SECURED • {userId} • {sessionStamp}
+            SECLOUDIVE • LEARNING WORKSPACE • {userId} • {sessionStamp}
           </div>
         ))}
       </div>

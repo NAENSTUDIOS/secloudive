@@ -10,24 +10,17 @@ import hmac
 import hashlib
 import json
 import base64
+import secrets
 from typing import Optional, Dict, Any
 from pydantic import BaseModel, EmailStr
 
-JWT_SECRET = os.getenv("JWT_SECRET", "secloudive-prod-agent-secret-key-99827361")
+JWT_SECRET = os.getenv("JWT_SECRET", "").strip()
 JWT_ALGORITHM = "HS256"
 TOKEN_EXPIRY_SECONDS = 60 * 60 * 24 * 7 # 7 days
+PASSWORD_HASH_ITERATIONS = 310_000
 
 # In-memory user database (backed by production DB or SQLite)
-USER_DB: Dict[str, Dict[str, Any]] = {
-    "operator@secloudive.io": {
-        "userId": "USR-DEV-001",
-        "email": "operator@secloudive.io",
-        "passwordHash": hashlib.sha256("SecurityEngineer2026!".encode()).hexdigest(),
-        "role": "Cloud Security Engineer",
-        "tier": "Tier 4: Enterprise Practitioner",
-        "createdAt": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
-    }
-}
+USER_DB: Dict[str, Dict[str, Any]] = {}
 
 class UserRegisterRequest(BaseModel):
     email: str
@@ -51,8 +44,42 @@ def _base64url_decode(data: str) -> bytes:
     padding = '=' * (4 - (len(data) % 4))
     return base64.urlsafe_b64decode(data + padding)
 
+def is_auth_configured() -> bool:
+    return len(JWT_SECRET) >= 32
+
+def hash_password(password: str) -> str:
+    salt = secrets.token_bytes(16)
+    digest = hashlib.pbkdf2_hmac(
+        "sha256", password.encode("utf-8"), salt, PASSWORD_HASH_ITERATIONS
+    )
+    return "pbkdf2_sha256${}${}${}".format(
+        PASSWORD_HASH_ITERATIONS,
+        _base64url_encode(salt),
+        _base64url_encode(digest),
+    )
+
+def verify_password(password: str, encoded_hash: str) -> bool:
+    try:
+        algorithm, iterations, salt_b64, digest_b64 = encoded_hash.split("$")
+        if algorithm != "pbkdf2_sha256":
+            return False
+        expected = hashlib.pbkdf2_hmac(
+            "sha256",
+            password.encode("utf-8"),
+            _base64url_decode(salt_b64),
+            int(iterations),
+        )
+        return hmac.compare_digest(expected, _base64url_decode(digest_b64))
+    except (TypeError, ValueError):
+        return False
+
+def require_auth_configuration() -> None:
+    if not is_auth_configured():
+        raise RuntimeError("JWT_SECRET must be configured with at least 32 characters.")
+
 def create_jwt_token(payload: Dict[str, Any], expiry_seconds: int = TOKEN_EXPIRY_SECONDS) -> str:
     """Creates a signed HMAC-SHA256 JWT token without external heavy dependencies."""
+    require_auth_configuration()
     header = {"alg": "HS256", "typ": "JWT"}
     body = {
         **payload,
@@ -72,6 +99,8 @@ def create_jwt_token(payload: Dict[str, Any], expiry_seconds: int = TOKEN_EXPIRY
 
 def verify_jwt_token(token: str) -> Optional[Dict[str, Any]]:
     """Verifies a JWT token signature and expiration."""
+    if not is_auth_configured():
+        return None
     try:
         parts = token.split('.')
         if len(parts) != 3:
@@ -98,8 +127,7 @@ def authenticate_user(email: str, password: str) -> Optional[Dict[str, Any]]:
     user = USER_DB.get(email.strip().lower())
     if not user:
         return None
-    hashed_input = hashlib.sha256(password.encode()).hexdigest()
-    if user["passwordHash"] == hashed_input:
+    if verify_password(password, user["passwordHash"]):
         return {
             "userId": user["userId"],
             "email": user["email"],
@@ -116,7 +144,7 @@ def register_user(email: str, password: str, target_role: str = "Cloud Security 
     new_user = {
         "userId": f"USR-{int(time.time())}",
         "email": norm_email,
-        "passwordHash": hashlib.sha256(password.encode()).hexdigest(),
+        "passwordHash": hash_password(password),
         "role": target_role,
         "tier": "Tier 1: Cloud Explorer",
         "createdAt": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
@@ -209,4 +237,3 @@ def authenticate_or_register_google_user(sub: str, email: str, name: str = "", p
         "authProvider": "google",
         "syncStatus": "registered_new_single_user_id"
     }
-

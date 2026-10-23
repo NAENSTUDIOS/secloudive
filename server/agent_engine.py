@@ -38,6 +38,7 @@ from auth import (
     verify_jwt_token,
     authenticate_user,
     register_user,
+    require_auth_configuration,
     UserRegisterRequest,
     UserLoginRequest
 )
@@ -893,6 +894,7 @@ async def get_supabase_backend_status():
 @app.post("/api/auth/register")
 async def register_endpoint(payload: UserRegisterRequest):
     try:
+        require_auth_configuration()
         user = register_user(payload.email, payload.password, payload.target_role or "Cloud Security Engineer")
         token = create_jwt_token(user)
         return {
@@ -903,9 +905,15 @@ async def register_endpoint(payload: UserRegisterRequest):
         }
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
 
 @app.post("/api/auth/login")
 async def login_endpoint(payload: UserLoginRequest):
+    try:
+        require_auth_configuration()
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
     user = authenticate_user(payload.email, payload.password)
     if not user:
         raise HTTPException(status_code=401, detail="Invalid email or password.")

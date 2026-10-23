@@ -31,6 +31,7 @@ import {
 } from '../data/multiCloudResources.js'
 import { SKILL_MAP_NODES, AUDIENCE_PERSONAS } from '../data/learning/stepWiseSkillMap.js'
 import { getLearnerClearance, isFeatureAccessible } from '../data/structuredLearningPath.js'
+import { shouldHydrateCloudProgress } from '../utils/progressMerge.js'
 
 
 import {
@@ -296,12 +297,12 @@ export function ChallengeProvider({ children }) {
   useEffect(() => {
     if (!auth?.isSupabaseMode || !auth?.supabaseUserId || !auth?.supabaseData?.progress) return
     const cloudProgress = auth.supabaseData.progress
-    if (cloudProgress && Object.keys(cloudProgress).length > 0) {
-      // Merge: cloud wins over empty localStorage (first sign-in on a new device)
-      setProgress(prev => (Object.keys(prev).length === 0 ? cloudProgress : prev))
+    if (shouldHydrateCloudProgress(progress, cloudProgress)) {
+      // Cloud wins only when the local profile contains no meaningful activity.
+      setProgress(() => cloudProgress)
       setAutoSaveState({ isSaving: false, lastSaved: 'Synced from cloud ☁️' })
     }
-  }, [auth?.supabaseUserId, auth?.supabaseData?.progress, auth?.isSupabaseMode])
+  }, [auth?.supabaseUserId, auth?.supabaseData?.progress, auth?.isSupabaseMode, progress])
 
   useEffect(() => {
     const targetKey = getProfileStorageKey(activeProfile.id)
@@ -1422,4 +1423,3 @@ Exact AWS CLI containment / remediation commands or next steps.`,
 export function useChallenges() {
   return useContext(ChallengeContext)
 }
-

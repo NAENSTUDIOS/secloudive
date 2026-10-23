@@ -3,6 +3,8 @@ import { ArrowUpRight, BookOpen, ExternalLink, ShieldCheck, Flame, Terminal, Spa
 export default function ResourceCard({ resource }) {
   if (!resource) return null
 
+  const resourceUrl = typeof resource.url === 'string' ? resource.url.trim() : ''
+  const hasValidUrl = /^https?:\/\//i.test(resourceUrl)
   const isThm = (resource.provider === 'tryhackme') || (resource.title || '').includes('TryHackMe')
   const isHtb = (resource.provider === 'hackthebox') || (resource.title || '').includes('HackTheBox')
   const isAzure = resource.provider === 'azure'
@@ -127,16 +129,27 @@ export default function ResourceCard({ resource }) {
         <div style={{ fontSize: '10px', color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '8px', font: "600 10px 'DM Mono', monospace" }}>
           <span>CURATED BY NAEN STUDIOS SECURITY ENGINEERING</span>
         </div>
-        <a
-          className="resource-link"
-          href={resource.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label={`Open ${resource.title} in a new tab`}
-        >
-          <span>Open Resource</span>
-          <ExternalLink size={13} />
-        </a>
+        {hasValidUrl ? (
+          <a
+            className="resource-link"
+            href={resourceUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`Open ${resource.title} in a new tab`}
+          >
+            <span>Open Resource</span>
+            <ExternalLink size={13} />
+          </a>
+        ) : (
+          <span
+            className="resource-link"
+            role="status"
+            aria-label={`${resource.title} link is unavailable`}
+            style={{ color: '#fbbf24', cursor: 'not-allowed' }}
+          >
+            <span>Link unavailable</span>
+          </span>
+        )}
       </div>
       <ArrowUpRight className="resource-arrow" size={16} aria-hidden="true" />
     </article>

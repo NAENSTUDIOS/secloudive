@@ -87,7 +87,7 @@ export default function Footer() {
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             <span style={{ fontSize: '0.78rem', color: '#cbd5e1', fontWeight: 700 }}>
-              NAEN Studios
+              SeCloudive
             </span>
             <p style={{ margin: 0, fontSize: '0.75rem', color: '#94a3b8', lineHeight: 1.5 }}>
               Creators of NAEN AI & the SeCloudive educational cloud architecture simulator.
@@ -114,7 +114,7 @@ export default function Footer() {
         paddingTop: '14px'
       }}>
         <div className="footer-brand">
-          <span>© 2025–2026 SeCloudive by NAEN Studios. Independent Educational Cloud Security Simulator.</span>
+          <span>© 2025–2026 SeCloudive. Independent educational cloud security learning platform.</span>
           <span>Official Support: <a href="mailto:naenstudios@gmail.com" style={{ color: '#38bdf8', textDecoration: 'underline' }}>naenstudios@gmail.com</a> • All referenced trademarks belong to their respective owners.</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>

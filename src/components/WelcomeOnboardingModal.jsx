@@ -145,7 +145,7 @@ export function getTimeOfDayGreeting() {
       salutation: 'Good Night 🌙',
       headline: 'Deep Night Focus: Forge Unbreakable Cloud Security Defenses',
       subtext: 'Nighttime is when true architectural mastery is forged in quiet focus. Master AWS threat detection, dissect incident vectors, and sharpen your defensive instincts.',
-      badgeText: 'NIGHT DEFENDER PROTOCOL',
+      badgeText: 'NIGHT STUDY SESSION',
       badgeColor: '#a855f7',
       accentGlow: 'rgba(168, 85, 247, 0.2)'
     }
@@ -279,27 +279,32 @@ export default function WelcomeOnboardingModal({ isFullPageGate = false, onCompl
     playTactileClick()
 
     try {
-      if (credentialResponse?.credential) {
-        if (auth?.signInWithGoogle) {
-          const res = await auth.signInWithGoogle(credentialResponse.credential)
-          if (res?.success) {
-            handleFinalLaunch()
-            return
-          }
-        }
+      if (!credentialResponse?.credential) {
+        setAuthError('Google did not return a valid credential. Please try again or use email sign in.')
+        return
+      }
 
-        const decoded = parseGoogleCredential(credentialResponse.credential)
-        if (decoded && loginWithGoogle) {
-          const res = loginWithGoogle(decoded)
-          if (res?.success) {
-            handleFinalLaunch()
-            return
-          }
+      if (auth?.signInWithGoogle) {
+        const res = await auth.signInWithGoogle(credentialResponse.credential)
+        if (res?.success) {
+          handleFinalLaunch()
+          return
+        }
+        setAuthError(res?.error || 'Google sign in could not be completed. Please try again.')
+        return
+      }
+
+      const decoded = parseGoogleCredential(credentialResponse.credential)
+      if (decoded && loginWithGoogle) {
+        const res = loginWithGoogle(decoded)
+        if (res?.success) {
+          handleFinalLaunch()
+          return
         }
       }
-      handleFinalLaunch()
-    } catch {
-      handleFinalLaunch()
+      setAuthError('Google sign in is unavailable right now. Please use email sign in or continue as guest.')
+    } catch (err) {
+      setAuthError(err?.message || 'Google sign in could not be completed. Please try again.')
     } finally {
       setIsProcessing(false)
     }
@@ -326,10 +331,29 @@ export default function WelcomeOnboardingModal({ isFullPageGate = false, onCompl
             handleFinalLaunch()
             return
           }
+          setAuthError(res?.error || 'Email sign in failed. Check your credentials and try again.')
+          return
         }
-        handleFinalLaunch()
+        setAuthError('Email sign in is unavailable right now. Please use Google sign in or continue as guest.')
       } else {
-        // Register Mode
+        if (password.length < 6) {
+          setAuthError('Use a password with at least 6 characters.')
+          return
+        }
+
+        if (auth?.signUpWithEmail) {
+          const res = await auth.signUpWithEmail(email.trim(), password, {
+            name: studentName.trim() || email.split('@')[0],
+            role: 'Aspiring AWS Cloud Security Engineer'
+          })
+          if (res?.success) {
+            handleFinalLaunch()
+            return
+          }
+          setAuthError(res?.error || 'Account creation failed. Please try again.')
+          return
+        }
+
         const autoId = `SEC-STU-${Math.floor(1000 + Math.random() * 9000)}`
         const regRes = registerUniqueProfile({
           userId: autoId,
@@ -338,7 +362,11 @@ export default function WelcomeOnboardingModal({ isFullPageGate = false, onCompl
           role: 'Aspiring AWS Cloud Security Engineer',
           migrateGuestData: true
         })
-        handleFinalLaunch()
+        if (regRes?.success) {
+          handleFinalLaunch()
+        } else {
+          setAuthError(regRes?.error || 'Account creation failed. Please try again.')
+        }
       }
     } catch (err) {
       setAuthError(err.message || 'Authentication failed.')
@@ -432,7 +460,7 @@ export default function WelcomeOnboardingModal({ isFullPageGate = false, onCompl
                   fontSize: '0.65rem',
                   fontWeight: 800
                 }}>
-                  100% AWS DEFENDER
+                  AWS CLOUD SECURITY ACADEMY
                 </span>
               </div>
               <p style={{ margin: 0, fontSize: '0.7rem', color: '#94a3b8' }}>
@@ -510,7 +538,7 @@ export default function WelcomeOnboardingModal({ isFullPageGate = false, onCompl
                   marginBottom: '4px'
                 }}>
                   <Sparkles size={12} />
-                  <span>{greeting.badgeText} • 100% AWS CLOUD DEFENSE</span>
+                  <span>{greeting.badgeText} • CLOUD SECURITY LEARNING</span>
                 </div>
 
                 <div style={{ fontSize: '1.05rem', fontWeight: 800, color: greeting.badgeColor, marginBottom: '2px' }}>
@@ -564,13 +592,13 @@ export default function WelcomeOnboardingModal({ isFullPageGate = false, onCompl
               }}>
                 <div style={{ textAlign: 'center', marginBottom: '14px' }}>
                   <span style={{ fontSize: '0.68rem', color: '#ff9900', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px' }}>
-                    GATE ACCESS ENCLAVE
+                    GET STARTED
                   </span>
                   <h3 style={{ margin: '2px 0 4px', fontSize: '1.15rem', fontWeight: 800, color: '#f8fafc' }}>
-                    Select Access Mode to Unlock the UHD Auto-Built Layer
+                    Choose how you want to begin learning
                   </h3>
                   <p style={{ margin: 0, fontSize: '0.78rem', color: '#94a3b8' }}>
-                    Choose your identity method below. Upon authentication or guest selection, the platform immediately launches in high-definition.
+                    Choose an account or continue as a guest. Your learning workspace will open immediately.
                   </p>
                 </div>
 
@@ -646,7 +674,7 @@ export default function WelcomeOnboardingModal({ isFullPageGate = false, onCompl
                         boxShadow: '0 4px 14px rgba(2, 132, 199, 0.4)'
                       }}
                     >
-                      <span>Resume in UHD Layer</span>
+                      <span>Continue learning</span>
                       <ArrowRight size={14} />
                     </button>
                   </div>
@@ -692,7 +720,7 @@ export default function WelcomeOnboardingModal({ isFullPageGate = false, onCompl
                     </div>
 
                     <div style={{ fontSize: '0.7rem', color: '#38bdf8', marginTop: '6px' }}>
-                      ✓ Auto-unlocks UHD Layer immediately
+                      ✓ Your learning workspace opens immediately
                     </div>
                   </div>
 
@@ -806,7 +834,7 @@ export default function WelcomeOnboardingModal({ isFullPageGate = false, onCompl
                             cursor: 'pointer'
                           }}
                         >
-                          {isProcessing ? 'Authenticating...' : (authMode === 'login' ? 'Sign In & Unlock Layer' : 'Register & Unlock Layer')}
+                          {isProcessing ? 'Authenticating...' : (authMode === 'login' ? 'Sign In & Continue' : 'Register & Continue')}
                         </button>
                       </form>
                     </div>
@@ -857,7 +885,7 @@ export default function WelcomeOnboardingModal({ isFullPageGate = false, onCompl
                     </button>
 
                     <div style={{ fontSize: '0.7rem', color: '#34d399', marginTop: '6px' }}>
-                      ✓ Opens UHD Auto-Built Layer immediately
+                      ✓ Opens your learning workspace immediately
                     </div>
                   </div>
                 </div>
@@ -1242,6 +1270,15 @@ export default function WelcomeOnboardingModal({ isFullPageGate = false, onCompl
                         text="continue_with"
                         size="large"
                       />
+                      {auth?.signInWithGoogleOAuth && (
+                        <button
+                          type="button"
+                          onClick={() => auth.signInWithGoogleOAuth(window.location.origin)}
+                          style={{ marginTop: '8px', background: 'transparent', border: 0, color: '#7dd3fc', fontSize: '0.72rem', cursor: 'pointer' }}
+                        >
+                          Use secure browser redirect instead
+                        </button>
+                      )}
                     </div>
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', paddingTop: '10px', borderTop: '1px solid rgba(255, 255, 255, 0.08)' }}>

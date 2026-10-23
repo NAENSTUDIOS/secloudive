@@ -191,12 +191,14 @@ export default function UserSyncModal() {
 
         // Try Supabase sign up
         if (auth?.signUpWithEmail) {
-          try {
-            await auth.signUpWithEmail(email.trim(), password, {
-              name: nameVal,
-              role: targetRole
-            })
-          } catch {}
+          const signUpRes = await auth.signUpWithEmail(email.trim(), password, {
+            name: nameVal,
+            role: targetRole
+          })
+          if (!signUpRes?.success) {
+            setAuthError(signUpRes?.error || 'Account creation failed. Please try again.')
+            return
+          }
         }
 
         // Register profile with deterministic auto-generated Student ID
@@ -754,6 +756,15 @@ export default function UserSyncModal() {
                         text="continue_with"
                         size="large"
                       />
+                      {auth?.signInWithGoogleOAuth && (
+                        <button
+                          type="button"
+                          onClick={() => auth.signInWithGoogleOAuth(window.location.origin)}
+                          style={{ marginTop: '8px', background: 'transparent', border: 0, color: '#7dd3fc', fontSize: '0.72rem', cursor: 'pointer' }}
+                        >
+                          Use secure browser redirect instead
+                        </button>
+                      )}
                     </div>
 
                     {/* Value Points */}

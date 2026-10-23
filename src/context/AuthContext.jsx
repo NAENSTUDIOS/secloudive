@@ -250,10 +250,18 @@ export function AuthProvider({ children }) {
           return { success: true, method: 'supabase_google' }
         }
         if (error) {
-          console.warn('[AuthContext] Supabase signInWithIdToken notice, falling back to local sync:', error.message)
+          const message = error.message || 'Supabase rejected the Google credential.'
+          console.error('[AuthContext] Supabase Google sign-in failed:', message)
+          setAuthError(message)
+          setLoading(false)
+          return { success: false, error: message, method: 'supabase_google' }
         }
       } catch (err) {
-        console.warn('[AuthContext] Supabase handshake notice:', err)
+        const message = err?.message || 'Supabase Google sign-in could not be completed.'
+        console.error('[AuthContext] Supabase Google sign-in exception:', err)
+        setAuthError(message)
+        setLoading(false)
+        return { success: false, error: message, method: 'supabase_google' }
       }
     }
 
@@ -293,6 +301,37 @@ export function AuthProvider({ children }) {
     setAuthError('Google sign-in could not be completed.')
     setLoading(false)
     return { success: false, error: 'Google sign-in failed.' }
+  }, [])
+
+  // Redirect-based Supabase OAuth fallback. This is useful when GIS popup
+  // restrictions block the credential button or when using a mobile browser.
+  const signInWithGoogleOAuth = useCallback(async (redirectTo = window.location.origin) => {
+    if (!isSupabaseConfigured || !supabase) {
+      const error = 'Supabase is not configured. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.'
+      setAuthError(error)
+      return { success: false, error }
+    }
+
+    setLoading(true)
+    setAuthError(null)
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo,
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'select_account'
+        }
+      }
+    })
+
+    if (error) {
+      setLoading(false)
+      setAuthError(error.message)
+      return { success: false, error: error.message }
+    }
+
+    return { success: true, url: data?.url, method: 'supabase_google_oauth' }
   }, [])
 
   // ─── METHOD 2: Direct Google Data Sign In (Sandbox / Fallback) ───────────────
@@ -519,6 +558,7 @@ export function AuthProvider({ children }) {
     // Unified Authentication Methods
     signIn: signInWithGoogle,                // Alias for backwards compatibility
     signInWithGoogle,
+    signInWithGoogleOAuth,
     signInWithDirectGoogleData,
     signInWithEmail,
     signUpWithEmail,

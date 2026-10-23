@@ -143,14 +143,9 @@ export default function Profile() {
 
   // Admin Identification check
   const isAdminUser = Boolean(
-    activeProfile?.email === 'naenstudios@gmail.com' ||
-    (activeProfile?.id && String(activeProfile.id).toLowerCase().includes('naenstud')) ||
+    activeProfile?.email?.trim().toLowerCase() === 'naenstudios@gmail.com' ||
     activeProfile?.role === 'admin' ||
-    activeProfile?.isAdmin ||
-    (typeof window !== 'undefined' && (
-      localStorage.getItem('secloudive_admin_authenticated') === 'true' ||
-      localStorage.getItem('secloudive_user_email') === 'naenstudios@gmail.com'
-    ))
+    activeProfile?.isAdmin === true
   )
 
   // Portal Navigation Tabs

@@ -83,6 +83,7 @@ export default function AdminDashboard() {
   const [jobConfig, setJobConfig] = useState(() => liveJobFeedAggregator.getConfig());
   const [isSyncingJobs, setIsSyncingJobs] = useState(false);
   const [jobSyncMessage, setJobSyncMessage] = useState('');
+  const [refreshMessage, setRefreshMessage] = useState('');
 
   // 4. Diagnostic State
   const [diagnosticStatus, setDiagnosticStatus] = useState('idle'); // 'idle' | 'running' | 'success'
@@ -108,8 +109,12 @@ export default function AdminDashboard() {
       setIncidents(stored ? JSON.parse(stored) : []);
       setLearners(userSyncManager.getAllProfiles());
       setJobConfig(liveJobFeedAggregator.getConfig());
+      setRefreshMessage('Local telemetry refreshed just now.');
       playSuccessChime();
-    } catch {}
+    } catch (error) {
+      setRefreshMessage(`Refresh failed: ${error?.message || 'local telemetry could not be read.'}`);
+    }
+    setTimeout(() => setRefreshMessage(''), 5000);
   };
 
   const clearAllIncidents = () => {
@@ -441,10 +446,24 @@ export default function AdminDashboard() {
                   alignItems: 'center'
                 }}
                 title="Refresh All Telemetry"
+                aria-label="Refresh all local telemetry"
               >
                 <RefreshCw size={14} />
               </button>
             </div>
+            {refreshMessage && (
+              <div
+                role="status"
+                style={{
+                  marginTop: '10px',
+                  color: refreshMessage.startsWith('Refresh failed') ? '#fca5a5' : '#86efac',
+                  fontSize: '0.78rem',
+                  fontWeight: 700
+                }}
+              >
+                {refreshMessage}
+              </div>
+            )}
           </div>
         </div>
 
@@ -458,8 +477,8 @@ export default function AdminDashboard() {
           {[
             {
               title: 'Registered Student Profiles',
-              value: `${learners.length || 1} Local (${12450 + (learners.length || 0)} Total)`,
-              sub: 'Cloud Security Candidates',
+              value: `${learners.length} Local Profiles`,
+              sub: 'Cloud totals unavailable in this console',
               icon: <Users size={22} style={{ color: '#38bdf8' }} />,
               border: 'rgba(56, 189, 248, 0.35)'
             },
@@ -479,8 +498,10 @@ export default function AdminDashboard() {
             },
             {
               title: 'Live Cloud Opportunities',
-              value: '40+ Verified Jobs & Internships',
-              sub: 'Automated Multi-API Ingestion',
+              value: jobConfig?.lastSyncTimestamp ? 'Feed Configured' : 'Feed Not Synced',
+              sub: jobConfig?.lastSyncTimestamp
+                ? `Last sync ${new Date(jobConfig.lastSyncTimestamp).toLocaleString()}`
+                : 'Run a sync to verify current opportunities',
               icon: <Briefcase size={22} style={{ color: '#f59e0b' }} />,
               border: 'rgba(245, 158, 11, 0.35)'
             }
@@ -1234,7 +1255,6 @@ export default function AdminDashboard() {
                 type="button"
                 onClick={() => {
                   playTactileClick();
-                  localStorage.removeItem('secloudive_admin_authenticated');
                   window.location.href = '/';
                 }}
                 style={{
@@ -1248,7 +1268,7 @@ export default function AdminDashboard() {
                   cursor: 'pointer'
                 }}
               >
-                Sign Out Admin Session
+                Return to Student Portal
               </button>
             </div>
           </div>

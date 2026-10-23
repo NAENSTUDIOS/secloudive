@@ -64,6 +64,11 @@ import { getModuleQuiz, evaluateQuizSubmission } from '../data/learning/moduleQu
 import { generateAdaptiveQuizSession } from '../data/learning/adaptiveQuizEngine.js'
 import { KNOWLEDGE_BADGES } from '../data/learning/badges.js'
 import { getResourcesForDomain } from '../data/learningResources.js'
+import { getLearningTrackBlueprint } from '../data/learning/resourceLibrary.js'
+import {
+  isGuestUser,
+  saveFoundationAssessmentAttempt
+} from '../services/supabaseProgressService'
 import NaenContentGuardian from '../components/NaenContentGuardian'
 import LearningTrackModeSwitcher from '../components/LearningTrackModeSwitcher'
 import StepWiseSkillMap from '../components/StepWiseSkillMap'
@@ -425,6 +430,13 @@ export default function LearningCenter() {
   // Status flags for current topic
   const isCurrentTopicCompleted = learningTopicsCompleted.includes(activeTopic.id)
   const isCurrentTopicBookmarked = learningBookmarkedTopics.includes(activeTopic.id)
+  const activePathQuizScore = learningQuizScores[activePath.id]
+  const normalizedQuizScore = typeof activePathQuizScore === 'number'
+    ? activePathQuizScore
+    : (activePathQuizScore?.score ?? activePathQuizScore?.percentage ?? null)
+  const normalizedQuizPassed = typeof activePathQuizScore === 'object'
+    ? Boolean(activePathQuizScore?.passed ?? normalizedQuizScore >= 70)
+    : normalizedQuizScore !== null && normalizedQuizScore >= 70
 
   // Handle Selection in Topic Multi-Type Checks
   const handleSelectTopicCheckOption = (checkKey, optionIdx, isCorrect) => {
@@ -500,6 +512,41 @@ export default function LearningCenter() {
       // Evaluate adaptive quiz session with question randomizations preserved
       const evaluated = submitAdaptiveQuizSession(activePath.id, currentQuizSession, quizUserAnswers)
       setActiveQuizResult(evaluated)
+
+      const userId = activeProfile?.id
+      if (evaluated && userId && !isGuestUser(userId)) {
+        const readinessLevel = evaluated.score >= 90
+          ? 'ADVANCED_TRACK_READY'
+          : evaluated.score >= 80
+            ? 'PROFESSIONAL_READY'
+            : evaluated.score >= 70
+              ? 'ASSOCIATE_READY'
+              : evaluated.score >= 60
+                ? 'JUNIOR_READY'
+                : evaluated.score >= 40
+                  ? 'DEVELOPING'
+                  : 'BEGINNER'
+
+        saveFoundationAssessmentAttempt(userId, {
+          foundationId: activePath.id,
+          score: evaluated.score,
+          readinessLevel,
+          passed: evaluated.passed,
+          assessmentPayload: {
+            sessionId: evaluated.sessionId,
+            attemptNumber: evaluated.attemptNumber,
+            domainName: evaluated.domainName,
+            tierLabel: evaluated.tierLabel,
+            correctCount: evaluated.correctCount,
+            totalQuestions: evaluated.totalQuestions,
+            strongTopics: evaluated.strongTopics,
+            weakTopics: evaluated.weakTopics,
+            difficultyStats: evaluated.difficultyStats
+          }
+        }).catch(error => {
+          console.warn('[LearningCenter] Could not persist assessment attempt:', error?.message || error)
+        })
+      }
     }
   }
 
@@ -1046,9 +1093,9 @@ export default function LearningCenter() {
                 </span>
               </div>
               <h4 className="path-tab-title">{pathItem.shortTitle || pathItem.title}</h4>
-              {quizScore && (
-                <div style={{ fontSize: '10px', color: quizScore.passed ? '#4ade80' : '#fbbf24', font: "600 10px 'DM Mono', monospace" }}>
-                  Quiz: {quizScore.percentage}% {quizScore.passed ? '✓' : ''}
+              {quizScore !== undefined && quizScore !== null && (
+                <div style={{ fontSize: '10px', color: (typeof quizScore === 'number' ? quizScore >= 70 : quizScore.passed) ? '#4ade80' : '#fbbf24', font: "600 10px 'DM Mono', monospace" }}>
+                  Quiz: {typeof quizScore === 'number' ? quizScore : (quizScore.percentage ?? quizScore.score ?? 0)}% {(typeof quizScore === 'number' ? quizScore >= 70 : quizScore.passed) ? '✓' : ''}
                 </div>
               )}
               <div className="path-mini-progress">
@@ -1176,9 +1223,9 @@ export default function LearningCenter() {
                   <Award size={14} style={{ color: '#38bdf8' }} />
                   Module Assessment
                 </span>
-                {learningQuizScores[activePath.id] ? (
-                  <span className="quiz-score-badge" style={{ color: learningQuizScores[activePath.id].passed ? '#4ade80' : '#fbbf24' }}>
-                    Score: {learningQuizScores[activePath.id].percentage}%
+                {normalizedQuizScore !== null ? (
+                  <span className="quiz-score-badge" style={{ color: normalizedQuizPassed ? '#4ade80' : '#fbbf24' }}>
+                    Score: {normalizedQuizScore}%
                   </span>
                 ) : (
                   <span className="quiz-score-badge">12 Questions</span>
@@ -1201,7 +1248,19 @@ export default function LearningCenter() {
           <nav className="topics-nav-list" aria-label="Topics Navigation" style={{ marginTop: '16px' }}>
             {filteredTopics.length === 0 ? (
               <div style={{ padding: '20px 10px', textAlign: 'center', color: '#64748b', fontSize: '13px' }}>
-                No topics match your filter criteria.
+                <p style={{ margin: '0 0 12px' }}>
+                  No topics match your current search and filter criteria.
+                </p>
+                <button
+                  type="button"
+                  className="filter-btn"
+                  onClick={() => {
+                    setSearchQuery('')
+                    setLevelFilter('all')
+                  }}
+                >
+                  Clear search and filters
+                </button>
               </div>
             ) : (
               filteredTopics.map((topicItem) => {
@@ -1427,6 +1486,7 @@ export default function LearningCenter() {
             <InteractiveTopicEngine
               topic={activeTopic}
               pathResources={getResourcesForDomain ? getResourcesForDomain(activePath.id, selectedCloudProvider) : []}
+              learningBlueprint={getLearningTrackBlueprint(activePath.id)}
             />
           </div>
 

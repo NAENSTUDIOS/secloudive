@@ -15,10 +15,16 @@ import {
 import { Link } from 'react-router-dom'
 import { useChallenges } from '../context/ChallengeContext'
 import { printResumePdf } from '../utils/resumePdfExporter'
+import {
+  isGuestUser,
+  savePortfolioArtifact
+} from '../services/supabaseProgressService'
+import { createPortfolioEvidenceDraft, validatePortfolioEvidence } from '../utils/portfolioEvidenceContracts'
 
 export default function PortfolioEvidenceCard() {
-  const { masterCareerProfile } = useChallenges()
+  const { masterCareerProfile, activeProfile } = useChallenges()
   const [copied, setCopied] = useState(false)
+  const [saveState, setSaveState] = useState('idle')
 
   if (!masterCareerProfile) return null
 
@@ -54,6 +60,43 @@ Verified by SeCloudive Cloud Security Career Operating System.`
     setTimeout(() => setCopied(false), 3000)
   }
 
+  const handleSaveEvidence = async () => {
+    const userId = activeProfile?.id
+    if (!userId || isGuestUser(userId)) {
+      setSaveState('guest')
+      return
+    }
+
+    const evidence = createPortfolioEvidenceDraft({
+      artifactType: 'career_readiness_dossier',
+      title: `${targetCareerRole} verified evidence dossier`,
+      summary: `Verified SeCloudive progress for ${targetCareerRole}, including labs, investigations, architecture reviews, and simulator work.`,
+      skills: portfolioEvidence.demonstratedSkills,
+      roleMappings: [targetCareerRole],
+      sourceActivityId: `career-profile:${targetCareerRole}`,
+      validationResults: [{
+        validator: 'SeCloudive career profile',
+        status: 'passed',
+        verifiedAt: new Date().toISOString()
+      }],
+      documentation: [{
+        type: 'resume_pdf',
+        title: 'NAEN Studios portfolio evidence dossier'
+      }],
+      verificationId: `SECL-${Date.now().toString(36).toUpperCase()}`
+    })
+
+    const validation = validatePortfolioEvidence(evidence)
+    if (!validation.complete) {
+      setSaveState('invalid')
+      return
+    }
+
+    setSaveState('saving')
+    const saved = await savePortfolioArtifact(userId, evidence)
+    setSaveState(saved ? 'saved' : 'error')
+  }
+
   return (
     <section className="portfolio-evidence-panel" aria-label="Professional Cloud Security Portfolio Tracker">
       <div className="portfolio-header">
@@ -80,6 +123,23 @@ Verified by SeCloudive Cloud Security Career Operating System.`
           >
             <FileText size={14} />
             <span>📄 View & Save NAEN PDF</span>
+          </button>
+          <button
+            type="button"
+            className="button button-ghost button-copy-dossier"
+            onClick={handleSaveEvidence}
+            disabled={saveState === 'saving'}
+            title="Save this validated evidence dossier to your private cloud portfolio"
+          >
+            <ShieldCheck size={14} />
+            <span>
+              {saveState === 'saving' ? 'Saving Evidence…'
+                : saveState === 'saved' ? 'Evidence Saved'
+                  : saveState === 'guest' ? 'Sign In to Save'
+                    : saveState === 'error' ? 'Retry Cloud Save'
+                      : saveState === 'invalid' ? 'Evidence Needs Review'
+                        : 'Save to Cloud Portfolio'}
+            </span>
           </button>
           <button 
             type="button" 

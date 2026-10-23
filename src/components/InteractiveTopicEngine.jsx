@@ -316,7 +316,7 @@ function LiveCliTab({ topic }) {
 }
 
 // ─── Tab: Recap & Refs ────────────────────────────────────────────────────────
-function RecapTab({ topic, pathResources }) {
+function RecapTab({ topic, pathResources, learningBlueprint }) {
   const explicit = topic.awsResources || topic.learningResources || topic.resources || []
   const seen = new Set()
   const unique = [...explicit, ...pathResources].filter(r => { const k = r.url || r.title; if (seen.has(k)) return false; seen.add(k); return true })
@@ -333,6 +333,40 @@ function RecapTab({ topic, pathResources }) {
 
   return (
     <div>
+      {learningBlueprint && learningBlueprint.length > 0 && (
+        <div style={{ marginBottom: 20 }}>
+          <div style={{ fontSize: 11, color: '#a78bfa', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10, fontWeight: 700 }}>
+            Progressive learning blueprint
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 10 }}>
+            {learningBlueprint.map(track => (
+              <div key={track.id} style={{ padding: 14, background: 'rgba(15,23,42,0.85)', border: '1px solid rgba(167,139,250,0.2)', borderRadius: 10 }}>
+                <div style={{ color: '#e2e8f0', fontSize: 13, fontWeight: 700, marginBottom: 6 }}>{track.title}</div>
+                <div style={{ color: '#94a3b8', fontSize: 11, lineHeight: 1.5, marginBottom: 10 }}>{track.overview}</div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
+                  {track.levelFramework.slice(0, 4).map(level => (
+                    <span key={level.level} style={{ color: '#c4b5fd', background: 'rgba(167,139,250,0.1)', border: '1px solid rgba(167,139,250,0.2)', borderRadius: 999, padding: '3px 7px', fontSize: 9 }}>
+                      L{level.level} {level.name}
+                    </span>
+                  ))}
+                </div>
+                <div style={{ color: '#64748b', fontSize: 10, marginTop: 9 }}>
+                  {track.projects.length} projects · {track.assessments.length} assessments · {track.certifications.length || 'No mapped'} certifications
+                </div>
+                {track.rolePlay && (
+                  <div style={{ marginTop: 10, paddingTop: 9, borderTop: '1px solid rgba(167,139,250,0.12)' }}>
+                    <div style={{ color: '#c4b5fd', fontSize: 10, fontWeight: 700 }}>{track.rolePlay.title}</div>
+                    <div style={{ color: '#64748b', fontSize: 10, lineHeight: 1.45, marginTop: 3 }}>{track.rolePlay.managerRequest}</div>
+                    <div style={{ color: '#64748b', fontSize: 10, marginTop: 5 }}>
+                      {track.jobTickets.length} job ticket · {track.productionIncidents.length} incident drills · {track.teamActivities.length} team activities
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
       <div style={{ padding: '14px 18px', background: 'linear-gradient(135deg, rgba(15,23,42,0.9) 0%, rgba(56,189,248,0.08) 100%)', border: '1px solid rgba(56,189,248,0.25)', borderRadius: 10, marginBottom: 20, fontSize: 13, color: '#94a3b8', display: 'flex', gap: 12, alignItems: 'flex-start' }}>
         <div style={{ width: 32, height: 32, borderRadius: 8, background: 'rgba(56,189,248,0.15)', border: '1px solid rgba(56,189,248,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#38bdf8', flexShrink: 0 }}>
           <Sparkles size={16} />
@@ -414,7 +448,7 @@ const TABS = [
   { id: 'recap', label: 'Recap & Refs', icon: <FileText size={14} />, desc: 'PDFs & references only (supplementary)' },
 ]
 
-export default function InteractiveTopicEngine({ topic, pathResources = [] }) {
+export default function InteractiveTopicEngine({ topic, pathResources = [], learningBlueprint = [] }) {
   const [active, setActive] = useState('theory')
   useEffect(() => { setActive('theory') }, [topic?.id])
   if (!topic) return null
@@ -446,7 +480,7 @@ export default function InteractiveTopicEngine({ topic, pathResources = [] }) {
         {active === 'howItWorks' && <HowItWorksTab topic={topic} />}
         {active === 'liveCli' && <LiveCliTab topic={topic} />}
         {active === 'multiCloud' && <TopicMultiCloudCrosswalk topic={topic} pathId={topic.pathId} />}
-        {active === 'recap' && <RecapTab topic={topic} pathResources={pathResources} />}
+        {active === 'recap' && <RecapTab topic={topic} pathResources={pathResources} learningBlueprint={learningBlueprint} />}
       </div>
     </div>
   )

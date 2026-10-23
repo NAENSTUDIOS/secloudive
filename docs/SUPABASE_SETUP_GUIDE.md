@@ -120,6 +120,41 @@ claude mcp add --scope project --transport http supabase "https://mcp.supabase.c
 
 ## 🔍 Verification & Health Check
 
+### Google Login Configuration
+
+SeCloudive supports two Google sign-in paths:
+
+1. Google Identity Services ID token, used by the visible Google button and exchanged with Supabase through `signInWithIdToken`.
+2. Supabase OAuth redirect, available as a browser/mobile fallback through `signInWithGoogleOAuth`.
+
+Both paths must use the same Google Web application OAuth client.
+
+In Google Cloud Console, create or select a Web application OAuth client and add:
+
+- Authorized JavaScript origins: `http://localhost:5173`, `http://127.0.0.1:5173`, and the production frontend origin.
+- Hosted Supabase redirect URI: `https://wcthjlnbkwkhvxrcuwfx.supabase.co/auth/v1/callback`
+- Local Supabase redirect URI: `http://127.0.0.1:54321/auth/v1/callback`
+
+In Supabase Dashboard > Authentication > Providers > Google:
+
+1. Enable Google.
+2. Paste the same Google Web client ID.
+3. Paste the Google client secret.
+
+In Authentication > URL Configuration, set the Site URL to the frontend origin and add each exact frontend origin as a redirect URL, such as `http://localhost:5173` and `http://127.0.0.1:5173`.
+
+Create `.env.local` in the repository root:
+
+```ini
+VITE_SUPABASE_URL=https://wcthjlnbkwkhvxrcuwfx.supabase.co
+VITE_SUPABASE_ANON_KEY=<your Supabase publishable-or-anon-key>
+VITE_GOOGLE_CLIENT_ID=<the same Google Web client ID>
+```
+
+Restart Vite after changing environment variables. Never place the Supabase service-role key or Google client secret in frontend environment variables.
+
+Errors such as `provider is not enabled`, `invalid client`, or `redirect_uri_mismatch` indicate a dashboard/provider mismatch, not a learner-account problem.
+
 ### In-App Connection Ping
 1. Click the **User Identity / Auto-Sync** badge in the navbar (or press `Ctrl + K` -> "User Identity").
 2. Select the **Supabase Backend** tab.

@@ -423,14 +423,9 @@ export default function Navbar() {
         </NavLink>
 
         {/* 5. Admin Portal (Visible to NAEN Studios Administration) */}
-        {(activeProfile?.email?.toLowerCase() === 'naenstudios@gmail.com' ||
-          activeProfile?.id?.toLowerCase().includes('naenstud') ||
+        {(activeProfile?.email?.trim().toLowerCase() === 'naenstudios@gmail.com' ||
           activeProfile?.role === 'admin' ||
-          (typeof window !== 'undefined' && (
-            localStorage.getItem('secloudive_user_email')?.toLowerCase() === 'naenstudios@gmail.com' ||
-            localStorage.getItem('secloudive_admin_authenticated') === 'true'
-          ))
-        ) && (
+          activeProfile?.isAdmin === true) && (
           <NavLink 
             to="/admin" 
             onClick={closeMenu} 

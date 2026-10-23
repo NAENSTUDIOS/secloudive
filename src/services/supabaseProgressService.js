@@ -24,6 +24,15 @@
 
 import { supabase, isSupabaseConfigured } from '../lib/supabase'
 
+export const FOUNDATION_READINESS_LEVELS = Object.freeze([
+  'BEGINNER',
+  'DEVELOPING',
+  'JUNIOR_READY',
+  'ASSOCIATE_READY',
+  'PROFESSIONAL_READY',
+  'ADVANCED_TRACK_READY'
+])
+
 // ─── Guard Helper ────────────────────────────────────────────────────────────
 export function isGuestUser(userId) {
   if (!userId) return true
@@ -227,8 +236,108 @@ export async function saveUserProgress(userId, progressData, tier = 1, xp = 0) {
     if (upsertError) {
       console.warn('[SupabaseService] saveUserProgress upsert error:', upsertError.message)
     }
+
   } catch (err) {
     console.error('[SupabaseService] saveUserProgress exception:', err)
+  }
+}
+
+/**
+ * Store a completed foundation assessment. Local/offline callers continue to
+ * use their existing state; this only persists when an authenticated Supabase
+ * session and a real user ID are available.
+ */
+export async function saveFoundationAssessmentAttempt(userId, {
+  foundationId,
+  score,
+  readinessLevel,
+  passed,
+  assessmentPayload = {}
+}) {
+  if (
+    !guard('saveFoundationAssessmentAttempt', userId)
+    || !foundationId
+    || !FOUNDATION_READINESS_LEVELS.includes(readinessLevel)
+  ) return null
+  try {
+    const safeScore = Math.max(0, Math.min(100, Number(score) || 0))
+    const { data, error } = await supabase
+      .from('foundation_assessment_attempts')
+      .insert({
+        user_id: userId,
+        foundation_id: foundationId,
+        score: safeScore,
+        readiness_level: readinessLevel,
+        passed: Boolean(passed),
+        assessment_payload: assessmentPayload || {}
+      })
+      .select()
+      .single()
+
+    if (error) {
+      console.warn('[SupabaseService] saveFoundationAssessmentAttempt notice:', error.message)
+      return null
+    }
+    return data
+  } catch (err) {
+    console.error('[SupabaseService] saveFoundationAssessmentAttempt exception:', err)
+    return null
+  }
+}
+
+/**
+ * Persist a validated portfolio artifact with owner-scoped RLS.
+ */
+export async function savePortfolioArtifact(userId, artifact) {
+  if (!guard('savePortfolioArtifact', userId) || !artifact?.verificationId) return null
+  try {
+    const { data, error } = await supabase
+      .from('portfolio_artifacts')
+      .upsert({
+        user_id: userId,
+        artifact_type: artifact.artifactType,
+        title: artifact.title,
+        summary: artifact.summary,
+        skills: artifact.skills || [],
+        role_mappings: artifact.roleMappings || [],
+        source_activity_id: artifact.sourceActivityId,
+        validation_results: artifact.validationResults || [],
+        documentation: artifact.documentation || [],
+        verification_id: artifact.verificationId,
+        visibility: artifact.visibility === 'public' ? 'public' : 'private',
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'user_id,artifact_type,source_activity_id' })
+      .select()
+      .single()
+
+    if (error) {
+      console.warn('[SupabaseService] savePortfolioArtifact notice:', error.message)
+      return null
+    }
+    return data
+  } catch (err) {
+    console.error('[SupabaseService] savePortfolioArtifact exception:', err)
+    return null
+  }
+}
+
+export async function fetchPortfolioArtifacts(userId) {
+  if (!guard('fetchPortfolioArtifacts', userId)) return null
+  try {
+    const { data, error } = await supabase
+      .from('portfolio_artifacts')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+
+    if (error) {
+      console.warn('[SupabaseService] fetchPortfolioArtifacts notice:', error.message)
+      return null
+    }
+    return data || []
+  } catch (err) {
+    console.error('[SupabaseService] fetchPortfolioArtifacts exception:', err)
+    return null
   }
 }
 
@@ -879,4 +988,3 @@ export async function saveUserNote(userId, contextId = 'universal', noteContent 
     console.error('[SupabaseService] saveUserNote exception:', err)
   }
 }
-

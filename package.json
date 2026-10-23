@@ -12,7 +12,9 @@
     "preview": "vite preview",
     "audit:jsx": "node scripts/audit_jsx_imports.js",
     "diagnose:keys": "node scripts/diagnose_keys.mjs",
-    "test": "node scripts/test_simulated_identifiers.mjs && node --dns-result-order=ipv4first scripts/test_sentinel_scope.mjs && node scripts/test_unique_user_id_system.mjs && node scripts/verify_onboarding_persistence.mjs && node scripts/audit_jsx_imports.js"
+    "test": "node scripts/test_simulated_identifiers.mjs && node --dns-result-order=ipv4first scripts/test_sentinel_scope.mjs && node scripts/test_unique_user_id_system.mjs && node scripts/verify_onboarding_persistence.mjs && node scripts/test_progress_merge.mjs && node scripts/test_learning_resource_library.mjs && node scripts/test_learning_resource_urls.mjs && node scripts/test_curriculum_contracts.mjs && node scripts/test_career_coverage_contracts.mjs && node scripts/test_foundation_portfolio_contracts.mjs && node scripts/audit_jsx_imports.js",
+    "test:auth": "python -m unittest server.test_auth",
+    "test:progress": "node scripts/test_progress_merge.mjs"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^6.1.1",

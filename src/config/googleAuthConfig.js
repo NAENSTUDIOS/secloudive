@@ -24,6 +24,10 @@ export const GOOGLE_CLIENT_ID =
   import.meta.env.VITE_GOOGLE_CLIENT_ID ||
   '997442635688-bvsb0nubr3v8ovhq05ejv1eu79d8e0c0.apps.googleusercontent.com'
 
+export const GOOGLE_CLIENT_ID_SOURCE = import.meta.env.VITE_GOOGLE_CLIENT_ID
+  ? 'environment'
+  : 'bundled fallback'
+
 /**
  * Scopes requested from Google.
  * We only need `openid profile email` — no Drive, Calendar, or other access.
