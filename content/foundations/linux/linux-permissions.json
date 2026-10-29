@@ -1,0 +1,49 @@
+{
+  "id": "foundation-linux-permissions",
+  "title": "Linux permissions: making access intentional",
+  "contentType": "lesson",
+  "status": "in_review",
+  "version": 1,
+  "domain": "linux",
+  "estimatedMinutes": 20,
+  "objectives": [
+    "Explain how owners, groups, and permission bits control Linux file access.",
+    "Identify an unnecessarily broad permission and explain its security impact."
+  ],
+  "learningObjectives": [
+    {
+      "id": "linux-permissions-explain",
+      "statement": "Explain how owners, groups, and permission bits control Linux file access.",
+      "assessmentMethod": "knowledge_check"
+    },
+    {
+      "id": "linux-permissions-reason",
+      "statement": "Identify an unnecessarily broad permission and explain its security impact.",
+      "assessmentMethod": "practice"
+    }
+  ],
+  "prerequisites": ["foundation-computer-files"],
+  "relatedAwsConcepts": ["least privilege", "EC2 access", "IAM policy review"],
+  "relatedRoles": ["cloud_security_analyst", "iam_engineer", "cloud_security_engineer"],
+  "body": [
+    {
+      "type": "paragraph",
+      "value": "Linux permissions answer a practical question: which identity may perform which action on a resource? Start by identifying the owner and group, then check whether the requested access is necessary for the task."
+    },
+    {
+      "type": "callout",
+      "value": "A permission that is convenient but broader than the job requires is a security finding, even when no incident has happened yet."
+    },
+    {
+      "type": "paragraph",
+      "value": "This lesson uses the same reasoning pattern that appears later in IAM reviews: identify the principal, identify the resource, identify the action, and reduce access to the smallest justified scope."
+    }
+  ],
+  "provenance": {
+    "attributionRequired": false,
+    "originalityNotes": "Original Secloudive explanation and learning objective. Public concepts were independently researched and rewritten; no source text or exercise was copied.",
+    "reviewedAt": "2026-10-26"
+  },
+  "owner": "secloudive-curriculum",
+  "nextReviewAt": "2027-04-26"
+}

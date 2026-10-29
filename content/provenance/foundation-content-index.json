@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "items": [
+    {
+      "contentId": "foundation-linux-permissions",
+      "sourceType": "secloudive_original",
+      "license": "Proprietary Secloudive content",
+      "attribution": "Secloudive curriculum team",
+      "reviewStatus": "technical_and_rights_review_required_before_publication"
+    },
+    {
+      "contentId": "foundation-networking-cidr",
+      "sourceType": "secloudive_original",
+      "license": "Proprietary Secloudive content",
+      "attribution": "Secloudive curriculum team",
+      "reviewStatus": "technical_and_rights_review_required_before_publication"
+    }
+  ]
+}

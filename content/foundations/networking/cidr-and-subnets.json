@@ -1,0 +1,49 @@
+{
+  "id": "foundation-networking-cidr",
+  "title": "CIDR and subnets: reasoning about network boundaries",
+  "contentType": "lesson",
+  "status": "in_review",
+  "version": 1,
+  "domain": "networking",
+  "estimatedMinutes": 25,
+  "objectives": [
+    "Explain how a CIDR prefix describes an address range.",
+    "Choose a network boundary that supports the stated connectivity and isolation needs."
+  ],
+  "learningObjectives": [
+    {
+      "id": "cidr-explain",
+      "statement": "Explain how a CIDR prefix describes an address range.",
+      "assessmentMethod": "knowledge_check"
+    },
+    {
+      "id": "cidr-reason",
+      "statement": "Choose a network boundary that supports the stated connectivity and isolation needs.",
+      "assessmentMethod": "practice"
+    }
+  ],
+  "prerequisites": ["foundation-computer-files"],
+  "relatedAwsConcepts": ["VPC", "subnets", "route tables", "security groups"],
+  "relatedRoles": ["cloud_security_analyst", "cloud_security_engineer", "security_architect"],
+  "body": [
+    {
+      "type": "paragraph",
+      "value": "A CIDR prefix describes a block of addresses. The prefix length tells you how much of the address identifies the network and how much remains for addresses inside that network."
+    },
+    {
+      "type": "callout",
+      "value": "A subnet boundary is a security and operations decision. Choose it from the required communication paths, expected growth, and isolation needs rather than copying a familiar number."
+    },
+    {
+      "type": "paragraph",
+      "value": "In AWS, this reasoning becomes visible in VPC design, route tables, security groups, network ACLs, and private service access."
+    }
+  ],
+  "provenance": {
+    "attributionRequired": false,
+    "originalityNotes": "Original Secloudive explanation and learning objective. Public concepts were independently researched and rewritten; no source text or exercise was copied.",
+    "reviewedAt": "2026-10-26"
+  },
+  "owner": "secloudive-curriculum",
+  "nextReviewAt": "2027-04-26"
+}

@@ -1,36 +1,19 @@
 {
   "name": "secloudive",
   "private": true,
-  "version": "0.0.0",
-  "type": "module",
+  "packageManager": "pnpm@9.15.5",
   "scripts": {
-    "dev": "vite",
-    "dev:frontend": "vite",
-    "dev:backend": "python -m uvicorn server.agent_engine:app --host 0.0.0.0 --port 8000 --reload",
-    "start:backend": "python server/agent_engine.py",
-    "build": "vite build",
-    "preview": "vite preview",
-    "audit:jsx": "node scripts/audit_jsx_imports.js",
-    "diagnose:keys": "node scripts/diagnose_keys.mjs",
-    "test": "node scripts/test_simulated_identifiers.mjs && node --dns-result-order=ipv4first scripts/test_sentinel_scope.mjs && node scripts/test_unique_user_id_system.mjs && node scripts/verify_onboarding_persistence.mjs && node scripts/test_progress_merge.mjs && node scripts/test_learning_resource_library.mjs && node scripts/test_learning_resource_urls.mjs && node scripts/test_curriculum_contracts.mjs && node scripts/test_career_coverage_contracts.mjs && node scripts/test_foundation_portfolio_contracts.mjs && node scripts/audit_jsx_imports.js",
-    "test:auth": "python -m unittest server.test_auth",
-    "test:progress": "node scripts/test_progress_merge.mjs"
+    "build": "turbo run build",
+    "check": "turbo run check",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "typecheck": "turbo run typecheck"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^6.1.1",
-    "typescript": "~6.0.2",
-    "vite": "^8.3.0"
-  },
-  "dependencies": {
-    "@react-oauth/google": "^0.13.5",
-    "@supabase/ssr": "^0.12.7",
-    "@supabase/supabase-js": "^2.117.2",
-    "jszip": "^3.10.2",
-    "jwt-decode": "^4.0.0",
-    "lucide-react": "^1.48.0",
-    "qrcode": "^1.5.4",
-    "react": "^19.3.0",
-    "react-dom": "^19.3.0",
-    "react-router-dom": "^7.18.4"
+    "prettier": "^3.4.2",
+    "turbo": "^2.3.3",
+    "typescript": "^5.7.2"
   }
 }
