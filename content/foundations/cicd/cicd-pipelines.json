@@ -1,0 +1,49 @@
+{
+  "id": "foundation-cicd-pipelines",
+  "title": "CI/CD: secure delivery pipelines",
+  "contentType": "lesson",
+  "status": "in_review",
+  "version": 1,
+  "domain": "ci_cd",
+  "estimatedMinutes": 25,
+  "objectives": [
+    "Describe where a security scanning gate belongs in a CI/CD pipeline.",
+    "Explain why a pipeline IAM role should not have broad administrative permissions."
+  ],
+  "learningObjectives": [
+    {
+      "id": "cicd-scan-gate",
+      "statement": "Describe where a security scanning gate belongs in a CI/CD pipeline.",
+      "assessmentMethod": "knowledge_check"
+    },
+    {
+      "id": "cicd-iam-scope",
+      "statement": "Explain why a pipeline IAM role should not have broad administrative permissions.",
+      "assessmentMethod": "knowledge_check"
+    }
+  ],
+  "prerequisites": ["foundation-git-github", "foundation-docker-containers"],
+  "relatedAwsConcepts": ["CodeBuild", "CodeDeploy", "CodePipeline", "IAM roles", "Secrets Manager"],
+  "relatedRoles": ["devsecops_engineer", "cloud_security_engineer"],
+  "body": [
+    {
+      "type": "paragraph",
+      "value": "A CI/CD pipeline automates the path from a code commit to a running deployment. Each stage — build, test, scan, deploy — is an opportunity to enforce a security control before the change reaches production. A pipeline that skips scanning is a pipeline that ships unreviewed risk."
+    },
+    {
+      "type": "callout",
+      "value": "The IAM role that a pipeline assumes is a high-value target. If it has broad permissions, a compromised pipeline can modify any resource in your account. Scope it to exactly what the deployment step requires and nothing more."
+    },
+    {
+      "type": "paragraph",
+      "value": "In AWS, CodeBuild runs your build and test steps, CodeDeploy handles the deployment, and CodePipeline orchestrates the stages. Secrets used during the build should come from Secrets Manager or Parameter Store, not from environment variables baked into the pipeline definition."
+    }
+  ],
+  "provenance": {
+    "attributionRequired": false,
+    "originalityNotes": "Original Secloudive explanation. Public concepts independently researched and rewritten.",
+    "reviewedAt": "2026-10-26"
+  },
+  "owner": "secloudive-curriculum",
+  "nextReviewAt": "2027-04-26"
+}

@@ -9,6 +9,10 @@ const contentRoot = path.join(process.cwd(), '..', '..', 'content', 'foundations
 const moduleFiles: Record<string, string> = {
   'linux-permissions': path.join(contentRoot, 'linux', 'linux-permissions.json'),
   'cidr-and-subnets': path.join(contentRoot, 'networking', 'cidr-and-subnets.json'),
+  'python-basics': path.join(contentRoot, 'python', 'python-basics.json'),
+  'git-github-fundamentals': path.join(contentRoot, 'git', 'git-github-fundamentals.json'),
+  'docker-containers': path.join(contentRoot, 'docker', 'docker-containers.json'),
+  'cicd-pipelines': path.join(contentRoot, 'cicd', 'cicd-pipelines.json'),
 };
 
 export function generateStaticParams() {

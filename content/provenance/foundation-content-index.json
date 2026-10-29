@@ -14,6 +14,34 @@
       "license": "Proprietary Secloudive content",
       "attribution": "Secloudive curriculum team",
       "reviewStatus": "technical_and_rights_review_required_before_publication"
+    },
+    {
+      "contentId": "foundation-python-basics",
+      "sourceType": "secloudive_original",
+      "license": "Proprietary Secloudive content",
+      "attribution": "Secloudive curriculum team",
+      "reviewStatus": "technical_and_rights_review_required_before_publication"
+    },
+    {
+      "contentId": "foundation-git-github",
+      "sourceType": "secloudive_original",
+      "license": "Proprietary Secloudive content",
+      "attribution": "Secloudive curriculum team",
+      "reviewStatus": "technical_and_rights_review_required_before_publication"
+    },
+    {
+      "contentId": "foundation-docker-containers",
+      "sourceType": "secloudive_original",
+      "license": "Proprietary Secloudive content",
+      "attribution": "Secloudive curriculum team",
+      "reviewStatus": "technical_and_rights_review_required_before_publication"
+    },
+    {
+      "contentId": "foundation-cicd-pipelines",
+      "sourceType": "secloudive_original",
+      "license": "Proprietary Secloudive content",
+      "attribution": "Secloudive curriculum team",
+      "reviewStatus": "technical_and_rights_review_required_before_publication"
     }
   ]
 }

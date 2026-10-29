@@ -1,15 +1,40 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = { title: 'Foundations Academy' };
 
 const topics = [
-  ['Linux', 'Permissions, processes, logs, and secure administration.', 'linux-permissions'],
-  ['Networking', 'IP, routing, DNS, TLS, and cloud network reasoning.', 'cidr-and-subnets'],
-  ['Git and GitHub', 'Version control, review, repository security, and collaboration.'],
-  ['Python', 'Automation, APIs, JSON, testing, and AWS security utilities.'],
-  ['Docker', 'Images, containers, secrets, and secure runtime practices.'],
-  ['CI/CD', 'Pipelines, scanning, approvals, and secure delivery.'],
+  {
+    title: 'Linux',
+    description: 'Permissions, processes, logs, and secure administration.',
+    moduleId: 'linux-permissions',
+  },
+  {
+    title: 'Networking',
+    description: 'IP, routing, DNS, TLS, and cloud network reasoning.',
+    moduleId: 'cidr-and-subnets',
+  },
+  {
+    title: 'Python',
+    description: 'Automation, APIs, JSON, testing, and AWS security utilities.',
+    moduleId: 'python-basics',
+  },
+  {
+    title: 'Git and GitHub',
+    description: 'Version control, review, repository security, and collaboration.',
+    moduleId: 'git-github-fundamentals',
+  },
+  {
+    title: 'Docker',
+    description: 'Images, containers, secrets, and secure runtime practices.',
+    moduleId: 'docker-containers',
+  },
+  {
+    title: 'CI/CD',
+    description: 'Pipelines, scanning, approvals, and secure delivery.',
+    moduleId: 'cicd-pipelines',
+  },
 ];
-
-export const metadata = { title: 'Foundations Academy' };
 
 export default function FoundationsPortalPage() {
   return (
@@ -20,24 +45,20 @@ export default function FoundationsPortalPage() {
         Each foundation connects to AWS security skills, practical exercises, and role evidence.
       </p>
       <div className="portal-banner">
-        <strong>Sign in to track learning.</strong>
-        <span>Content access and progress will be permission-aware.</span>
+        <strong>Reading previews are open.</strong>
+        <span>Sign in to track progress, save notes, and complete knowledge checks.</span>
         <Link className="button button-primary" href="/login">
           Log in securely
         </Link>
       </div>
       <div className="topic-grid">
-        {topics.map(([title, description, moduleId]) => (
-          <article className="topic-card" key={title}>
-            <h2>{title}</h2>
-            <p>{description}</p>
-            {moduleId ? (
-              <Link className="text-link" href={`/portal/foundations/${moduleId}`}>
-                Open reading preview →
-              </Link>
-            ) : (
-              <span className="portal-muted">Planned foundation</span>
-            )}
+        {topics.map((topic) => (
+          <article className="topic-card" key={topic.title}>
+            <h2>{topic.title}</h2>
+            <p>{topic.description}</p>
+            <Link className="text-link" href={`/portal/foundations/${topic.moduleId}`}>
+              Open reading preview →
+            </Link>
           </article>
         ))}
       </div>

@@ -4,12 +4,17 @@
   "scripts": {
     "build": "tsc",
     "check": "tsc --noEmit",
+    "dev": "node --watch dist/main.js",
     "lint": "tsc --noEmit",
+    "start": "node dist/main.js",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@secloudive/contracts": "workspace:*"
+    "@hono/node-server": "^1.13.7",
+    "@secloudive/content-schema": "workspace:*",
+    "@secloudive/contracts": "workspace:*",
+    "hono": "^4.7.11"
   },
   "devDependencies": {
     "@types/node": "^22.10.5",

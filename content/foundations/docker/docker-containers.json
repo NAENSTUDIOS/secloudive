@@ -1,0 +1,49 @@
+{
+  "id": "foundation-docker-containers",
+  "title": "Docker: container security and image hygiene",
+  "contentType": "lesson",
+  "status": "in_review",
+  "version": 1,
+  "domain": "docker",
+  "estimatedMinutes": 30,
+  "objectives": [
+    "Explain how container isolation differs from virtual machine isolation.",
+    "Identify a security risk in a Dockerfile and describe a safer alternative."
+  ],
+  "learningObjectives": [
+    {
+      "id": "docker-isolation",
+      "statement": "Explain how container isolation differs from virtual machine isolation.",
+      "assessmentMethod": "knowledge_check"
+    },
+    {
+      "id": "docker-dockerfile-risk",
+      "statement": "Identify a security risk in a Dockerfile and describe a safer alternative.",
+      "assessmentMethod": "practice"
+    }
+  ],
+  "prerequisites": ["foundation-linux-permissions"],
+  "relatedAwsConcepts": ["ECR", "ECS", "Fargate", "Inspector", "IAM task roles"],
+  "relatedRoles": ["devsecops_engineer", "cloud_security_engineer", "cloud_security_analyst"],
+  "body": [
+    {
+      "type": "paragraph",
+      "value": "A container shares the host kernel but isolates its filesystem, process tree, and network namespace. This isolation is useful but not absolute: a misconfigured container can escape to the host, access secrets mounted as environment variables, or run as root with unnecessary privileges."
+    },
+    {
+      "type": "callout",
+      "value": "Never run a container as root unless the workload requires it. Use a non-root USER in your Dockerfile, scan images before pushing to ECR, and grant the ECS task role only the permissions the container actually needs."
+    },
+    {
+      "type": "paragraph",
+      "value": "In AWS, ECR stores your images and Inspector scans them for known vulnerabilities. The ECS task role is the IAM identity your container assumes at runtime — it should be scoped to the minimum permissions required, just like any other IAM principal."
+    }
+  ],
+  "provenance": {
+    "attributionRequired": false,
+    "originalityNotes": "Original Secloudive explanation. Public concepts independently researched and rewritten.",
+    "reviewedAt": "2026-10-26"
+  },
+  "owner": "secloudive-curriculum",
+  "nextReviewAt": "2027-04-26"
+}

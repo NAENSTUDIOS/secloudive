@@ -1,0 +1,49 @@
+{
+  "id": "foundation-git-github",
+  "title": "Git and GitHub: version control and repository security",
+  "contentType": "lesson",
+  "status": "in_review",
+  "version": 1,
+  "domain": "git_github",
+  "estimatedMinutes": 25,
+  "objectives": [
+    "Explain how a commit history provides an audit trail for infrastructure changes.",
+    "Identify a secrets exposure risk in a repository and describe how to remediate it."
+  ],
+  "learningObjectives": [
+    {
+      "id": "git-audit-trail",
+      "statement": "Explain how a commit history provides an audit trail for infrastructure changes.",
+      "assessmentMethod": "knowledge_check"
+    },
+    {
+      "id": "git-secrets-exposure",
+      "statement": "Identify a secrets exposure risk in a repository and describe how to remediate it.",
+      "assessmentMethod": "practice"
+    }
+  ],
+  "prerequisites": [],
+  "relatedAwsConcepts": ["CodeCommit", "CodePipeline", "IAM for CI/CD", "Secrets Manager"],
+  "relatedRoles": ["devsecops_engineer", "cloud_security_engineer", "cloud_security_analyst"],
+  "body": [
+    {
+      "type": "paragraph",
+      "value": "Git records every change to a codebase with an author, timestamp, and message. For infrastructure and security work, this history is an audit trail: you can see who changed a policy, when, and why. That traceability is a security control, not just a development convenience."
+    },
+    {
+      "type": "callout",
+      "value": "A secret committed to a repository is compromised, even if you delete it in the next commit. The history remains. Rotate the credential immediately, then use a secrets scanner in CI to prevent recurrence."
+    },
+    {
+      "type": "paragraph",
+      "value": "In AWS pipelines, Git events trigger CodePipeline runs. The IAM role that the pipeline assumes should follow least privilege: it needs only the permissions required for that specific deployment, not broad administrative access."
+    }
+  ],
+  "provenance": {
+    "attributionRequired": false,
+    "originalityNotes": "Original Secloudive explanation. Public concepts independently researched and rewritten.",
+    "reviewedAt": "2026-10-26"
+  },
+  "owner": "secloudive-curriculum",
+  "nextReviewAt": "2027-04-26"
+}

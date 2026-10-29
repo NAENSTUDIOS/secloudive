@@ -1,0 +1,49 @@
+{
+  "id": "foundation-python-basics",
+  "title": "Python basics: automation and AWS security utilities",
+  "contentType": "lesson",
+  "status": "in_review",
+  "version": 1,
+  "domain": "python",
+  "estimatedMinutes": 30,
+  "objectives": [
+    "Write a Python script that reads and parses a JSON API response.",
+    "Identify the security risk of hardcoding credentials in a script."
+  ],
+  "learningObjectives": [
+    {
+      "id": "python-json-parse",
+      "statement": "Write a Python script that reads and parses a JSON API response.",
+      "assessmentMethod": "practice"
+    },
+    {
+      "id": "python-credentials-risk",
+      "statement": "Identify the security risk of hardcoding credentials in a script.",
+      "assessmentMethod": "knowledge_check"
+    }
+  ],
+  "prerequisites": ["foundation-linux-permissions"],
+  "relatedAwsConcepts": ["Boto3", "Lambda", "Secrets Manager", "IAM roles for EC2"],
+  "relatedRoles": ["cloud_security_analyst", "devsecops_engineer", "cloud_security_engineer"],
+  "body": [
+    {
+      "type": "paragraph",
+      "value": "Python is the primary scripting language for AWS security work. Boto3, the AWS SDK for Python, lets you query CloudTrail, inspect IAM policies, list S3 bucket permissions, and automate remediation — all from a script you can version-control and review."
+    },
+    {
+      "type": "callout",
+      "value": "Never hardcode AWS credentials in a script. Use IAM roles, environment variables loaded from Secrets Manager, or a credentials file with restricted permissions. A credential in source code is a credential that will eventually be exposed."
+    },
+    {
+      "type": "paragraph",
+      "value": "The same reasoning that applies to Linux file permissions applies to Python scripts: the script should request only the permissions it needs, read credentials from a controlled source, and leave no sensitive data in logs or temporary files."
+    }
+  ],
+  "provenance": {
+    "attributionRequired": false,
+    "originalityNotes": "Original Secloudive explanation. Public concepts independently researched and rewritten.",
+    "reviewedAt": "2026-10-26"
+  },
+  "owner": "secloudive-curriculum",
+  "nextReviewAt": "2027-04-26"
+}
