@@ -2,6 +2,11 @@
   "name": "@secloudive/content-schema",
   "private": true,
   "version": "0.1.0",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts"
+    }
+  },
   "scripts": {
     "build": "tsc",
     "check": "tsc --noEmit",

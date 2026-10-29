@@ -1,4 +1,6 @@
 import Link from 'next/link';
+import { SiteHeader } from '../components/site-header';
+import { SiteFooter } from '../components/site-footer';
 
 const foundations = ['Linux', 'Networking', 'Python', 'Git and GitHub', 'Docker', 'CI/CD'];
 
@@ -11,23 +13,7 @@ const missions = [
 export default function HomePage() {
   return (
     <>
-      <header className="site-header">
-        <Link className="brand" href="/" aria-label="Secloudive home">
-          <span className="brand-mark" aria-hidden="true">
-            S
-          </span>
-          Secloudive
-        </Link>
-        <nav className="site-nav" aria-label="Primary navigation">
-          <a href="#how-it-works">How it works</a>
-          <a href="#foundations">Foundations</a>
-          <a href="#missions">Missions</a>
-          <a href="#safety">Safety</a>
-          <a className="button button-quiet" href="/login">
-            Log in
-          </a>
-        </nav>
-      </header>
+      <SiteHeader />
 
       <main id="main-content">
         <section className="hero section-shell" aria-labelledby="hero-title">
@@ -194,23 +180,7 @@ export default function HomePage() {
         </section>
       </main>
 
-      <footer className="site-footer">
-        <div>
-          <Link className="brand" href="/">
-            <span className="brand-mark" aria-hidden="true">
-              S
-            </span>
-            Secloudive
-          </Link>
-          <p>Practical AWS security learning through foundations, missions, and evidence.</p>
-        </div>
-        <nav aria-label="Footer navigation">
-          <a href="/privacy">Privacy</a>
-          <a href="/terms">Terms</a>
-          <a href="/accessibility">Accessibility</a>
-          <a href="/security">Security</a>
-        </nav>
-      </footer>
+      <SiteFooter />
     </>
   );
 }

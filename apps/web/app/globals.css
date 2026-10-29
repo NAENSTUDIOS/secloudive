@@ -687,6 +687,40 @@ h3 {
 .mission-card:hover strong {
   color: var(--teal);
 }
+.mission-detail-card {
+  border-top: 1px solid var(--line);
+  padding: 2rem 0;
+}
+.mission-detail-header {
+  align-items: center;
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+.mission-phase-badge {
+  background: var(--teal);
+  border-radius: 999px;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  padding: 0.25rem 0.75rem;
+  text-transform: uppercase;
+}
+.mission-detail-card h3 {
+  font-size: 1.4rem;
+  margin-bottom: 0.5rem;
+}
+.mission-detail-card p {
+  color: var(--muted);
+  max-width: 680px;
+}
+.mission-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
 .safety-section {
   align-items: center;
   background: var(--teal-dark);

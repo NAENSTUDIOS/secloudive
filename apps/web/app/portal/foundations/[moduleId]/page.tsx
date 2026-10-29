@@ -1,32 +1,29 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { readFile } from 'node:fs/promises';
+import path from 'node:path';
+import type { FoundationModule } from '@secloudive/content-schema';
 
-const modules = {
-  'linux-permissions': {
-    eyebrow: 'Linux foundation · 20 minutes',
-    title: 'Linux permissions: making access intentional',
-    summary:
-      'Learn the reasoning pattern behind owners, groups, permission bits, and least privilege.',
-    objectives: [
-      'Explain how owners, groups, and permission bits control access.',
-      'Identify access that is broader than the job requires.',
-    ],
-    concepts: 'Least privilege · EC2 access · IAM policy review',
-  },
-  'cidr-and-subnets': {
-    eyebrow: 'Networking foundation · 25 minutes',
-    title: 'CIDR and subnets: reasoning about network boundaries',
-    summary: 'Build the network reasoning needed for VPCs, routing, and isolation decisions.',
-    objectives: [
-      'Explain how a CIDR prefix describes an address range.',
-      'Choose a boundary that fits connectivity and isolation needs.',
-    ],
-    concepts: 'VPC · Subnets · Route tables · Security groups',
-  },
-} as const;
+const contentRoot = path.join(process.cwd(), '..', '..', 'content', 'foundations');
+
+const moduleFiles: Record<string, string> = {
+  'linux-permissions': path.join(contentRoot, 'linux', 'linux-permissions.json'),
+  'cidr-and-subnets': path.join(contentRoot, 'networking', 'cidr-and-subnets.json'),
+};
 
 export function generateStaticParams() {
-  return Object.keys(modules).map((moduleId) => ({ moduleId }));
+  return Object.keys(moduleFiles).map((moduleId) => ({ moduleId }));
+}
+
+async function loadModule(moduleId: string): Promise<FoundationModule | null> {
+  const filePath = moduleFiles[moduleId];
+  if (!filePath) return null;
+  try {
+    const raw = await readFile(filePath, 'utf8');
+    return JSON.parse(raw) as FoundationModule;
+  } catch {
+    return null;
+  }
 }
 
 export default async function FoundationModulePage({
@@ -35,20 +32,21 @@ export default async function FoundationModulePage({
   params: Promise<{ moduleId: string }>;
 }) {
   const { moduleId } = await params;
-  const foundation = modules[moduleId as keyof typeof modules];
+  const module = await loadModule(moduleId);
 
-  if (!foundation) {
-    notFound();
-  }
+  if (!module) notFound();
+
+  const domainLabel = module.domain.charAt(0).toUpperCase() + module.domain.slice(1);
+  const eyebrow = `${domainLabel} foundation · ${module.estimatedMinutes} minutes`;
 
   return (
     <article className="reading-page">
       <Link className="text-link" href="/portal/foundations">
         ← All foundations
       </Link>
-      <p className="eyebrow reading-eyebrow">{foundation.eyebrow}</p>
-      <h1>{foundation.title}</h1>
-      <p className="hero-summary">{foundation.summary}</p>
+      <p className="eyebrow reading-eyebrow">{eyebrow}</p>
+      <h1>{module.title}</h1>
+
       <div className="portal-banner">
         <strong>Reading preview</strong>
         <span>Sign in to save notes, complete checks, and sync evidence.</span>
@@ -56,33 +54,50 @@ export default async function FoundationModulePage({
           Log in securely
         </Link>
       </div>
+
       <section className="reading-section" aria-labelledby="objectives-title">
         <h2 id="objectives-title">By the end, you can</h2>
         <ul className="reading-list">
-          {foundation.objectives.map((objective) => (
-            <li key={objective}>{objective}</li>
+          {module.learningObjectives.map((obj) => (
+            <li key={obj.id}>{obj.statement}</li>
           ))}
         </ul>
       </section>
-      <section className="reading-section" aria-labelledby="lesson-title">
-        <h2 id="lesson-title">Why this matters</h2>
-        <p>
-          Security work begins by identifying the actor, the resource, and the action, then deciding
-          what access is justified. That reasoning transfers from local systems to AWS identity and
-          network controls.
-        </p>
-        <div className="reading-callout">
-          <strong>Practice principle</strong>
-          <span>
-            Convenience is not evidence that access is necessary. A secure decision explains the
-            smallest scope that supports the task.
-          </span>
-        </div>
-      </section>
-      <section className="reading-section" aria-labelledby="connections-title">
-        <h2 id="connections-title">Connected AWS concepts</h2>
-        <p>{foundation.concepts}</p>
-      </section>
+
+      {module.body.map((block, index) => {
+        if (block.type === 'heading') {
+          return (
+            <section className="reading-section" key={index} aria-labelledby={`block-${index}`}>
+              <h2 id={`block-${index}`}>{block.value}</h2>
+            </section>
+          );
+        }
+        if (block.type === 'callout') {
+          return (
+            <div className="reading-callout" key={index}>
+              <strong>Practice principle</strong>
+              <span>{block.value}</span>
+            </div>
+          );
+        }
+        return (
+          <section className="reading-section" key={index}>
+            <p>{block.value}</p>
+          </section>
+        );
+      })}
+
+      {module.relatedAwsConcepts.length > 0 && (
+        <section className="reading-section" aria-labelledby="connections-title">
+          <h2 id="connections-title">Connected AWS concepts</h2>
+          <div className="tag-list">
+            {module.relatedAwsConcepts.map((concept) => (
+              <span className="topic-tag" key={concept}>{concept}</span>
+            ))}
+          </div>
+        </section>
+      )}
+
       <div className="reading-actions">
         <button className="button button-secondary" disabled type="button">
           Save note · sign in required
