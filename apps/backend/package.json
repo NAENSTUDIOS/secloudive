@@ -3,6 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "build": "node --check server.js",
     "test": "node --test",
     "node:test": "node --test",
     "start": "node server.js",
