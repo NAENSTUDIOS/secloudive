@@ -1,0 +1,5 @@
+[
+  {"name":"AWS Well-Architected","url":"https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/","domains":["docs.aws.amazon.com"]},
+  {"name":"Microsoft Cloud Security","url":"https://learn.microsoft.com/security/","domains":["learn.microsoft.com"]},
+  {"name":"Google Cloud Security","url":"https://cloud.google.com/security","domains":["cloud.google.com"]}
+]

@@ -1,0 +1,6 @@
+[
+  {"id":"core","slug":"core","title":"Cloud Security Core","description":"Vendor-neutral security foundations.","modules":["core-beginner-shared-responsibility","core-beginner-iam","core-beginner-networking"]},
+  {"id":"aws","slug":"aws","title":"AWS Security","description":"Secure AWS identity, networking, and workloads.","modules":[]},
+  {"id":"azure","slug":"azure","title":"Azure Security","description":"Secure Microsoft Azure environments.","modules":[]},
+  {"id":"gcp","slug":"gcp","title":"Google Cloud Security","description":"Secure Google Cloud environments.","modules":[]}
+]

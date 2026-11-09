@@ -1,0 +1,20 @@
+{
+  "id": "core-beginner-networking",
+  "track": "core",
+  "level": "beginner",
+  "title": "Networking basics",
+  "summary": "Understand VPCs, subnets, security groups, firewalls, and how to reduce unintended exposure.",
+  "estimatedMinutes": 45,
+  "prerequisites": ["core-beginner-iam"],
+  "body": "# Networking basics\n\nCloud networks provide logical boundaries around workloads. A virtual network is divided into subnets and connected through routes, gateways, load balancers, and private endpoints. Security is not achieved by naming a subnet private; it depends on routes, addresses, listeners, and enforcement rules.\n\n## Subnets and routes\n\nPublic subnets commonly have a route to an internet gateway. Private subnets avoid direct inbound internet routing and use controlled egress when needed. Workloads should be placed according to their exposure requirements, with administrative access through a managed private path rather than open remote-management ports.\n\n## Security groups and firewalls\n\nSecurity groups or equivalent workload firewalls control allowed traffic. Network ACLs, subnet firewalls, and centralized firewalls can add boundaries, but every layer must be understood. Prefer explicit source ranges, required ports, and clear ownership. Avoid allowing all addresses to sensitive ports.\n\n## Worked example\n\nA web service may accept HTTPS from the internet through a load balancer. Application instances should accept traffic only from that load balancer's security identity, while a database should accept its database port only from the application tier. Administrative access should use a private management path and strong identity controls.\n\n## Common mistakes\n\nTeams often expose a database because a temporary troubleshooting rule was never removed. Other mistakes include confusing outbound access with inbound access, forgetting IPv6 rules, and opening a port to the world when a service-to-service rule would work. Review effective routes and firewall rules together, then test from the actual source network.",
+  "keyConcepts": ["Virtual networks", "Subnets", "Routes", "Security groups", "Network exposure"],
+  "quiz": [
+    {"question":"What usually makes a subnet public?","options":["A route to an internet gateway","A descriptive name","A database inside it","A disabled log"],"answerIndex":0,"explanation":"Reachability depends on routes and addresses, not labels."},
+    {"question":"Who should normally reach a private database?","options":["Every internet address","Only the required application tier","All guest users","Any workload in every account"],"answerIndex":1,"explanation":"Restrict database access to the specific service identity and port."},
+    {"question":"What is a strong firewall rule?","options":["All ports from anywhere","Required port from a narrow source","No source restriction","A temporary rule without an owner"],"answerIndex":1,"explanation":"Narrow, owned rules reduce exposure."},
+    {"question":"Why review routes and firewall rules together?","options":["Either one alone determines effective reachability","Routes never matter","Firewalls create identities","It disables encryption"],"answerIndex":0,"explanation":"Both routing and filtering contribute to reachability."},
+    {"question":"Which mistake is common?","options":["Removing unused rules","Leaving a troubleshooting exposure in place","Testing from the source network","Documenting owners"],"answerIndex":1,"explanation":"Temporary access often becomes permanent if not reviewed."}
+  ],
+  "resourceIds": ["aws-vpc-basics", "azure-vnet-basics", "gcp-vpc-basics"],
+  "labId": null
+}

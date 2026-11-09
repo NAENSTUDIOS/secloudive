@@ -1,0 +1,3 @@
+[
+  {"id":"lab-aws-iam","pathId":"aws","title":"IAM policy review","description":"Find excessive permissions.","durationMinutes":30}
+]

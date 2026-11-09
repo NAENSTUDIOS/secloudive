@@ -1,0 +1,20 @@
+{
+  "id": "core-beginner-iam",
+  "track": "core",
+  "level": "beginner",
+  "title": "IAM basics",
+  "summary": "Learn identities, roles, policies, authentication, and the first principles of least privilege.",
+  "estimatedMinutes": 40,
+  "prerequisites": ["core-beginner-shared-responsibility"],
+  "body": "# IAM basics\n\nIdentity and access management controls who can perform which action on which resource under which conditions. Cloud IAM generally separates an identity, an authentication event, and an authorization decision. A user or workload proves who it is, then a policy engine evaluates whether the requested action is allowed.\n\n## Users, groups, and roles\n\nHuman users should normally sign in through an organization identity provider with multifactor authentication. Groups can represent job functions, but roles are especially important for workloads and temporary access. A role can be assumed by a trusted identity for a limited session, avoiding long-lived credentials embedded in code.\n\n## Policies and least privilege\n\nA policy should grant only the actions and resources required for a task. Begin with a narrow scope, observe denied actions through audit logs, and add permissions deliberately. Avoid broad administrator grants, wildcard resources, and shared credentials. Deny rules and organization-level guardrails can provide a second layer when a permission is accidentally granted.\n\n## Worked example\n\nA reporting job needs to read one analytics dataset and write a report to one private bucket. Its role should permit the required read actions on that dataset and write actions on that bucket, not access to every object in every account. The role trust policy should allow only the approved workload identity to assume it, and its session should be logged.\n\n## Common mistakes\n\nDo not treat authentication as authorization. Do not copy a production administrator policy into a development job. Do not store access keys in source control or chat. Review unused permissions, rotate credentials, and prefer short-lived role sessions where supported.",
+  "keyConcepts": ["Authentication", "Authorization", "Roles", "Policy scope", "Least privilege"],
+  "quiz": [
+    {"question":"What is the goal of least privilege?","options":["Give every user admin access","Grant only required access for a task","Remove all audit logs","Share one credential"],"answerIndex":1,"explanation":"Least privilege limits the blast radius of mistakes and compromise."},
+    {"question":"Why are workload roles preferred to embedded keys?","options":["They are always public","They can provide temporary scoped access","They disable logging","They bypass policy evaluation"],"answerIndex":1,"explanation":"Temporary role sessions reduce long-lived secret exposure."},
+    {"question":"What does authentication establish?","options":["What an identity is allowed to do","The identity's proof of identity","Whether a resource is encrypted","Whether a network is private"],"answerIndex":1,"explanation":"Authorization evaluates permissions after identity is established."},
+    {"question":"Which policy is safest for a reporting job?","options":["All actions on all resources","Read one dataset and write one report location","No logging","Shared root credentials"],"answerIndex":1,"explanation":"The scope should match the job's actual needs."},
+    {"question":"Where should a cloud access key never be stored?","options":["A secret manager","A protected runtime environment","A public repository","An audited deployment system"],"answerIndex":2,"explanation":"Public repositories expose credentials to anyone who can read them."}
+  ],
+  "resourceIds": ["aws-iam-basics", "azure-entra-basics", "gcp-iam-basics"],
+  "labId": null
+}
