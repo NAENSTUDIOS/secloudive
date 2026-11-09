@@ -10,8 +10,8 @@
 
 ## OAuth redirects
 
-- Local callback: `http://localhost:3000/auth/google/callback`
-- Production callback: `https://<render-service>.onrender.com/auth/google/callback`
+- Local callback: `http://localhost:4000/api/auth/google/callback`
+- Production callback: `https://<render-service>.onrender.com/api/auth/google/callback`
 - Add both origins and callbacks in Google Cloud Console and the backend
   provider configuration. Add the frontend origin to CORS.
 

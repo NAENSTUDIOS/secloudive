@@ -48,6 +48,8 @@ For local development, copy `apps/frontend/.env.example` and
 `FRONTEND_ORIGIN` to the exact frontend origin, and set
 `GOOGLE_CALLBACK_URL` to `${backend-origin}/api/auth/google/callback`. Never
 place `SUPABASE_SERVICE_ROLE_KEY`, Google secrets, or LLM keys in the frontend.
+Do not append `/api` twice: the exact production callback is
+`https://secloudive.onrender.com/api/auth/google/callback`.
 
 ### Vercel frontend setup
 
